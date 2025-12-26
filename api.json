@@ -1,0 +1,1676 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "operationId": "signIn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Sign in",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "operationId": "getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Profile",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "userCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/emailAvailable": {
+      "get": {
+        "operationId": "emailAvailable",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Check email available",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/companies": {
+      "post": {
+        "operationId": "companyCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create company",
+        "tags": [
+          "Companies"
+        ]
+      },
+      "patch": {
+        "operationId": "companyUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update company",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/companies/list": {
+      "get": {
+        "operationId": "companyListByUser",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List companies by user",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/companies/search": {
+      "post": {
+        "operationId": "companySearch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySearchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AresResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Search in ARES",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
+    "/invoices": {
+      "post": {
+        "operationId": "invoiceCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Invoice creation data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create invoice",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/list": {
+      "get": {
+        "operationId": "invoiceListByUser",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by invoice type",
+            "schema": {
+              "enum": [
+                "INCOMING",
+                "OUTGOING"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page (default: 10)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedInvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List invoices by user with filtering and pagination",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/count": {
+      "get": {
+        "operationId": "invoiceGetCount",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get count of invoices for current user in current year",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "operationId": "invoiceGet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of the invoice",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get invoice by id",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/byMonth": {
+      "post": {
+        "operationId": "invoiceGetByMonth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetByMonthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvoiceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get invoices by month and year",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/byNumber/{number}": {
+      "get": {
+        "operationId": "invoiceGetByNumber",
+        "parameters": [
+          {
+            "name": "number",
+            "required": true,
+            "in": "path",
+            "description": "Invoice number",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get invoice by number",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/banks": {
+      "post": {
+        "operationId": "bankCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBankDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create bank",
+        "tags": [
+          "Bank"
+        ]
+      },
+      "patch": {
+        "operationId": "bankUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBankDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update bank",
+        "tags": [
+          "Bank"
+        ]
+      }
+    },
+    "/banks/list": {
+      "get": {
+        "operationId": "bankListByUser",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BankResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List banks by user",
+        "tags": [
+          "Bank"
+        ]
+      }
+    },
+    "/banks/setDefault": {
+      "post": {
+        "operationId": "bankSetDefault",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetDefaultBankDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Set default bank for user",
+        "tags": [
+          "Bank"
+        ]
+      }
+    },
+    "/user-profile": {
+      "post": {
+        "operationId": "userProfileCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create user profile",
+        "tags": [
+          "UserProfile"
+        ]
+      },
+      "get": {
+        "operationId": "userProfileGet",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get user profile",
+        "tags": [
+          "UserProfile"
+        ]
+      },
+      "patch": {
+        "operationId": "userProfileUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update user profile",
+        "tags": [
+          "UserProfile"
+        ]
+      }
+    },
+    "/simple-invoices": {
+      "post": {
+        "operationId": "simpleInvoiceCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Simple invoice creation data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSimpleInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create simple invoice",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      },
+      "patch": {
+        "operationId": "simpleInvoiceUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSimpleInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update simple invoice",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      }
+    },
+    "/simple-invoices/list": {
+      "get": {
+        "operationId": "simpleInvoiceListByUser",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List simple invoices by user",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      }
+    },
+    "/simple-invoices/{id}": {
+      "get": {
+        "operationId": "simpleInvoiceGet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of the simple invoice",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get simple invoice by id",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      },
+      "delete": {
+        "operationId": "simpleInvoiceDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of the simple invoice",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete simple invoice",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "accounting",
+    "description": "Accounting API description",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "accounting",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email"
+        ]
+      },
+      "CreateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "isOwn": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "country"
+        ]
+      },
+      "CompanyResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "country"
+        ]
+      },
+      "UpdateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "CompanySearchDto": {
+        "type": "object",
+        "properties": {
+          "obchodniJmeno": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "start": {
+            "type": "number"
+          },
+          "pocet": {
+            "type": "number"
+          }
+        }
+      },
+      "SidloDto": {
+        "type": "object",
+        "properties": {
+          "kodStatu": {
+            "type": "string"
+          },
+          "nazevStatu": {
+            "type": "string"
+          },
+          "kodKraje": {
+            "type": "number"
+          },
+          "nazevKraje": {
+            "type": "string"
+          },
+          "kodOkresu": {
+            "type": "number"
+          },
+          "nazevOkresu": {
+            "type": "string"
+          },
+          "kodObce": {
+            "type": "number"
+          },
+          "nazevObce": {
+            "type": "string"
+          },
+          "kodUlice": {
+            "type": "number"
+          },
+          "nazevUlice": {
+            "type": "string"
+          },
+          "cisloDomovni": {
+            "type": "number"
+          },
+          "cisloOrientacni": {
+            "type": "number"
+          },
+          "kodCastiObce": {
+            "type": "number"
+          },
+          "nazevCastiObce": {
+            "type": "string"
+          },
+          "kodAdresnihoMista": {
+            "type": "number"
+          },
+          "psc": {
+            "type": "number"
+          },
+          "textovaAdresa": {
+            "type": "string"
+          },
+          "standardizaceAdresy": {
+            "type": "boolean"
+          },
+          "typCisloDomovni": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "kodStatu",
+          "nazevStatu",
+          "kodKraje",
+          "nazevKraje",
+          "kodOkresu",
+          "nazevOkresu",
+          "kodObce",
+          "nazevObce",
+          "kodUlice",
+          "nazevUlice",
+          "cisloDomovni",
+          "kodCastiObce",
+          "nazevCastiObce",
+          "kodAdresnihoMista",
+          "psc",
+          "textovaAdresa",
+          "standardizaceAdresy",
+          "typCisloDomovni"
+        ]
+      },
+      "AdresaDorucovaciDto": {
+        "type": "object",
+        "properties": {
+          "radekAdresy1": {
+            "type": "string"
+          },
+          "radekAdresy2": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "radekAdresy1",
+          "radekAdresy2"
+        ]
+      },
+      "EkonomickySubjektDto": {
+        "type": "object",
+        "properties": {
+          "ico": {
+            "type": "string"
+          },
+          "obchodniJmeno": {
+            "type": "string"
+          },
+          "sidlo": {
+            "$ref": "#/components/schemas/SidloDto"
+          },
+          "pravniForma": {
+            "type": "string"
+          },
+          "financniUrad": {
+            "type": "string"
+          },
+          "datumVzniku": {
+            "type": "string"
+          },
+          "datumAktualizace": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "icoId": {
+            "type": "string"
+          },
+          "adresaDorucovaci": {
+            "$ref": "#/components/schemas/AdresaDorucovaciDto"
+          }
+        },
+        "required": [
+          "ico",
+          "obchodniJmeno",
+          "sidlo",
+          "pravniForma",
+          "financniUrad",
+          "datumVzniku",
+          "datumAktualizace",
+          "dic",
+          "icoId",
+          "adresaDorucovaci"
+        ]
+      },
+      "AresResponseDto": {
+        "type": "object",
+        "properties": {
+          "pocetCelkem": {
+            "type": "number"
+          },
+          "ekonomickeSubjekty": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EkonomickySubjektDto"
+            }
+          }
+        },
+        "required": [
+          "pocetCelkem",
+          "ekonomickeSubjekty"
+        ]
+      },
+      "InvoiceItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Product A"
+          },
+          "pricePerUnit": {
+            "type": "number",
+            "example": 100
+          },
+          "units": {
+            "type": "number",
+            "example": 2
+          },
+          "vat": {
+            "type": "number",
+            "example": 15,
+            "description": "VAT percentage"
+          },
+          "amount": {
+            "type": "number",
+            "example": 230
+          }
+        },
+        "required": [
+          "name",
+          "pricePerUnit",
+          "units",
+          "vat",
+          "amount"
+        ]
+      },
+      "CreateInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "string"
+          },
+          "bankId": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string",
+            "example": "20250001"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CZK"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "INCOMING",
+              "OUTGOING"
+            ],
+            "example": "INCOMING",
+            "description": "Type of invoice - INCOMING or OUTGOING"
+          },
+          "exchangeRate": {
+            "type": "number",
+            "example": 24.85
+          },
+          "createdDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-20"
+          },
+          "taxDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-21"
+          },
+          "dueDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-07-20"
+          },
+          "total": {
+            "type": "number",
+            "example": 1000
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 150
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1150
+          },
+          "items": {
+            "description": "Array of invoice items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemDto"
+            }
+          }
+        },
+        "required": [
+          "companyId",
+          "bankId",
+          "number",
+          "currency",
+          "type",
+          "createdDate",
+          "taxDate",
+          "dueDate",
+          "total",
+          "totalTax",
+          "totalWithTax",
+          "items"
+        ]
+      },
+      "BankResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "swift": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "currency",
+          "default"
+        ]
+      },
+      "InvoiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "taxDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "dueDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalTax": {
+            "type": "number"
+          },
+          "exchangeRate": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "totalWithTax": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemDto"
+            }
+          },
+          "bank": {
+            "$ref": "#/components/schemas/BankResponseDto"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyResponseDto"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "createdDate",
+          "taxDate",
+          "dueDate",
+          "total",
+          "totalTax",
+          "currency",
+          "type",
+          "totalWithTax",
+          "items",
+          "bank",
+          "company"
+        ]
+      },
+      "PaginatedInvoiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "GetByMonthDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2025,
+            "description": "Year (YYYY)",
+            "minimum": 1900,
+            "maximum": 2100
+          },
+          "month": {
+            "type": "number",
+            "example": 6,
+            "description": "Month (1-12)",
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        "required": [
+          "year",
+          "month"
+        ]
+      },
+      "CreateBankDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "swift": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "currency"
+        ]
+      },
+      "UpdateBankDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "swift": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "currency"
+        ]
+      },
+      "SetDefaultBankDto": {
+        "type": "object",
+        "properties": {
+          "bankId": {
+            "type": "string",
+            "description": "UUID of the bank to set as default"
+          }
+        },
+        "required": [
+          "bankId"
+        ]
+      },
+      "CreateUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "UserProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "UpdateUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateSimpleInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string",
+            "example": "20250001"
+          },
+          "createdDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-20"
+          },
+          "taxDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-07-20"
+          },
+          "total": {
+            "type": "number",
+            "example": 1000
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 150
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1150
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "companyId",
+          "number",
+          "createdDate",
+          "taxDate",
+          "total",
+          "totalTax",
+          "totalWithTax"
+        ]
+      },
+      "SimpleInvoiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "taxDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalTax": {
+            "type": "number"
+          },
+          "totalWithTax": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyResponseDto"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "createdDate",
+          "taxDate",
+          "total",
+          "totalTax",
+          "totalWithTax",
+          "company"
+        ]
+      },
+      "UpdateSimpleInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string",
+            "example": "20250001"
+          },
+          "createdDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-20"
+          },
+          "taxDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-07-20"
+          },
+          "total": {
+            "type": "number",
+            "example": 1000
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 150
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1150
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    }
+  }
+}
