@@ -112,9 +112,12 @@ export function Autocomplete({
   };
 
   return (
-    <div ref={wrapperRef} className="flex items-center gap-4">
-      <Label className="w-[200px] text-right">Vyhledat v ARES</Label>
-      <div className="flex flex-col relative">
+    <div
+      ref={wrapperRef}
+      className="grid w-full grid-cols-[200px_minmax(0,1fr)] items-start gap-4"
+    >
+      <Label className="pt-2 text-right">Vyhledat v ARES</Label>
+      <div className="relative min-w-0">
         <input
           type="text"
           value={inputValue}
@@ -127,12 +130,12 @@ export function Autocomplete({
           placeholder="Zadejte název nebo celé IČO"
           disabled={disabled}
           className={cn(
-            'flex h-10 w-[350px] rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+            'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
             className,
           )}
         />
         {open && (
-          <div className="absolute top-full z-50 mt-1 w-[350px] rounded-md border bg-popover text-popover-foreground">
+          <div className="absolute top-full z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground">
             <Command shouldFilter={false} className="rounded-md">
               <CommandList>
                 {loading && (

@@ -55,7 +55,7 @@ export default function OutgoingInvoices() {
                   className="cursor-pointer hover:bg-secondary/50"
                 >
                   <TableCell className="font-mono font-medium">
-                    {invoice.id}
+                    {invoice.number}
                   </TableCell>
                   <TableCell>{invoice.company?.name}</TableCell>
                   <TableCell className="font-semibold text-warning">

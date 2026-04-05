@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -17,7 +17,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -104,13 +103,20 @@ const SimpleInvoices = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Simple Invoices</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Simple Invoices
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Create and manage simplified invoices
+          </p>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
               Create Simple Invoice
             </Button>
           </DialogTrigger>
@@ -256,41 +262,46 @@ const SimpleInvoices = () => {
         </Dialog>
       </div>
 
-      <Card className="p-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Invoice Number</TableHead>
-              <TableHead>Company</TableHead>
-              <TableHead>Created Date</TableHead>
-              <TableHead>Tax Date</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-right">Total Tax</TableHead>
-              <TableHead className="text-right">Total with Tax</TableHead>
-              <TableHead>Description</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell className="font-medium">{invoice.number}</TableCell>
-                <TableCell>{invoice.company.name}</TableCell>
-                <TableCell>{invoice.createdDate}</TableCell>
-                <TableCell>{invoice.taxDate}</TableCell>
-                <TableCell className="text-right">
-                  ${invoice.total.toFixed(2)}
-                </TableCell>
-                <TableCell className="text-right">
-                  ${invoice.totalTax.toFixed(2)}
-                </TableCell>
-                <TableCell className="text-right">
-                  ${invoice.totalWithTax.toFixed(2)}
-                </TableCell>
-                <TableCell>{invoice.description || "-"}</TableCell>
+      <Card>
+        <CardHeader>
+          <CardTitle>All Simple Invoices</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice Number</TableHead>
+                <TableHead>Company</TableHead>
+                <TableHead>Created Date</TableHead>
+                <TableHead>Tax Date</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="text-right">Total Tax</TableHead>
+                <TableHead className="text-right">Total with Tax</TableHead>
+                <TableHead>Description</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell className="font-medium">{invoice.number}</TableCell>
+                  <TableCell>{invoice.company.name}</TableCell>
+                  <TableCell>{invoice.createdDate}</TableCell>
+                  <TableCell>{invoice.taxDate}</TableCell>
+                  <TableCell className="text-right">
+                    ${invoice.total.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    ${invoice.totalTax.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    ${invoice.totalWithTax.toFixed(2)}
+                  </TableCell>
+                  <TableCell>{invoice.description || "-"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
       </Card>
     </div>
   );

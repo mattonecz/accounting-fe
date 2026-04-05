@@ -9,14 +9,21 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Form } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
 import { DollarSign } from 'lucide-react';
 import type { CreateUserDto, LoginDto } from '@/api/model';
 import { useSignIn } from '@/api/auth/auth';
 import { useUserCreate } from '@/api/users/users';
-import { InputController } from '@/components/InputController';
+import { Input } from '@/components/ui/input';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -99,21 +106,41 @@ export default function Auth() {
                   onSubmit={loginForm.handleSubmit(handleLogin)}
                   className="space-y-4"
                 >
-                  <InputController
+                  <FormField
                     control={loginForm.control}
-                    name="username"
-                    label="Username"
-                    type="text"
                     rules={{ required: 'Username is required' }}
-                    placeholder="your username"
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="your@email.com"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <InputController
+                  <FormField
                     control={loginForm.control}
                     name="password"
-                    label="Password"
-                    type="password"
                     rules={{ required: 'Password is required' }}
-                    placeholder="••••••••"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                   <Button type="submit" className="w-full">
                     Sign In
@@ -128,21 +155,33 @@ export default function Auth() {
                   onSubmit={registerForm.handleSubmit(handleRegister)}
                   className="space-y-4"
                 >
-                  <InputController
+                  <FormField
                     control={registerForm.control}
                     name="email"
-                    label="Email"
-                    type="email"
                     rules={{ required: 'Email is required' }}
-                    placeholder="your@email.com"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="your@email.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <InputController
+                  <FormField
                     control={registerForm.control}
                     name="password"
-                    label="Password"
-                    type="password"
                     rules={{ required: 'Password is required' }}
-                    placeholder="••••••••"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                   <Button type="submit" className="w-full">
                     Create Account

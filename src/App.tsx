@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AiChatDialog } from "@/components/AiChatDialog";
 import { SnackbarProvider } from "notistack";
 import Dashboard from "./pages/Dashboard";
 import Contacts from "./pages/Contacts";
@@ -53,6 +54,7 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                     </div>
+                    <AiChatDialog />
                   </div>
                 </ProtectedRoute>
               }

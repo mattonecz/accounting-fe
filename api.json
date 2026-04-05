@@ -198,6 +198,40 @@
         ]
       }
     },
+    "/companies/findByName": {
+      "get": {
+        "operationId": "companyFindByName",
+        "parameters": [
+          {
+            "name": "name",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Find companies by name (partial, diacritic-insensitive)",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
     "/companies/search": {
       "post": {
         "operationId": "companySearch",
@@ -341,6 +375,28 @@
           }
         },
         "summary": "Get count of invoices for current user in current year",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/stats": {
+      "get": {
+        "operationId": "invoiceGetStats",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get dashboard stats",
         "tags": [
           "Invoices"
         ]
@@ -786,6 +842,38 @@
         "summary": "Delete simple invoice",
         "tags": [
           "SimpleInvoice"
+        ]
+      }
+    },
+    "/ai-chat/chat": {
+      "post": {
+        "operationId": "aiChatChat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Chat with AI",
+        "tags": [
+          "AiChat"
         ]
       }
     }
@@ -1403,6 +1491,118 @@
           "totalPages"
         ]
       },
+      "DashboardSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalIncome": {
+            "type": "number",
+            "example": 45231
+          },
+          "totalExpenses": {
+            "type": "number",
+            "example": 12456
+          },
+          "netBalance": {
+            "type": "number",
+            "example": 32775
+          },
+          "activeClients": {
+            "type": "number",
+            "example": 24
+          },
+          "newClientsThisMonth": {
+            "type": "number",
+            "example": 2
+          },
+          "incomeChangePct": {
+            "type": "number",
+            "example": 12
+          },
+          "expenseChangePct": {
+            "type": "number",
+            "example": 4
+          },
+          "netChangePct": {
+            "type": "number",
+            "example": 8
+          }
+        },
+        "required": [
+          "totalIncome",
+          "totalExpenses",
+          "netBalance",
+          "activeClients",
+          "newClientsThisMonth",
+          "incomeChangePct",
+          "expenseChangePct",
+          "netChangePct"
+        ]
+      },
+      "DashboardInvoiceItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PAID",
+              "PENDING"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "companyName",
+          "date",
+          "amount",
+          "currency",
+          "status"
+        ]
+      },
+      "DashboardStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/DashboardSummaryDto"
+          },
+          "recentIncomingInvoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardInvoiceItemDto"
+            }
+          },
+          "recentOutgoingInvoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardInvoiceItemDto"
+            }
+          }
+        },
+        "required": [
+          "summary",
+          "recentIncomingInvoices",
+          "recentOutgoingInvoices"
+        ]
+      },
       "GetByMonthDto": {
         "type": "object",
         "properties": {
@@ -1669,6 +1869,258 @@
         },
         "required": [
           "id"
+        ]
+      },
+      "SelectedCompanyInputDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "db_company",
+              "ares_candidate"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Database company id"
+          },
+          "ico": {
+            "type": "string",
+            "description": "Company ICO"
+          },
+          "name": {
+            "type": "string",
+            "description": "Company name (for DB company)"
+          },
+          "obchodniJmeno": {
+            "type": "string",
+            "description": "ARES business name"
+          },
+          "sidloText": {
+            "type": "string",
+            "description": "Short address text for ARES candidate"
+          },
+          "address": {
+            "type": "string",
+            "description": "Company address for db_company item"
+          },
+          "aresEntity": {
+            "$ref": "#/components/schemas/EkonomickySubjektDto"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "ChatContextOperationsDto": {
+        "type": "object",
+        "properties": {
+          "setPurpose": {
+            "type": "string",
+            "enum": [
+              "general",
+              "company_creation"
+            ]
+          },
+          "setSelectedCompany": {
+            "$ref": "#/components/schemas/SelectedCompanyInputDto"
+          },
+          "clearContext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ChatRequestDto": {
+        "type": "object",
+        "properties": {
+          "userInput": {
+            "type": "string",
+            "description": "The user message to send to the AI"
+          },
+          "contextOperations": {
+            "$ref": "#/components/schemas/ChatContextOperationsDto"
+          }
+        },
+        "required": [
+          "userInput"
+        ]
+      },
+      "ChatHistoryItemDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ]
+      },
+      "SelectedCompanySnapshotDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "LastCompanySearchItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "LastCompanySearchDto": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "local",
+              "ares"
+            ]
+          },
+          "query": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LastCompanySearchItemDto"
+            }
+          },
+          "timestamp": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "source",
+          "query",
+          "count",
+          "items",
+          "timestamp"
+        ]
+      },
+      "ChatContextSnapshotDto": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "general",
+              "company_creation"
+            ]
+          },
+          "selectedCompany": {
+            "$ref": "#/components/schemas/SelectedCompanySnapshotDto"
+          },
+          "lastCompanySearch": {
+            "$ref": "#/components/schemas/LastCompanySearchDto"
+          }
+        },
+        "required": [
+          "purpose"
+        ]
+      },
+      "TokenUsageDto": {
+        "type": "object",
+        "properties": {
+          "promptTokens": {
+            "type": "number"
+          },
+          "completionTokens": {
+            "type": "number"
+          },
+          "totalTokens": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "promptTokens",
+          "completionTokens",
+          "totalTokens"
+        ]
+      },
+      "ChatMetricsDto": {
+        "type": "object",
+        "properties": {
+          "durationMs": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenUsageDto"
+          },
+          "estimatedCostUsd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "durationMs",
+          "model",
+          "tokens",
+          "estimatedCostUsd"
+        ]
+      },
+      "ChatResponseDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "description": "The AI response"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatHistoryItemDto"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/ChatContextSnapshotDto"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/ChatMetricsDto"
+          }
+        },
+        "required": [
+          "answer",
+          "history",
+          "context",
+          "metrics"
         ]
       }
     }
