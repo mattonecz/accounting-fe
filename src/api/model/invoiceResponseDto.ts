@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 import type { InvoiceItemDto } from './invoiceItemDto';
-import type { BankResponseDto } from './bankResponseDto';
-import type { CompanyResponseDto } from './companyResponseDto';
+import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
+import type { InvoiceCompanySnapshotDto } from './invoiceCompanySnapshotDto';
 
 export interface InvoiceResponseDto {
   id: string;
@@ -22,6 +22,7 @@ export interface InvoiceResponseDto {
   type: string;
   totalWithTax: number;
   items: InvoiceItemDto[];
-  bank: BankResponseDto;
-  company: CompanyResponseDto;
+  bankAccount?: InvoiceBankAccountSnapshotDto;
+  company?: InvoiceCompanySnapshotDto;
+  supplier?: InvoiceCompanySnapshotDto;
 }

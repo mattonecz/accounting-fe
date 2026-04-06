@@ -47,7 +47,7 @@ export default function IncomingInvoices() {
                   onClick={() => navigate(`/invoices/${invoice.id}`)}
                 >
                   <TableCell className="font-mono font-medium">{invoice.number}</TableCell>
-                  <TableCell>{invoice.company?.name}</TableCell>
+                  <TableCell>{invoice.company?.name || invoice.supplier?.name || '-'}</TableCell>
                   <TableCell className="font-semibold text-success">{invoice.total}</TableCell>
                   <TableCell className="text-muted-foreground">{invoice.createdDate}</TableCell>
                   <TableCell className="text-muted-foreground">{invoice.dueDate}</TableCell>

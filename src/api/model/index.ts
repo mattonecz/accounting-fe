@@ -35,6 +35,8 @@ export * from './dashboardSummaryDto';
 export * from './ekonomickySubjektDto';
 export * from './emailAvailableParams';
 export * from './getByMonthDto';
+export * from './invoiceBankAccountSnapshotDto';
+export * from './invoiceCompanySnapshotDto';
 export * from './invoiceItemDto';
 export * from './invoiceListByUserParams';
 export * from './invoiceListByUserType';

@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Download } from 'lucide-react';
+import { Plus, Eye } from 'lucide-react';
 
 import { useInvoiceListByUser } from '@/api/invoices/invoices';
 import { useNavigate } from 'react-router-dom';
@@ -40,24 +40,24 @@ export default function OutgoingInvoices() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Reference #</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Issue Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Číslo faktury</TableHead>
+                <TableHead>Odběratel</TableHead>
+                <TableHead>Částka</TableHead>
+                <TableHead>Datum vystavení</TableHead>
+                <TableHead>Datum zdanitelného plnění</TableHead>
+                <TableHead className="text-right">Akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoices.data?.data?.data?.map((invoice) => (
                 <TableRow
                   key={invoice.id}
-                  className="cursor-pointer hover:bg-secondary/50"
+                  className="hover:bg-secondary/50"
                 >
                   <TableCell className="font-mono font-medium">
                     {invoice.number}
                   </TableCell>
-                  <TableCell>{invoice.company?.name}</TableCell>
+                  <TableCell>{invoice.company?.name || invoice.supplier?.name || '-'}</TableCell>
                   <TableCell className="font-semibold text-warning">
                     {invoice.total}
                   </TableCell>
@@ -68,9 +68,14 @@ export default function OutgoingInvoices() {
                     {invoice.taxDate}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Download className="h-3 w-3" />
-                      Download
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate(`/invoices/${invoice.id}`)}
+                      aria-label={`Zobrazit fakturu ${invoice.number}`}
+                      title="Zobrazit"
+                    >
+                      <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>

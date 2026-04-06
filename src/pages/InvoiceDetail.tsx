@@ -1,249 +1,290 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, Download, Printer } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
+import { useMemo, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Download, Printer } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useInvoiceGet } from '@/api/invoices/invoices';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
-// Mock data - in real app this would come from API
-const getInvoiceById = (id: string) => ({
-  id: id,
-  number: "INV-2024-001",
-  type: "INCOMING",
-  client: {
-    name: "Acme Corp",
-    address: "123 Business Street",
-    city: "New York, NY 10001",
-    taxId: "US123456789",
-  },
-  company: {
-    name: "Your Company Name",
-    address: "456 Company Avenue",
-    city: "San Francisco, CA 94102",
-    email: "billing@yourcompany.com",
-    phone: "+1 (555) 123-4567",
-    taxId: "US987654321",
-  },
-  bank: {
-    name: "Bank of America",
-    accountNumber: "1234567890",
-    iban: "US12 3456 7890 1234 5678 90",
-    swift: "BOFAUS3N",
-  },
-  createdDate: "2024-01-15",
-  taxDate: "2024-01-15",
-  dueDate: "2024-02-15",
-  status: "Paid",
-  currency: "USD",
-  items: [
-    {
-      description: "Web Development Services",
-      quantity: 40,
-      unitPrice: 100,
-      taxRate: 10,
-      total: 4000,
-      totalTax: 400,
-      totalWithTax: 4400,
-    },
-    {
-      description: "UI/UX Design",
-      quantity: 20,
-      unitPrice: 80,
-      taxRate: 10,
-      total: 1600,
-      totalTax: 160,
-      totalWithTax: 1760,
-    },
-  ],
-  total: 5600,
-  totalTax: 560,
-  totalWithTax: 6160,
-  notes: "Payment due within 30 days. Thank you for your business.",
-});
+const formatDate = (date?: string) => {
+  if (!date) {
+    return '-';
+  }
+
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) {
+    return date;
+  }
+
+  return new Intl.DateTimeFormat('cs-CZ').format(parsed);
+};
+
+const formatMoney = (amount: number | undefined, currency: string) => {
+  return new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount ?? 0);
+};
+
+const formatCompanyAddress = (company?: {
+  street?: string;
+  city?: string;
+  psc?: string;
+  country?: string;
+}) => {
+  const firstLine = [company?.street].filter(Boolean).join(', ');
+  const secondLine = [company?.psc, company?.city].filter(Boolean).join(' ');
+  const thirdLine = company?.country || '';
+
+  return [firstLine, secondLine, thirdLine].filter(Boolean);
+};
 
 const InvoiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const invoice = getInvoiceById(id || "");
+  const { data, isLoading, isError } = useInvoiceGet(id || '');
+  const invoiceRef = useRef<HTMLDivElement | null>(null);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const invoice = data?.data;
+  const currency = invoice?.currency || 'CZK';
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "Paid":
-        return "default";
-      case "Pending":
-        return "secondary";
-      case "Overdue":
-        return "destructive";
-      default:
-        return "secondary";
+  const vatSummary = useMemo(() => {
+    if (!invoice) {
+      return [] as Array<{ vatRate: number; base: number; tax: number; total: number }>;
     }
+
+    const grouped = new Map<number, { base: number; tax: number; total: number }>();
+
+    invoice.items.forEach((item) => {
+      const qty = item.amount || 0;
+      const base = qty * (item.pricePerUnit || 0);
+      const tax = base * ((item.vat || 0) / 100);
+      const total = base + tax;
+
+      const existing = grouped.get(item.vat || 0) || { base: 0, tax: 0, total: 0 };
+      grouped.set(item.vat || 0, {
+        base: existing.base + base,
+        tax: existing.tax + tax,
+        total: existing.total + total,
+      });
+    });
+
+    return Array.from(grouped.entries())
+      .map(([vatRate, values]) => ({ vatRate, ...values }))
+      .sort((a, b) => a.vatRate - b.vatRate);
+  }, [invoice]);
+
+  if (!id) {
+    return (
+      <div className="flex-1 p-8">
+        <p className="text-muted-foreground">Neplatné ID faktury.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 p-8">
+        <p className="text-muted-foreground">Načítám fakturu...</p>
+      </div>
+    );
+  }
+
+  if (isError || !invoice) {
+    return (
+      <div className="flex-1 p-8">
+        <p className="text-destructive">Fakturu se nepodařilo načíst.</p>
+      </div>
+    );
+  }
+
+  const handleDownloadPdf = async () => {
+    if (!invoiceRef.current) {
+      return;
+    }
+
+    const canvas = await html2canvas(invoiceRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const margin = 10;
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const contentWidth = pageWidth - margin * 2;
+    const contentHeight = pageHeight - margin * 2;
+    const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = margin;
+
+    pdf.addImage(imgData, 'PNG', margin, position, contentWidth, imgHeight, '', 'FAST');
+    heightLeft -= contentHeight;
+
+    while (heightLeft > 0) {
+      position = margin - (imgHeight - heightLeft);
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', margin, position, contentWidth, imgHeight, '', 'FAST');
+      heightLeft -= contentHeight;
+    }
+
+    pdf.save(`faktura-${invoice.number}.pdf`);
   };
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Action Bar - Hidden on print */}
+      <style>
+        {`@media print {
+          @page { size: A4; margin: 12mm; }
+          body { background: white !important; }
+          body * { visibility: hidden !important; }
+          #invoice-print-root, #invoice-print-root * { visibility: visible !important; }
+          #invoice-print-root { position: absolute; left: 0; top: 0; width: 100%; }
+          .invoice-sheet { box-shadow: none !important; width: auto !important; min-height: auto !important; }
+        }`}
+      </style>
+
       <div className="print:hidden bg-background border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+        <div className="mx-auto max-w-[1200px] px-4 py-4">
           <div className="flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              Zpět
             </Button>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-2" />
-                Print
-              </Button>
-              <Button variant="default" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="h-4 w-4 mr-2" />
+              Tisk
+            </Button>
+            <Button variant="default" size="sm" onClick={handleDownloadPdf}>
+              <Download className="h-4 w-4 mr-2" />
+              Stáhnout PDF
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* A4 Invoice Container */}
       <div className="flex justify-center py-8 print:p-0">
-        <div className="w-[210mm] min-h-[297mm] bg-background shadow-lg print:shadow-none print:w-full">
-          <div className="p-16 print:p-16">
-            {/* Header */}
-            <div className="flex justify-between items-start mb-12 pb-8 border-b-2 border-border">
-              <div>
-                <h1 className="text-5xl font-bold mb-3">INVOICE</h1>
-                <p className="text-lg font-mono text-muted-foreground">{invoice.number}</p>
-                <Badge variant={getStatusVariant(invoice.status)} className="mt-2 print:border print:border-current">
-                  {invoice.status}
-                </Badge>
-              </div>
-              <div className="text-right">
-                <h2 className="text-xl font-bold mb-3">{invoice.company.name}</h2>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <p>{invoice.company.address}</p>
-                  <p>{invoice.company.city}</p>
-                  <p className="mt-3">{invoice.company.email}</p>
-                  <p>{invoice.company.phone}</p>
-                  <p className="mt-2">Tax ID: {invoice.company.taxId}</p>
+        <div
+          id="invoice-print-root"
+          ref={invoiceRef}
+          className="invoice-sheet w-[210mm] min-h-[297mm] bg-background shadow-xl print:w-full print:shadow-none"
+        >
+          <div className="px-[14mm] py-[12mm] text-[12px] leading-relaxed text-foreground">
+            <header className="mb-6 border-b pb-4">
+              <div className="flex items-start justify-between gap-8">
+                <div>
+                  <h1 className="text-2xl font-bold uppercase tracking-wide">Faktura - daňový doklad</h1>
+                  <p className="mt-2 text-sm text-muted-foreground">Číslo dokladu: {invoice.number}</p>
+                </div>
+                <div className="text-right text-sm">
+                  <p><span className="text-muted-foreground">Datum vystavení:</span> {formatDate(invoice.createdDate)}</p>
+                  <p><span className="text-muted-foreground">DUZP:</span> {formatDate(invoice.taxDate)}</p>
+                  <p><span className="text-muted-foreground">Datum splatnosti:</span> {formatDate(invoice.dueDate)}</p>
+                  <p><span className="text-muted-foreground">Variabilní symbol:</span> {invoice.number}</p>
                 </div>
               </div>
-            </div>
+            </header>
 
-            {/* Invoice & Client Info */}
-            <div className="grid grid-cols-2 gap-12 mb-12">
-              <div>
-                <h3 className="text-xs font-bold text-muted-foreground mb-3 tracking-wider">BILL TO</h3>
-                <p className="font-bold text-lg mb-2">{invoice.client.name}</p>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <p>{invoice.client.address}</p>
-                  <p>{invoice.client.city}</p>
-                  <p className="mt-2">Tax ID: {invoice.client.taxId}</p>
-                </div>
+            <section className="mb-6 grid grid-cols-2 gap-8">
+              <div className="rounded border p-4">
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Dodavatel</h2>
+                <p className="font-semibold">{invoice.supplier?.name || '-'}</p>
+                {formatCompanyAddress(invoice.supplier).map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+                <p className="mt-2">IČO: {invoice.supplier?.ico || '-'}</p>
+                <p>DIČ: {invoice.supplier?.dic || '-'}</p>
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-muted-foreground mb-3 tracking-wider">INVOICE DETAILS</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Issue Date:</span>
-                    <span className="font-semibold">{invoice.createdDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tax Date:</span>
-                    <span className="font-semibold">{invoice.taxDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Due Date:</span>
-                    <span className="font-semibold">{invoice.dueDate}</span>
-                  </div>
-                </div>
+              <div className="rounded border p-4">
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Odběratel</h2>
+                <p className="font-semibold">{invoice.company?.name || '-'}</p>
+                {formatCompanyAddress(invoice.company).map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+                <p className="mt-2">IČO: {invoice.company?.ico || '-'}</p>
+                <p>DIČ: {invoice.company?.dic || '-'}</p>
               </div>
-            </div>
+            </section>
 
-            {/* Items Table */}
-            <div className="mb-12">
-              <table className="w-full">
+            <section className="mb-6 overflow-hidden rounded border">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-muted/30 print:bg-muted/50">
-                    <th className="text-left py-3 px-4 text-xs font-bold text-muted-foreground tracking-wider">DESCRIPTION</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-muted-foreground tracking-wider">QTY</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-muted-foreground tracking-wider">RATE</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-muted-foreground tracking-wider">TAX</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-muted-foreground tracking-wider">AMOUNT</th>
+                  <tr className="bg-muted/40">
+                    <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide">Položka</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide">Množství</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide">Cena bez DPH</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide">DPH</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide">Cena s DPH</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.items.map((item, index) => (
-                    <tr key={index} className="border-b border-border">
-                      <td className="py-4 px-4">{item.description}</td>
-                      <td className="py-4 px-4 text-right">{item.quantity}</td>
-                      <td className="py-4 px-4 text-right">{invoice.currency} {item.unitPrice.toFixed(2)}</td>
-                      <td className="py-4 px-4 text-right">{item.taxRate}%</td>
-                      <td className="py-4 px-4 text-right font-semibold">
-                        {invoice.currency} {item.totalWithTax.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
+                  {invoice.items.map((item, index) => {
+                    const quantity = item.amount || 0;
+                    const base = quantity * (item.pricePerUnit || 0);
+                    const tax = base * ((item.vat || 0) / 100);
+                    const total = base + tax;
+
+                    return (
+                      <tr key={`${item.name}-${index}`} className="border-t">
+                        <td className="px-3 py-2">{item.name}</td>
+                        <td className="px-3 py-2 text-right">{quantity}</td>
+                        <td className="px-3 py-2 text-right">{formatMoney(base, currency)}</td>
+                        <td className="px-3 py-2 text-right">{item.vat}% ({formatMoney(tax, currency)})</td>
+                        <td className="px-3 py-2 text-right font-medium">{formatMoney(total, currency)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-            </div>
+            </section>
 
-            {/* Totals */}
-            <div className="flex justify-end mb-12">
-              <div className="w-80">
-                <div className="space-y-3">
-                  <div className="flex justify-between py-2 text-sm">
-                    <span className="text-muted-foreground">Subtotal:</span>
-                    <span className="font-semibold">{invoice.currency} {invoice.total.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 text-sm">
-                    <span className="text-muted-foreground">Tax:</span>
-                    <span className="font-semibold">{invoice.currency} {invoice.totalTax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between py-4 border-t-2 border-border">
-                    <span className="text-xl font-bold">Total:</span>
-                    <span className="text-xl font-bold">{invoice.currency} {invoice.totalWithTax.toFixed(2)}</span>
+            <section className="mb-6 grid grid-cols-2 gap-8">
+              <div className="rounded border p-4">
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platební údaje</h2>
+                <p><span className="text-muted-foreground">Forma úhrady:</span> Bankovní převod</p>
+                <p><span className="text-muted-foreground">Banka:</span> {invoice.bankAccount?.name || '-'}</p>
+                <p><span className="text-muted-foreground">Číslo účtu:</span> {invoice.bankAccount?.number || '-'}</p>
+                <p><span className="text-muted-foreground">IBAN:</span> {invoice.bankAccount?.iban || '-'}</p>
+                <p><span className="text-muted-foreground">SWIFT:</span> {invoice.bankAccount?.swift || '-'}</p>
+              </div>
+
+              <div className="rounded border p-4">
+                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rekapitulace DPH</h2>
+                <div className="space-y-1 text-sm">
+                  {vatSummary.map((line) => (
+                    <div key={line.vatRate} className="flex items-center justify-between">
+                      <span>Sazba {line.vatRate}%</span>
+                      <span>{formatMoney(line.base, currency)} / {formatMoney(line.tax, currency)}</span>
+                    </div>
+                  ))}
+                  <div className="mt-2 border-t pt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Základ:</span>
+                      <span>{formatMoney(invoice.total, currency)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">DPH:</span>
+                      <span>{formatMoney(invoice.totalTax, currency)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-base font-semibold">
+                      <span>Celkem k úhradě:</span>
+                      <span>{formatMoney(invoice.totalWithTax, currency)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Bank Details */}
-            <div className="mb-12 p-6 bg-muted/30 rounded print:bg-muted/50">
-              <h3 className="text-xs font-bold text-muted-foreground mb-4 tracking-wider">PAYMENT DETAILS</h3>
-              <div className="grid grid-cols-2 gap-6 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Bank Name</p>
-                  <p className="font-semibold">{invoice.bank.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Account Number</p>
-                  <p className="font-mono font-semibold">{invoice.bank.accountNumber}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">IBAN</p>
-                  <p className="font-mono font-semibold">{invoice.bank.iban}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">SWIFT/BIC</p>
-                  <p className="font-mono font-semibold">{invoice.bank.swift}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Notes */}
-            {invoice.notes && (
-              <div className="mb-8">
-                <h3 className="text-xs font-bold text-muted-foreground mb-2 tracking-wider">NOTES</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{invoice.notes}</p>
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="text-center text-sm text-muted-foreground pt-8 border-t border-border">
-              <p>Thank you for your business!</p>
-            </div>
+            <footer className="border-t pt-4 text-xs text-muted-foreground">
+              <p>Doklad byl vystaven elektronicky.</p>
+              <p>Tento doklad obsahuje všechny dostupné údaje z evidovaného záznamu faktury.</p>
+            </footer>
           </div>
         </div>
       </div>

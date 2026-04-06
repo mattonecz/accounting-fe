@@ -30,21 +30,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
-    const storedAccessToken = localStorage.getItem('access_token');
-    if (storedAccessToken) {
-      const decoded = jwtDecode<UserData>(storedAccessToken);
-      setUser(decoded);
-      const isExpired = decoded.exp * 1000 < Date.now();
-      if (isExpired) {
-        localStorage.removeItem('access_token');
-        return;
-      }
+    try {
+      const storedAccessToken = localStorage.getItem('access_token');
+      if (storedAccessToken) {
+        const decoded = jwtDecode<UserData>(storedAccessToken);
+        setUser(decoded);
+        const isExpired = decoded.exp * 1000 < Date.now();
+        if (isExpired) {
+          localStorage.removeItem('access_token');
+          return;
+        }
 
-      setAccessToken(storedAccessToken);
-      axios.default.defaults.headers.common['Authorization'] =
-        `Bearer ${storedAccessToken}`;
+        setAccessToken(storedAccessToken);
+        axios.default.defaults.headers.common['Authorization'] =
+          `Bearer ${storedAccessToken}`;
+      }
+    } catch (e) {
+      localStorage.removeItem('access_token');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const login = (access_token: string) => {

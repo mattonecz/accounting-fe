@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Plus, Building2, Pencil, Star } from 'lucide-react';
+import { Plus, Pencil, Star } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -132,6 +132,16 @@ export default function BankAccounts() {
     );
   };
 
+  const sortedBankAccounts = [...(bankAccounts?.data ?? [])].sort((a, b) => {
+    if (a.default !== b.default) {
+      return a.default ? -1 : 1;
+    }
+
+    return (a.name ?? '').localeCompare(b.name ?? '', 'cs', {
+      sensitivity: 'base',
+    });
+  });
+
   return (
     <div className="flex-1 space-y-6 p-8">
       <div className="flex items-center justify-between">
@@ -231,7 +241,7 @@ export default function BankAccounts() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {bankAccounts?.data.map((account) => (
+        {sortedBankAccounts.map((account) => (
           <Card
             key={account.id}
             className={cn(
@@ -239,7 +249,7 @@ export default function BankAccounts() {
               account.default && 'border-primary/40 shadow-sm ring-1 ring-primary/20',
             )}
           >
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <CardTitle className="text-lg">{account.name}</CardTitle>
@@ -249,64 +259,53 @@ export default function BankAccounts() {
                     </p>
                   )}
                 </div>
-                <Building2 className="h-5 w-5 text-primary" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'h-9 w-9 rounded-full',
+                    account.default
+                      ? 'text-warning hover:text-warning'
+                      : 'text-muted-foreground hover:text-warning',
+                  )}
+                  onClick={() => handleSetDefault(account)}
+                  aria-label={
+                    account.default
+                      ? 'Default account'
+                      : `Set ${account.name} as default account`
+                  }
+                  title={
+                    account.default ? 'Default account' : 'Set as default account'
+                  }
+                >
+                  <Star
+                    className={cn('h-4 w-4', account.default && 'fill-current')}
+                  />
+                </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="pt-0 pb-3">
+              <div className="space-y-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Číslo účtu</p>
+                  <p className="text-sm text-muted-foreground">
+                    {account.number ? 'Číslo účtu' : 'IBAN'}
+                  </p>
                   <p className="text-base font-medium text-foreground">
                     {getAccountIdentifier(account)}
                   </p>
                 </div>
-                <div className="space-y-2 border-t pt-4">
-                  {account.iban && account.number !== account.iban && (
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        IBAN
-                      </p>
-                      <p className="text-sm font-mono text-muted-foreground">
-                        {account.iban}
-                      </p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                      Měna
-                    </p>
-                    <p className="text-sm font-medium text-foreground">
-                      {account.currency}
-                    </p>
-                  </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Měna
+                  </p>
+                  <p className="text-sm font-medium text-foreground">
+                    {account.currency}
+                  </p>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="justify-end gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  'h-9 w-9 rounded-full',
-                  account.default
-                    ? 'text-warning hover:text-warning'
-                    : 'text-muted-foreground hover:text-warning',
-                )}
-                onClick={() => handleSetDefault(account)}
-                aria-label={
-                  account.default
-                    ? 'Default account'
-                    : `Set ${account.name} as default account`
-                }
-                title={
-                  account.default ? 'Default account' : 'Set as default account'
-                }
-              >
-                <Star
-                  className={cn('h-4 w-4', account.default && 'fill-current')}
-                />
-              </Button>
+            <CardFooter className="justify-end gap-2 pt-0">
               <Button
                 type="button"
                 variant="ghost"

@@ -1361,12 +1361,9 @@
           "items"
         ]
       },
-      "BankResponseDto": {
+      "InvoiceBankAccountSnapshotDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
           },
@@ -1381,17 +1378,34 @@
           },
           "currency": {
             "type": "string"
-          },
-          "default": {
-            "type": "boolean"
           }
-        },
-        "required": [
-          "id",
-          "name",
-          "currency",
-          "default"
-        ]
+        }
+      },
+      "InvoiceCompanySnapshotDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          }
+        }
       },
       "InvoiceResponseDto": {
         "type": "object",
@@ -1438,11 +1452,14 @@
               "$ref": "#/components/schemas/InvoiceItemDto"
             }
           },
-          "bank": {
-            "$ref": "#/components/schemas/BankResponseDto"
+          "bankAccount": {
+            "$ref": "#/components/schemas/InvoiceBankAccountSnapshotDto"
           },
           "company": {
-            "$ref": "#/components/schemas/CompanyResponseDto"
+            "$ref": "#/components/schemas/InvoiceCompanySnapshotDto"
+          },
+          "supplier": {
+            "$ref": "#/components/schemas/InvoiceCompanySnapshotDto"
           }
         },
         "required": [
@@ -1456,9 +1473,7 @@
           "currency",
           "type",
           "totalWithTax",
-          "items",
-          "bank",
-          "company"
+          "items"
         ]
       },
       "PaginatedInvoiceResponseDto": {
@@ -1648,6 +1663,38 @@
         "required": [
           "name",
           "currency"
+        ]
+      },
+      "BankResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "swift": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "currency",
+          "default"
         ]
       },
       "UpdateBankDto": {

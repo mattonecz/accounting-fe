@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -26,8 +24,14 @@ import { Plus, Trash2, ArrowLeft } from 'lucide-react';
 import { CreateInvoiceDto } from '@/api/model';
 import { useCompanyListByUser } from '@/api/companies/companies';
 import { useBankListByUser } from '@/api/bank/bank';
-import { useInvoiceGetCount } from '@/api/invoices/invoices';
+import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
 import { InputController } from '@/components/InputController';
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  CZK: 'Kč',
+  EUR: '€',
+  USD: '$',
+};
 
 const CreateInvoice = () => {
   const navigate = useNavigate();
@@ -35,6 +39,7 @@ const CreateInvoice = () => {
   const { data: companies } = useCompanyListByUser();
   const { data: banks } = useBankListByUser();
   const { data: invoiceNumber } = useInvoiceGetCount();
+  const { mutate: createInvoice, isPending: isCreatingInvoice } = useInvoiceCreate();
 
   const form = useForm<CreateInvoiceDto>({
     defaultValues: {
@@ -47,9 +52,44 @@ const CreateInvoice = () => {
         date.setDate(date.getDate() + 14);
         return date.toISOString().split('T')[0];
       })(),
+      total: 0,
+      totalTax: 0,
+      totalWithTax: 0,
       items: [{ name: '', amount: 1, pricePerUnit: 0, vat: 21, units: 1 }],
     },
   });
+
+  const selectedCurrency = form.watch('currency') || 'CZK';
+  const currencyLabel = CURRENCY_SYMBOLS[selectedCurrency] || selectedCurrency;
+  const isCzkCurrency = selectedCurrency === 'CZK';
+
+  const sortedBanks = [...(banks?.data ?? [])].sort((a, b) => {
+    if (a.default !== b.default) {
+      return a.default ? -1 : 1;
+    }
+
+    return (a.name ?? '').localeCompare(b.name ?? '', 'cs', {
+      sensitivity: 'base',
+    });
+  });
+
+  const sortedCompanies = [...(companies?.data ?? [])].sort((a, b) =>
+    (a.name ?? '').localeCompare(b.name ?? '', 'cs', { sensitivity: 'base' }),
+  );
+
+  const formatMoney = (value?: number) => {
+    return `${(value ?? 0).toFixed(2)} ${currencyLabel}`;
+  };
+
+  const getBankAccountLabel = (account: {
+    name?: string;
+    currency?: string;
+    number?: string;
+    iban?: string;
+  }) => {
+    return `${account.name ?? '-'} (${account.currency ?? '-'})` +
+      `: ${account.number || account.iban || '-'}`;
+  };
 
   useEffect(() => {
     if (invoiceNumber?.data !== undefined) {
@@ -60,29 +100,44 @@ const CreateInvoice = () => {
     }
   }, [invoiceNumber, form]);
 
+  useEffect(() => {
+    const selectedBankId = form.getValues('bankId');
+    if (selectedBankId) {
+      return;
+    }
+
+    const defaultBank = sortedBanks.find((bank) => bank.default) ?? sortedBanks[0];
+    if (defaultBank) {
+      form.setValue('bankId', defaultBank.id);
+    }
+  }, [sortedBanks, form]);
+
+  useEffect(() => {
+    if (selectedCurrency === 'CZK') {
+      form.setValue('exchangeRate', undefined);
+    }
+  }, [selectedCurrency, form]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'items',
   });
 
-  const calculateItemTotals = (index: number) => {
-    const items = form.getValues('items');
-    const item = items[index];
-    const total = item.amount * item.pricePerUnit;
-    const totalTax = total * (item.vat / 100);
-    const totalWithTax = total + totalTax;
-
+  const calculateItemTotals = () => {
     calculateInvoiceTotals();
   };
 
   const calculateInvoiceTotals = () => {
     const items = form.getValues('items');
-    const total = items.reduce((sum, item) => sum + (item.total || 0), 0);
-    const totalTax = items.reduce((sum, item) => sum + (item.totalTax || 0), 0);
-    const totalWithTax = items.reduce(
-      (sum, item) => sum + (item.totalWithTax || 0),
+    const total = items.reduce(
+      (sum, item) => sum + (item.amount || 0) * (item.pricePerUnit || 0),
       0,
     );
+    const totalTax = items.reduce((sum, item) => {
+      const itemTotal = (item.amount || 0) * (item.pricePerUnit || 0);
+      return sum + itemTotal * ((item.vat || 0) / 100);
+    }, 0);
+    const totalWithTax = total + totalTax;
 
     form.setValue('total', total);
     form.setValue('totalTax', totalTax);
@@ -90,9 +145,22 @@ const CreateInvoice = () => {
   };
 
   const onSubmit = (data: CreateInvoiceDto) => {
-    console.log('Invoice data:', data);
-    enqueueSnackbar('Invoice created successfully', { variant: 'success' });
-    navigate('/outgoing-invoices');
+    createInvoice(
+      { data },
+      {
+        onSuccess: () => {
+          enqueueSnackbar('Faktura byla úspěšně vytvořena', {
+            variant: 'success',
+          });
+          navigate('/outgoing-invoices');
+        },
+        onError: () => {
+          enqueueSnackbar('Vytvoření faktury selhalo', {
+            variant: 'error',
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -102,9 +170,9 @@ const CreateInvoice = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Create Invoice</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Vytvořit fakturu</h2>
           <p className="text-muted-foreground">
-            Fill in the details to create a new invoice
+            Vyplňte údaje pro vytvoření nové faktury
           </p>
         </div>
       </div>
@@ -113,24 +181,17 @@ const CreateInvoice = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-6 text-center">
-              Basic Information
+              Základní informace
             </h3>
             <div className="max-w-3xl mx-auto space-y-4">
-              <InputController
-                control={form.control}
-                name="number"
-                label="Invoice Number"
-                placeholder="20250001"
-                rules={{ required: 'Invoice number is required' }}
-              />
               <FormField
                 control={form.control}
                 name="companyId"
-                rules={{ required: 'Company is required' }}
+                rules={{ required: 'Odběratel je povinný' }}
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Company
+                      Odběratel
                     </FormLabel>
                     <div className="flex flex-col">
                       <Select
@@ -139,11 +200,11 @@ const CreateInvoice = () => {
                       >
                         <FormControl>
                           <SelectTrigger className="w-[350px]">
-                            <SelectValue placeholder="Select company" />
+                            <SelectValue placeholder="Vyberte odběratele" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {companies?.data?.map((company) => (
+                          {sortedCompanies.map((company) => (
                             <SelectItem key={company.id} value={company.id}>
                               {company.name}
                             </SelectItem>
@@ -156,14 +217,22 @@ const CreateInvoice = () => {
                 )}
               />
 
+              <InputController
+                control={form.control}
+                name="number"
+                label="Číslo faktury"
+                placeholder="20250001"
+                rules={{ required: 'Číslo faktury je povinné' }}
+              />
+
               <FormField
                 control={form.control}
                 name="bankId"
-                rules={{ required: 'Bank account is required' }}
+                rules={{ required: 'Bankovní účet je povinný' }}
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Bank Account
+                      Bankovní účet
                     </FormLabel>
                     <div className="flex flex-col">
                       <Select
@@ -172,13 +241,13 @@ const CreateInvoice = () => {
                       >
                         <FormControl>
                           <SelectTrigger className="w-[400px]">
-                            <SelectValue placeholder="Select bank account" />
+                            <SelectValue placeholder="Vyberte bankovní účet" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {banks?.data?.map((account) => (
+                          {sortedBanks.map((account) => (
                             <SelectItem key={account.id} value={account.id}>
-                              {account.name}
+                              {getBankAccountLabel(account)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -195,7 +264,7 @@ const CreateInvoice = () => {
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Currency
+                      Měna
                     </FormLabel>
                     <div className="flex flex-col">
                       <Select
@@ -204,14 +273,14 @@ const CreateInvoice = () => {
                       >
                         <FormControl>
                           <SelectTrigger className="w-[250px]">
-                            <SelectValue placeholder="Select currency" />
+                            <SelectValue placeholder="Vyberte měnu" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="USD">USD - US Dollar</SelectItem>
+                          <SelectItem value="USD">USD - Americký dolar</SelectItem>
                           <SelectItem value="EUR">EUR - Euro</SelectItem>
                           <SelectItem value="CZK">
-                            CZK - Czech Koruna
+                            CZK - Česká koruna
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -221,43 +290,45 @@ const CreateInvoice = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="exchangeRate"
-                render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
-                    <FormLabel className="w-[200px] text-right">
-                      Exchange Rate
-                    </FormLabel>
-                    <div className="flex flex-col">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="Optional"
-                          className="w-[100px]"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              parseFloat(e.target.value) || undefined,
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
+              {!isCzkCurrency && (
+                <FormField
+                  control={form.control}
+                  name="exchangeRate"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-4">
+                      <FormLabel className="w-[200px] text-right">
+                        Kurz
+                      </FormLabel>
+                      <div className="flex flex-col">
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="Volitelně"
+                            className="w-[100px]"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                parseFloat(e.target.value) || undefined,
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
                 name="createdDate"
-                rules={{ required: 'Created date is required' }}
+                rules={{ required: 'Datum vystavení je povinné' }}
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Created Date
+                      Datum vystavení
                     </FormLabel>
                     <div className="flex flex-col">
                       <FormControl>
@@ -272,11 +343,11 @@ const CreateInvoice = () => {
               <FormField
                 control={form.control}
                 name="taxDate"
-                rules={{ required: 'Tax date is required' }}
+                rules={{ required: 'Datum zdanitelného plnění je povinné' }}
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Tax Date
+                      Datum zdanitelného plnění
                     </FormLabel>
                     <div className="flex flex-col">
                       <FormControl>
@@ -291,11 +362,11 @@ const CreateInvoice = () => {
               <FormField
                 control={form.control}
                 name="dueDate"
-                rules={{ required: 'Due date is required' }}
+                rules={{ required: 'Datum splatnosti je povinné' }}
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-4">
                     <FormLabel className="w-[200px] text-right">
-                      Due Date
+                      Datum splatnosti
                     </FormLabel>
                     <div className="flex flex-col">
                       <FormControl>
@@ -311,7 +382,7 @@ const CreateInvoice = () => {
 
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Invoice Items</h3>
+              <h3 className="text-lg font-semibold">Polozky faktury</h3>
               <Button
                 type="button"
                 variant="outline"
@@ -327,7 +398,7 @@ const CreateInvoice = () => {
                 }
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Item
+                Přidat položku
               </Button>
             </div>
 
@@ -338,19 +409,19 @@ const CreateInvoice = () => {
                   #
                 </span>
                 <span className="flex-1 text-sm font-medium text-muted-foreground">
-                  Description
+                  Popis
                 </span>
                 <span className="w-24 text-sm font-medium text-muted-foreground">
-                  Qty
+                  Množství
                 </span>
                 <span className="w-32 text-sm font-medium text-muted-foreground">
-                  Price
+                  Cena
                 </span>
                 <span className="w-24 text-sm font-medium text-muted-foreground">
-                  Tax %
+                  DPH %
                 </span>
                 <span className="w-32 text-sm font-medium text-muted-foreground">
-                  Total
+                  Celkem
                 </span>
                 <span className="w-10"></span>
               </div>
@@ -363,11 +434,11 @@ const CreateInvoice = () => {
                   <FormField
                     control={form.control}
                     name={`items.${index}.name`}
-                    rules={{ required: 'Description is required' }}
+                    rules={{ required: 'Popis je povinný' }}
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder="Item description" {...field} />
+                          <Input placeholder="Popis položky" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -378,10 +449,10 @@ const CreateInvoice = () => {
                     control={form.control}
                     name={`items.${index}.amount`}
                     rules={{
-                      required: 'Quantity is required',
+                      required: 'Množství je povinné',
                       min: {
                         value: 0.01,
-                        message: 'Quantity must be greater than 0',
+                        message: 'Množství musí být větší než 0',
                       },
                     }}
                     render={({ field }) => (
@@ -392,7 +463,7 @@ const CreateInvoice = () => {
                             {...field}
                             onChange={(e) => {
                               field.onChange(parseFloat(e.target.value) || 0);
-                              calculateItemTotals(index);
+                              calculateItemTotals();
                             }}
                           />
                         </FormControl>
@@ -405,10 +476,10 @@ const CreateInvoice = () => {
                     control={form.control}
                     name={`items.${index}.pricePerUnit`}
                     rules={{
-                      required: 'Price is required',
+                      required: 'Cena je povinná',
                       min: {
                         value: 0.01,
-                        message: 'Price must be greater than 0',
+                        message: 'Cena musí být větší než 0',
                       },
                     }}
                     render={({ field }) => (
@@ -420,7 +491,7 @@ const CreateInvoice = () => {
                             {...field}
                             onChange={(e) => {
                               field.onChange(parseFloat(e.target.value) || 0);
-                              calculateItemTotals(index);
+                              calculateItemTotals();
                             }}
                           />
                         </FormControl>
@@ -441,7 +512,7 @@ const CreateInvoice = () => {
                             {...field}
                             onChange={(e) => {
                               field.onChange(parseFloat(e.target.value) || 0);
-                              calculateItemTotals(index);
+                              calculateItemTotals();
                             }}
                           />
                         </FormControl>
@@ -452,9 +523,11 @@ const CreateInvoice = () => {
 
                   <div className="w-32">
                     <p className="font-medium">
-                      $
-                      {form.watch(`items.${index}.totalWithTax`)?.toFixed(2) ||
-                        '0.00'}
+                      {formatMoney(
+                        (form.watch(`items.${index}.amount`) || 0) *
+                          (form.watch(`items.${index}.pricePerUnit`) || 0) *
+                          (1 + (form.watch(`items.${index}.vat`) || 0) / 100),
+                      )}
                     </p>
                   </div>
 
@@ -476,25 +549,19 @@ const CreateInvoice = () => {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Invoice Summary</h3>
+            <h3 className="text-lg font-semibold mb-4">Souhrn faktury</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Subtotal</p>
-                <p className="text-2xl font-bold">
-                  ${form.watch('total')?.toFixed(2) || '0.00'}
-                </p>
+                <p className="text-sm text-muted-foreground">Mezisoučet</p>
+                <p className="text-2xl font-bold">{formatMoney(form.watch('total'))}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Tax</p>
-                <p className="text-2xl font-bold">
-                  ${form.watch('totalTax')?.toFixed(2) || '0.00'}
-                </p>
+                <p className="text-sm text-muted-foreground">DPH celkem</p>
+                <p className="text-2xl font-bold">{formatMoney(form.watch('totalTax'))}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="text-2xl font-bold">
-                  ${form.watch('totalWithTax')?.toFixed(2) || '0.00'}
-                </p>
+                <p className="text-sm text-muted-foreground">Částka celkem</p>
+                <p className="text-2xl font-bold">{formatMoney(form.watch('totalWithTax'))}</p>
               </div>
             </div>
           </Card>
@@ -505,9 +572,11 @@ const CreateInvoice = () => {
               variant="outline"
               onClick={() => navigate(-1)}
             >
-              Cancel
+              Zrušit
             </Button>
-            <Button type="submit">Create Invoice</Button>
+            <Button type="submit" disabled={isCreatingInvoice}>
+              {isCreatingInvoice ? 'Vytvářím...' : 'Vytvořit fakturu'}
+            </Button>
           </div>
         </form>
       </Form>
