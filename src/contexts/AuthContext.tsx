@@ -9,6 +9,7 @@ axios.default.defaults.baseURL = 'http://localhost:3001';
 interface AuthContextType {
   login: (access_token: string) => void;
   logout: () => void;
+  updateUser: (patch: Partial<UserData>) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
   user: UserData | null;
@@ -57,6 +58,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('access_token', access_token);
     axios.default.defaults.headers.common['Authorization'] =
       `Bearer ${access_token}`;
+    setUser(jwtDecode<UserData>(access_token));
+  };
+
+  const updateUser = (patch: Partial<UserData>) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev));
   };
 
   const logout = () => {
@@ -68,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ login, logout, isAuthenticated: !!accessToken, isLoading, user }}
+      value={{ login, logout, updateUser, isAuthenticated: !!accessToken, isLoading, user }}
     >
       {children}
     </AuthContext.Provider>

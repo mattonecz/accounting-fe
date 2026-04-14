@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
+import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
 
 export interface CreateInvoiceDto {
@@ -13,8 +14,10 @@ export interface CreateInvoiceDto {
   bankId: string;
   number: string;
   currency: string;
-  /** Type of invoice - INCOMING or OUTGOING */
+  /** Direction of invoice - RECEIVED or ISSUED */
   type: CreateInvoiceDtoType;
+  /** Invoice status. Defaults to ISSUED when omitted. */
+  status?: CreateInvoiceDtoStatus;
   exchangeRate?: number;
   createdDate: string;
   taxDate: string;

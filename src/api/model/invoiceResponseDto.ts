@@ -5,9 +5,12 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceResponseDtoStatus } from './invoiceResponseDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { InvoiceCompanySnapshotDto } from './invoiceCompanySnapshotDto';
+import type { PaymentResponseDto } from './paymentResponseDto';
+import type { InvoiceStatusHistoryItemDto } from './invoiceStatusHistoryItemDto';
 
 export interface InvoiceResponseDto {
   id: string;
@@ -20,9 +23,12 @@ export interface InvoiceResponseDto {
   exchangeRate?: number;
   currency: string;
   type: string;
+  status: InvoiceResponseDtoStatus;
   totalWithTax: number;
   items: InvoiceItemDto[];
   bankAccount?: InvoiceBankAccountSnapshotDto;
   company?: InvoiceCompanySnapshotDto;
   supplier?: InvoiceCompanySnapshotDto;
+  payments?: PaymentResponseDto[];
+  statusHistory?: InvoiceStatusHistoryItemDto[];
 }

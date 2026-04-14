@@ -14,7 +14,8 @@ import { Label } from './label';
 import { CreateCompanyDto } from '@/api/model';
 
 interface AutocompleteProps {
-  onChange: (value: CreateCompanyDto) => void;
+  onChange: (value: CreateCompanyDto, financniUrad?: string) => void;
+  withFinancniUrad?: boolean;
   debounceMs?: number;
   disabled?: boolean;
   className?: string;
@@ -22,6 +23,7 @@ interface AutocompleteProps {
 
 export function Autocomplete({
   onChange,
+  withFinancniUrad = false,
   debounceMs = 300,
   disabled = false,
   className,
@@ -97,17 +99,20 @@ export function Autocomplete({
     if (typeof data === 'object' && data !== null && 'ico' in data) {
       const streetName = data.sidlo.nazevUlice || data.sidlo.nazevCastiObce;
       const baseAddress = streetName + ' ' + data.sidlo.cisloDomovni;
-      onChange({
-        name: data.obchodniJmeno,
-        country: 'CZ',
-        ico: data.ico,
-        dic: data.dic,
-        city: data.sidlo.nazevObce,
-        street: data.sidlo.cisloOrientacni
-          ? baseAddress + '/' + data.sidlo.cisloOrientacni
-          : baseAddress,
-        psc: data.sidlo.psc.toString(),
-      });
+      onChange(
+        {
+          name: data.obchodniJmeno,
+          country: 'CZ',
+          ico: data.ico,
+          dic: data.dic,
+          city: data.sidlo.nazevObce,
+          street: data.sidlo.cisloOrientacni
+            ? baseAddress + '/' + data.sidlo.cisloOrientacni
+            : baseAddress,
+          psc: data.sidlo.psc.toString(),
+        },
+        withFinancniUrad ? data.financniUrad : undefined,
+      );
     }
   };
 

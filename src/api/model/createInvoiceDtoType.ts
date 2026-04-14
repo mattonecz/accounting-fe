@@ -7,13 +7,13 @@
  */
 
 /**
- * Type of invoice - INCOMING or OUTGOING
+ * Direction of invoice - RECEIVED or ISSUED
  */
 export type CreateInvoiceDtoType = typeof CreateInvoiceDtoType[keyof typeof CreateInvoiceDtoType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateInvoiceDtoType = {
-  INCOMING: 'INCOMING',
-  OUTGOING: 'OUTGOING',
+  RECEIVED: 'RECEIVED',
+  ISSUED: 'ISSUED',
 } as const;

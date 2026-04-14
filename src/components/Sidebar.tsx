@@ -22,9 +22,9 @@ const navigation = [
   { name: 'Bank Accounts', href: '/bank-accounts', icon: Building2 },
   { name: 'Faktury vydané', href: '/outgoing-invoices', icon: FileInput },
   { name: 'Faktury přijaté', href: '/incoming-invoices', icon: FileText },
-  { name: 'Simple Invoices', href: '/invoices/simple', icon: Receipt },
-  { name: 'Tax Report', href: '/tax-report', icon: Calculator },
-  { name: 'Profile', href: '/profile', icon: UserCircle },
+  { name: 'Zjednodušené doklady', href: '/invoices/simple', icon: Receipt },
+  { name: 'Přehled DPH', href: '/tax-report', icon: Calculator },
+  { name: 'Profil', href: '/profile', icon: UserCircle },
 ];
 
 export const Sidebar = () => {

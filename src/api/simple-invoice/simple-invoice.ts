@@ -33,7 +33,9 @@ import type {
 
 import type {
   CreateSimpleInvoiceDto,
+  GetSimpleInvoiceVatByMonthDto,
   SimpleInvoiceResponseDto,
+  SimpleInvoiceVatTotalsDto,
   UpdateSimpleInvoiceDto
 } from '.././model';
 
@@ -253,6 +255,67 @@ export function useSimpleInvoiceListByUser<TData = Awaited<ReturnType<typeof sim
 
 
 /**
+ * @summary Get simple invoice VAT summary by month and year using tax date
+ */
+export const simpleInvoiceGetVatByMonth = (
+    getSimpleInvoiceVatByMonthDto: GetSimpleInvoiceVatByMonthDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<SimpleInvoiceVatTotalsDto>> => {
+    
+    
+    return axios.default.post(
+      `/simple-invoices/byMonth/vat`,
+      getSimpleInvoiceVatByMonthDto,options
+    );
+  }
+
+
+
+export const getSimpleInvoiceGetVatByMonthMutationOptions = <TError = AxiosError<SimpleInvoiceVatTotalsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetSimpleInvoiceVatByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetSimpleInvoiceVatByMonthDto}, TContext> => {
+
+const mutationKey = ['simpleInvoiceGetVatByMonth'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, {data: GetSimpleInvoiceVatByMonthDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  simpleInvoiceGetVatByMonth(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SimpleInvoiceGetVatByMonthMutationResult = NonNullable<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>>
+    export type SimpleInvoiceGetVatByMonthMutationBody = GetSimpleInvoiceVatByMonthDto
+    export type SimpleInvoiceGetVatByMonthMutationError = AxiosError<SimpleInvoiceVatTotalsDto>
+
+    /**
+ * @summary Get simple invoice VAT summary by month and year using tax date
+ */
+export const useSimpleInvoiceGetVatByMonth = <TError = AxiosError<SimpleInvoiceVatTotalsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetSimpleInvoiceVatByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>,
+        TError,
+        {data: GetSimpleInvoiceVatByMonthDto},
+        TContext
+      > => {
+
+      const mutationOptions = getSimpleInvoiceGetVatByMonthMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
  * @summary Get simple invoice by id
  */
 export const simpleInvoiceGet = (

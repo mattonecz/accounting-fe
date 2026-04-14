@@ -256,6 +256,95 @@ export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyLi
 
 
 /**
+ * @summary Get company by id
+ */
+export const companyGet = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<CompanyResponseDto>> => {
+    
+    
+    return axios.default.get(
+      `/companies/${id}`,options
+    );
+  }
+
+
+
+
+export const getCompanyGetQueryKey = (id?: string,) => {
+    return [
+    `/companies/${id}`
+    ] as const;
+    }
+
+    
+export const getCompanyGetQueryOptions = <TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCompanyGetQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyGet>>> = ({ signal }) => companyGet(id, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CompanyGetQueryResult = NonNullable<Awaited<ReturnType<typeof companyGet>>>
+export type CompanyGetQueryError = AxiosError<CompanyResponseDto>
+
+
+export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof companyGet>>,
+          TError,
+          Awaited<ReturnType<typeof companyGet>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof companyGet>>,
+          TError,
+          Awaited<ReturnType<typeof companyGet>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get company by id
+ */
+
+export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCompanyGetQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
  * @summary Find companies by name (partial, diacritic-insensitive)
  */
 export const companyFindByName = (

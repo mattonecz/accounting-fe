@@ -35,9 +35,12 @@ import type {
   CreateInvoiceDto,
   DashboardStatsResponseDto,
   GetByMonthDto,
+  InvoiceGetVatByMonthDefault,
   InvoiceListByUserParams,
   InvoiceResponseDto,
-  PaginatedInvoiceResponseDto
+  PaginatedInvoiceResponseDto,
+  UpdateInvoiceDto,
+  UpdateInvoiceStatusDto
 } from '.././model';
 
 
@@ -102,6 +105,67 @@ export const useInvoiceCreate = <TError = AxiosError<InvoiceResponseDto>,
       > => {
 
       const mutationOptions = getInvoiceCreateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Update invoice
+ */
+export const invoiceUpdate = (
+    updateInvoiceDto: UpdateInvoiceDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceResponseDto>> => {
+    
+    
+    return axios.default.patch(
+      `/invoices`,
+      updateInvoiceDto,options
+    );
+  }
+
+
+
+export const getInvoiceUpdateMutationOptions = <TError = AxiosError<InvoiceResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext> => {
+
+const mutationKey = ['invoiceUpdate'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceUpdate>>, {data: UpdateInvoiceDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  invoiceUpdate(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceUpdate>>>
+    export type InvoiceUpdateMutationBody = UpdateInvoiceDto
+    export type InvoiceUpdateMutationError = AxiosError<InvoiceResponseDto>
+
+    /**
+ * @summary Update invoice
+ */
+export const useInvoiceUpdate = <TError = AxiosError<InvoiceResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceUpdate>>,
+        TError,
+        {data: UpdateInvoiceDto},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -464,6 +528,68 @@ export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TE
 
 
 /**
+ * @summary Update invoice status
+ */
+export const invoiceUpdateStatus = (
+    id: string,
+    updateInvoiceStatusDto: UpdateInvoiceStatusDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceResponseDto>> => {
+    
+    
+    return axios.default.patch(
+      `/invoices/${id}/status`,
+      updateInvoiceStatusDto,options
+    );
+  }
+
+
+
+export const getInvoiceUpdateStatusMutationOptions = <TError = AxiosError<InvoiceResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext> => {
+
+const mutationKey = ['invoiceUpdateStatus'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceUpdateStatus>>, {id: string;data: UpdateInvoiceStatusDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  invoiceUpdateStatus(id,data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceUpdateStatusMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceUpdateStatus>>>
+    export type InvoiceUpdateStatusMutationBody = UpdateInvoiceStatusDto
+    export type InvoiceUpdateStatusMutationError = AxiosError<InvoiceResponseDto>
+
+    /**
+ * @summary Update invoice status
+ */
+export const useInvoiceUpdateStatus = <TError = AxiosError<InvoiceResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+        TError,
+        {id: string;data: UpdateInvoiceStatusDto},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceUpdateStatusMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
  * @summary Get invoices by month and year
  */
 export const invoiceGetByMonth = (
@@ -521,6 +647,67 @@ export const useInvoiceGetByMonth = <TError = AxiosError<InvoiceResponseDto[]>,
       > => {
 
       const mutationOptions = getInvoiceGetByMonthMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Get VAT summary by month and year using tax date
+ */
+export const invoiceGetVatByMonth = (
+    getByMonthDto: GetByMonthDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceGetVatByMonthDefault>> => {
+    
+    
+    return axios.default.post(
+      `/invoices/byMonth/vat`,
+      getByMonthDto,options
+    );
+  }
+
+
+
+export const getInvoiceGetVatByMonthMutationOptions = <TError = AxiosError<InvoiceGetVatByMonthDefault>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext> => {
+
+const mutationKey = ['invoiceGetVatByMonth'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceGetVatByMonth>>, {data: GetByMonthDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  invoiceGetVatByMonth(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceGetVatByMonthMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceGetVatByMonth>>>
+    export type InvoiceGetVatByMonthMutationBody = GetByMonthDto
+    export type InvoiceGetVatByMonthMutationError = AxiosError<InvoiceGetVatByMonthDefault>
+
+    /**
+ * @summary Get VAT summary by month and year using tax date
+ */
+export const useInvoiceGetVatByMonth = <TError = AxiosError<InvoiceGetVatByMonthDefault>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceGetVatByMonth>>,
+        TError,
+        {data: GetByMonthDto},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceGetVatByMonthMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

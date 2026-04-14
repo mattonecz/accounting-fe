@@ -198,6 +198,37 @@
         ]
       }
     },
+    "/companies/{id}": {
+      "get": {
+        "operationId": "companyGet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get company by id",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
     "/companies/findByName": {
       "get": {
         "operationId": "companyFindByName",
@@ -295,6 +326,36 @@
         "tags": [
           "Invoices"
         ]
+      },
+      "patch": {
+        "operationId": "invoiceUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update invoice",
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/list": {
@@ -308,8 +369,8 @@
             "description": "Filter by invoice type",
             "schema": {
               "enum": [
-                "INCOMING",
-                "OUTGOING"
+                "RECEIVED",
+                "ISSUED"
               ],
               "type": "string"
             }
@@ -434,6 +495,48 @@
         ]
       }
     },
+    "/invoices/{id}/status": {
+      "patch": {
+        "operationId": "invoiceUpdateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of the invoice",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInvoiceStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update invoice status",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
     "/invoices/byMonth": {
       "post": {
         "operationId": "invoiceGetByMonth",
@@ -464,6 +567,74 @@
           }
         },
         "summary": "Get invoices by month and year",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/byMonth/vat": {
+      "post": {
+        "operationId": "invoiceGetVatByMonth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetByMonthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payable": {
+                      "type": "object",
+                      "properties": {
+                        "base": {
+                          "type": "number",
+                          "example": 1000
+                        },
+                        "vat": {
+                          "type": "number",
+                          "example": 200
+                        },
+                        "total": {
+                          "type": "number",
+                          "example": 1200
+                        }
+                      }
+                    },
+                    "deductible": {
+                      "type": "object",
+                      "properties": {
+                        "base": {
+                          "type": "number",
+                          "example": 500
+                        },
+                        "vat": {
+                          "type": "number",
+                          "example": 100
+                        },
+                        "total": {
+                          "type": "number",
+                          "example": 600
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get VAT summary by month and year using tax date",
         "tags": [
           "Invoices"
         ]
@@ -790,6 +961,38 @@
         ]
       }
     },
+    "/simple-invoices/byMonth/vat": {
+      "post": {
+        "operationId": "simpleInvoiceGetVatByMonth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetSimpleInvoiceVatByMonthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleInvoiceVatTotalsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get simple invoice VAT summary by month and year using tax date",
+        "tags": [
+          "SimpleInvoice"
+        ]
+      }
+    },
     "/simple-invoices/{id}": {
       "get": {
         "operationId": "simpleInvoiceGet",
@@ -842,6 +1045,284 @@
         "summary": "Delete simple invoice",
         "tags": [
           "SimpleInvoice"
+        ]
+      }
+    },
+    "/payments": {
+      "post": {
+        "operationId": "paymentCreate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Payment creation data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create payment",
+        "tags": [
+          "Payments"
+        ]
+      },
+      "patch": {
+        "operationId": "paymentUpdate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update payment",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/list": {
+      "get": {
+        "operationId": "paymentListByUser",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List payments by user",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/invoice/{invoiceId}": {
+      "get": {
+        "operationId": "paymentListByInvoice",
+        "parameters": [
+          {
+            "name": "invoiceId",
+            "required": true,
+            "in": "path",
+            "description": "UUID of invoice",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List payments by invoice",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/{id}": {
+      "get": {
+        "operationId": "paymentGet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of payment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get payment by id",
+        "tags": [
+          "Payments"
+        ]
+      },
+      "delete": {
+        "operationId": "paymentDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID of payment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete payment",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/documents/receipt/parse": {
+      "post": {
+        "operationId": "documentParseReceipt",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseReceiptResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Parse receipt image into structured data",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/vat/export": {
+      "get": {
+        "operationId": "vatExport",
+        "parameters": [
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "description": "Year (YYYY)",
+            "schema": {
+              "minimum": 1900,
+              "maximum": 2100,
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "description": "Month (1-12)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 12,
+              "example": 4,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "khXml": {
+                      "type": "string"
+                    },
+                    "vatXml": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "khXml",
+                    "vatXml"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Export VAT return and control statement XML",
+        "tags": [
+          "vat"
         ]
       }
     },
@@ -1301,11 +1782,23 @@
           "type": {
             "type": "string",
             "enum": [
-              "INCOMING",
-              "OUTGOING"
+              "RECEIVED",
+              "ISSUED"
             ],
-            "example": "INCOMING",
-            "description": "Type of invoice - INCOMING or OUTGOING"
+            "example": "RECEIVED",
+            "description": "Direction of invoice - RECEIVED or ISSUED"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "ISSUED",
+            "description": "Invoice status. Defaults to ISSUED when omitted."
           },
           "exchangeRate": {
             "type": "number",
@@ -1407,6 +1900,107 @@
           }
         }
       },
+      "PaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "invoiceId": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "paymentDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "exchangeRate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "invoiceId",
+          "paymentMethod",
+          "amount",
+          "paymentDate"
+        ]
+      },
+      "InvoiceStatusHistoryChangeDto": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string",
+            "example": "dueDate"
+          },
+          "originalValue": {
+            "type": "object",
+            "description": "Original field value before the change",
+            "example": "2025-07-20T00:00:00.000Z",
+            "nullable": true
+          },
+          "newValue": {
+            "type": "object",
+            "description": "New field value after the change",
+            "example": "2025-07-31T00:00:00.000Z",
+            "nullable": true
+          }
+        },
+        "required": [
+          "item"
+        ]
+      },
+      "InvoiceStatusHistoryItemDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED",
+              "UPDATED"
+            ],
+            "example": "UPDATED"
+          },
+          "datetime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceStatusHistoryChangeDto"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "datetime"
+        ]
+      },
       "InvoiceResponseDto": {
         "type": "object",
         "properties": {
@@ -1443,6 +2037,16 @@
           "type": {
             "type": "string"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED"
+            ]
+          },
           "totalWithTax": {
             "type": "number"
           },
@@ -1460,6 +2064,18 @@
           },
           "supplier": {
             "$ref": "#/components/schemas/InvoiceCompanySnapshotDto"
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponseDto"
+            }
+          },
+          "statusHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceStatusHistoryItemDto"
+            }
           }
         },
         "required": [
@@ -1472,6 +2088,7 @@
           "totalTax",
           "currency",
           "type",
+          "status",
           "totalWithTax",
           "items"
         ]
@@ -1618,6 +2235,108 @@
           "recentOutgoingInvoices"
         ]
       },
+      "UpdateInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the invoice"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "bankId": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string",
+            "example": "20250001"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CZK"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIVED",
+              "ISSUED"
+            ],
+            "example": "ISSUED"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          },
+          "exchangeRate": {
+            "type": "number",
+            "example": 24.85
+          },
+          "createdDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-20"
+          },
+          "taxDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-21"
+          },
+          "dueDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-07-20"
+          },
+          "total": {
+            "type": "number",
+            "example": 1000
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 150
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1150
+          },
+          "items": {
+            "description": "Array of invoice items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemDto"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "UpdateInvoiceStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
       "GetByMonthDto": {
         "type": "object",
         "properties": {
@@ -1748,6 +2467,31 @@
           },
           "lastName": {
             "type": "string"
+          },
+          "c_ufo": {
+            "type": "string",
+            "description": "Tax office code for VAT filings",
+            "example": "452"
+          },
+          "c_pracufo": {
+            "type": "string",
+            "description": "Tax office workplace code for VAT filings",
+            "example": "2102"
+          },
+          "dic": {
+            "type": "string",
+            "description": "Tax identification number used for VAT filings",
+            "example": "9007180501"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number used in VAT filings",
+            "example": "776775798"
+          },
+          "email": {
+            "type": "string",
+            "description": "Contact email used in VAT filings",
+            "example": "mattone@seznam.cz"
           }
         },
         "required": [
@@ -1766,6 +2510,21 @@
           },
           "lastName": {
             "type": "string"
+          },
+          "c_ufo": {
+            "type": "string"
+          },
+          "c_pracufo": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
           }
         },
         "required": [
@@ -1782,6 +2541,31 @@
           },
           "lastName": {
             "type": "string"
+          },
+          "c_ufo": {
+            "type": "string",
+            "description": "Tax office code for VAT filings",
+            "example": "452"
+          },
+          "c_pracufo": {
+            "type": "string",
+            "description": "Tax office workplace code for VAT filings",
+            "example": "2102"
+          },
+          "dic": {
+            "type": "string",
+            "description": "Tax identification number used for VAT filings",
+            "example": "9007180501"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number used in VAT filings",
+            "example": "776775798"
+          },
+          "email": {
+            "type": "string",
+            "description": "Contact email used in VAT filings",
+            "example": "mattone@seznam.cz"
           }
         }
       },
@@ -1875,6 +2659,51 @@
           "company"
         ]
       },
+      "GetSimpleInvoiceVatByMonthDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2025,
+            "description": "Year (YYYY)",
+            "minimum": 1900,
+            "maximum": 2100
+          },
+          "month": {
+            "type": "number",
+            "example": 6,
+            "description": "Month (1-12)",
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        "required": [
+          "year",
+          "month"
+        ]
+      },
+      "SimpleInvoiceVatTotalsDto": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "number",
+            "example": 1000
+          },
+          "vat": {
+            "type": "number",
+            "example": 200
+          },
+          "total": {
+            "type": "number",
+            "example": 1200
+          }
+        },
+        "required": [
+          "base",
+          "vat",
+          "total"
+        ]
+      },
       "UpdateSimpleInvoiceDto": {
         "type": "object",
         "properties": {
@@ -1916,6 +2745,188 @@
         },
         "required": [
           "id"
+        ]
+      },
+      "CreatePaymentDto": {
+        "type": "object",
+        "properties": {
+          "invoiceId": {
+            "type": "string",
+            "description": "UUID of the related invoice"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "example": "1500.00"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CZK"
+          },
+          "paymentDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2026-04-07"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "exchangeRate": {
+            "type": "string",
+            "example": "24.865400"
+          }
+        },
+        "required": [
+          "invoiceId",
+          "paymentMethod",
+          "amount",
+          "paymentDate"
+        ]
+      },
+      "UpdatePaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the payment"
+          },
+          "invoiceId": {
+            "type": "string",
+            "description": "UUID of the related invoice"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "example": "1500.00"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CZK"
+          },
+          "paymentDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2026-04-07"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "exchangeRate": {
+            "type": "string",
+            "example": "24.865400"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ReceiptParseDataDto": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "nullable": true
+          },
+          "total": {
+            "type": "number",
+            "nullable": true
+          },
+          "vat": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "vendor",
+          "total",
+          "vat",
+          "currency",
+          "date"
+        ]
+      },
+      "ReceiptLlmCallDto": {
+        "type": "object",
+        "properties": {
+          "attempt": {
+            "type": "number"
+          },
+          "durationMs": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string"
+          },
+          "inputTokens": {
+            "type": "number"
+          },
+          "outputTokens": {
+            "type": "number"
+          },
+          "totalTokens": {
+            "type": "number"
+          },
+          "validationErrors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "attempt",
+          "durationMs",
+          "model",
+          "inputTokens",
+          "outputTokens",
+          "totalTokens"
+        ]
+      },
+      "ParseReceiptResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReceiptParseDataDto"
+          },
+          "llmCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceiptLlmCallDto"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "llmCalls"
         ]
       },
       "SelectedCompanyInputDto": {

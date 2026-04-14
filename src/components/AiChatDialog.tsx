@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bot, MessageSquare, SendHorizonal } from 'lucide-react';
+import { Bot, ImageUp, MessageSquare, SendHorizonal } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import { useAiChatChat } from '@/api/ai-chat/ai-chat';
-import type { ChatResponseDto } from '@/api/model';
+import { useDocumentParseReceipt } from '@/api/documents/documents';
+import type { ChatResponseDto, ParseReceiptResponseDto } from '@/api/model';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -26,21 +27,54 @@ const getLastAssistantIndex = (history: ChatResponseDto['history']) =>
 
 const formatUsd = (value: number) => `$${value.toFixed(6)}`;
 
+type ClientChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+const formatReceiptResult = (result: ParseReceiptResponseDto) => {
+  const { vendor, total, vat, currency, date } = result.data;
+
+  return [
+    'Výsledek parsování účtenky:',
+    `Dodavatel: ${vendor || '-'}`,
+    `Celkem: ${total ?? '-'}${currency ? ` ${currency}` : ''}`,
+    `DPH: ${vat ?? '-'}`,
+    `Datum: ${date || '-'}`,
+  ].join('\n');
+};
+
 export const AiChatDialog = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [chat, setChat] = useState<ChatResponseDto | null>(null);
+  const [clientMessages, setClientMessages] = useState<ClientChatMessage[]>([]);
   const [pendingUserMessage, setPendingUserMessage] = useState('');
   const { enqueueSnackbar } = useSnackbar();
   const { mutateAsync: sendMessage, isPending } = useAiChatChat();
+  const { mutateAsync: parseReceipt, isPending: isParsingReceipt } = useDocumentParseReceipt();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const history = chat?.history ?? [];
   const lastAssistantIndex = getLastAssistantIndex(history);
 
+  const allMessages = [
+    ...history.map((message, index) => ({
+      ...message,
+      source: 'server' as const,
+      serverIndex: index,
+    })),
+    ...clientMessages.map((message, index) => ({
+      ...message,
+      source: 'client' as const,
+      clientIndex: index,
+    })),
+  ];
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [history, pendingUserMessage, open, isPending]);
+  }, [allMessages, pendingUserMessage, open, isPending, isParsingReceipt]);
 
   const handleSubmit = async () => {
     const userInput = input.trim();
@@ -64,6 +98,58 @@ export const AiChatDialog = () => {
       setPendingUserMessage('');
       setInput(userInput);
       enqueueSnackbar('AI chat request failed', { variant: 'error' });
+    }
+  };
+
+  const handleReceiptSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file || isParsingReceipt) {
+      return;
+    }
+
+    setClientMessages((currentMessages) => [
+      ...currentMessages,
+      {
+        role: 'user',
+        content: `Nahrávám obrázek účtenky: ${file.name}`,
+      },
+    ]);
+
+    try {
+      const response = await parseReceipt({
+        data: {
+          file,
+        },
+      });
+
+      console.log('receipt/parse result', response.data);
+
+      setClientMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: 'assistant',
+          content: formatReceiptResult(response.data),
+        },
+      ]);
+
+      enqueueSnackbar('Účtenka byla úspěšně zpracována', {
+        variant: 'success',
+      });
+    } catch {
+      enqueueSnackbar('Parsování účtenky selhalo', {
+        variant: 'error',
+      });
+
+      setClientMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: 'assistant',
+          content: 'Parsování účtenky selhalo.',
+        },
+      ]);
+    } finally {
+      event.target.value = '';
     }
   };
 
@@ -91,16 +177,20 @@ export const AiChatDialog = () => {
 
         <ScrollArea className="flex-1 bg-muted/20 px-6 py-4">
           <div className="flex min-h-full flex-col gap-4">
-            {history.length === 0 && !pendingUserMessage ? (
+            {allMessages.length === 0 && !pendingUserMessage ? (
               <div className="flex flex-1 items-center justify-center">
                 <div className="max-w-sm rounded-xl border border-dashed bg-background/80 px-5 py-6 text-center text-sm text-muted-foreground">
                   Start with a short question about invoices, contacts, or accounting.
                 </div>
               </div>
             ) : (
-              history.map((message, index) => (
+              allMessages.map((message) => (
                 <div
-                  key={`${message.role}-${index}`}
+                  key={
+                    message.source === 'server'
+                      ? `${message.role}-${message.serverIndex}`
+                      : `${message.role}-client-${message.clientIndex}`
+                  }
                   className={cn(
                     'flex',
                     message.role === 'user' ? 'justify-end' : 'justify-start',
@@ -114,8 +204,11 @@ export const AiChatDialog = () => {
                         : 'border bg-background text-foreground',
                     )}
                   >
-                    <p>{message.content}</p>
-                    {message.role === 'assistant' && index === lastAssistantIndex && chat ? (
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {message.source === 'server' &&
+                    message.role === 'assistant' &&
+                    message.serverIndex === lastAssistantIndex &&
+                    chat ? (
                       <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground sm:grid-cols-3">
                         <div>
                           <span className="block font-medium text-foreground">Model</span>
@@ -163,11 +256,26 @@ export const AiChatDialog = () => {
                 </div>
               </div>
             ) : null}
+
+            {isParsingReceipt ? (
+              <div className="flex justify-start">
+                <div className="rounded-2xl border bg-background px-4 py-3 text-sm text-muted-foreground shadow-sm">
+                  Zpracovávám účtenku...
+                </div>
+              </div>
+            ) : null}
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
         <div className="border-t bg-background p-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleReceiptSelect}
+          />
           <form
             className="space-y-3"
             onSubmit={(event) => {
@@ -191,10 +299,23 @@ export const AiChatDialog = () => {
               <p className="text-xs text-muted-foreground">
                 Press Enter to send, Shift+Enter for a new line.
               </p>
-              <Button type="submit" className="gap-2" disabled={isPending || !input.trim()}>
-                <SendHorizonal className="h-4 w-4" />
-                Send
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  disabled={isParsingReceipt}
+                  onClick={() => fileInputRef.current?.click()}
+                  aria-label="Nahrát obrázek účtenky"
+                  title="Nahrát obrázek účtenky"
+                >
+                  <ImageUp className="h-4 w-4" />
+                </Button>
+                <Button type="submit" className="gap-2" disabled={isPending || !input.trim()}>
+                  <SendHorizonal className="h-4 w-4" />
+                  Send
+                </Button>
+              </div>
             </div>
           </form>
         </div>

@@ -19,7 +19,8 @@ import {
 } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import type { CreateUserDto, LoginDto } from '@/api/model';
 import { useSignIn } from '@/api/auth/auth';
 import { useUserCreate } from '@/api/users/users';
@@ -31,6 +32,7 @@ export default function Auth() {
   const { mutate: signIn } = useSignIn();
   const { mutate: createUser } = useUserCreate();
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginDto>({
     defaultValues: {
@@ -70,7 +72,18 @@ export default function Auth() {
           enqueueSnackbar('Account created successfully!', {
             variant: 'success',
           });
-          navigate('/');
+          signIn(
+            { data: { username: data.email, password: data.password } },
+            {
+              onSuccess: (res) => {
+                login(res.data.access_token);
+                navigate('/onboarding');
+              },
+              onError: () => {
+                navigate('/auth');
+              },
+            },
+          );
         },
         onError: () => {
           enqueueSnackbar('Username already registered', { variant: 'error' });
@@ -177,7 +190,25 @@ export default function Auth() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? 'text' : 'password'}
+                              placeholder="••••••••"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                              onClick={() => setShowPassword((v) => !v)}
+                              tabIndex={-1}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

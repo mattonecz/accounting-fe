@@ -11,6 +11,6 @@ export type InvoiceListByUserType = typeof InvoiceListByUserType[keyof typeof In
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceListByUserType = {
-  INCOMING: 'INCOMING',
-  OUTGOING: 'OUTGOING',
+  RECEIVED: 'RECEIVED',
+  ISSUED: 'ISSUED',
 } as const;
