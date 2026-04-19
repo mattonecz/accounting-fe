@@ -7,5 +7,6 @@
  */
 
 export interface LoginResponseDto {
-  access_token: string;
+  accessToken: string;
+  expiresAt: string;
 }

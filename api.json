@@ -33,6 +33,43 @@
         ]
       }
     },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "refresh",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Refresh tokens",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/auth/profile": {
       "get": {
         "operationId": "getProfile",
@@ -360,8 +397,17 @@
     },
     "/invoices/list": {
       "get": {
-        "operationId": "invoiceListByUser",
+        "operationId": "invoiceListByCompany",
         "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the company",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "type",
             "required": false,
@@ -413,7 +459,7 @@
             }
           }
         },
-        "summary": "List invoices by user with filtering and pagination",
+        "summary": "List invoices by company with filtering and pagination",
         "tags": [
           "Invoices"
         ]
@@ -422,7 +468,16 @@
     "/invoices/count": {
       "get": {
         "operationId": "invoiceGetCount",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -435,7 +490,7 @@
             }
           }
         },
-        "summary": "Get count of invoices for current user in current year",
+        "summary": "Get count of invoices for company in current year",
         "tags": [
           "Invoices"
         ]
@@ -444,7 +499,16 @@
     "/invoices/stats": {
       "get": {
         "operationId": "invoiceGetStats",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -540,7 +604,16 @@
     "/invoices/byMonth": {
       "post": {
         "operationId": "invoiceGetByMonth",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -575,7 +648,16 @@
     "/invoices/byMonth/vat": {
       "post": {
         "operationId": "invoiceGetVatByMonth",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -644,6 +726,14 @@
       "get": {
         "operationId": "invoiceGetByNumber",
         "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "number",
             "required": true,
@@ -736,8 +826,17 @@
     },
     "/banks/list": {
       "get": {
-        "operationId": "bankListByUser",
-        "parameters": [],
+        "operationId": "bankListByCompany",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -753,7 +852,7 @@
             }
           }
         },
-        "summary": "List banks by user",
+        "summary": "List banks by company",
         "tags": [
           "Bank"
         ]
@@ -785,7 +884,7 @@
             }
           }
         },
-        "summary": "Set default bank for user",
+        "summary": "Set default bank for company",
         "tags": [
           "Bank"
         ]
@@ -938,8 +1037,17 @@
     },
     "/simple-invoices/list": {
       "get": {
-        "operationId": "simpleInvoiceListByUser",
-        "parameters": [],
+        "operationId": "simpleInvoiceListByCompany",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -955,7 +1063,7 @@
             }
           }
         },
-        "summary": "List simple invoices by user",
+        "summary": "List simple invoices by company",
         "tags": [
           "SimpleInvoice"
         ]
@@ -964,7 +1072,16 @@
     "/simple-invoices/byMonth/vat": {
       "post": {
         "operationId": "simpleInvoiceGetVatByMonth",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1113,8 +1230,17 @@
     },
     "/payments/list": {
       "get": {
-        "operationId": "paymentListByUser",
-        "parameters": [],
+        "operationId": "paymentListByCompany",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -1130,7 +1256,7 @@
             }
           }
         },
-        "summary": "List payments by user",
+        "summary": "List payments by company",
         "tags": [
           "Payments"
         ]
@@ -1272,6 +1398,14 @@
         "operationId": "vatExport",
         "parameters": [
           {
+            "name": "companyId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "year",
             "required": true,
             "in": "query",
@@ -1392,12 +1526,17 @@
       "LoginResponseDto": {
         "type": "object",
         "properties": {
-          "access_token": {
+          "accessToken": {
             "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
-          "access_token"
+          "accessToken",
+          "expiresAt"
         ]
       },
       "CreateUserDto": {
@@ -1439,12 +1578,6 @@
           "country": {
             "type": "string"
           },
-          "isOwn": {
-            "type": "boolean"
-          },
-          "email": {
-            "type": "string"
-          },
           "street": {
             "type": "string"
           },
@@ -1479,9 +1612,6 @@
             "type": "string"
           },
           "country": {
-            "type": "string"
-          },
-          "email": {
             "type": "string"
           },
           "street": {
@@ -1519,9 +1649,6 @@
             "type": "string"
           },
           "country": {
-            "type": "string"
-          },
-          "email": {
             "type": "string"
           },
           "street": {
@@ -1736,30 +1863,35 @@
             "type": "string",
             "example": "Product A"
           },
-          "pricePerUnit": {
-            "type": "number",
-            "example": 100
-          },
-          "units": {
+          "quantity": {
             "type": "number",
             "example": 2
           },
-          "vat": {
+          "price": {
             "type": "number",
-            "example": 15,
-            "description": "VAT percentage"
+            "example": 100
           },
-          "amount": {
+          "taxRate": {
             "type": "number",
-            "example": 230
+            "example": 21,
+            "description": "Tax rate percentage"
+          },
+          "total": {
+            "type": "number",
+            "example": 200
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 242
           }
         },
         "required": [
           "name",
-          "pricePerUnit",
-          "units",
-          "vat",
-          "amount"
+          "quantity",
+          "price",
+          "taxRate",
+          "total",
+          "totalWithTax"
         ]
       },
       "CreateInvoiceDto": {
@@ -1906,6 +2038,9 @@
           "id": {
             "type": "string"
           },
+          "companyId": {
+            "type": "string"
+          },
           "invoiceId": {
             "type": "string"
           },
@@ -1940,6 +2075,7 @@
         },
         "required": [
           "id",
+          "companyId",
           "invoiceId",
           "paymentMethod",
           "amount",
@@ -2005,6 +2141,9 @@
         "type": "object",
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "companyId": {
             "type": "string"
           },
           "number": {
@@ -2080,6 +2219,7 @@
         },
         "required": [
           "id",
+          "companyId",
           "number",
           "createdDate",
           "taxDate",
@@ -2363,6 +2503,10 @@
       "CreateBankDto": {
         "type": "object",
         "properties": {
+          "companyId": {
+            "type": "string",
+            "description": "UUID of the company this bank belongs to"
+          },
           "name": {
             "type": "string"
           },
@@ -2380,6 +2524,7 @@
           }
         },
         "required": [
+          "companyId",
           "name",
           "currency"
         ]
@@ -2388,6 +2533,9 @@
         "type": "object",
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "companyId": {
             "type": "string"
           },
           "name": {
@@ -2411,6 +2559,7 @@
         },
         "required": [
           "id",
+          "companyId",
           "name",
           "currency",
           "default"
@@ -2453,10 +2602,15 @@
           "bankId": {
             "type": "string",
             "description": "UUID of the bank to set as default"
+          },
+          "companyId": {
+            "type": "string",
+            "description": "UUID of the company"
           }
         },
         "required": [
-          "bankId"
+          "bankId",
+          "companyId"
         ]
       },
       "CreateUserProfileDto": {
@@ -2477,11 +2631,6 @@
             "type": "string",
             "description": "Tax office workplace code for VAT filings",
             "example": "2102"
-          },
-          "dic": {
-            "type": "string",
-            "description": "Tax identification number used for VAT filings",
-            "example": "9007180501"
           },
           "phone": {
             "type": "string",
@@ -2517,9 +2666,6 @@
           "c_pracufo": {
             "type": "string"
           },
-          "dic": {
-            "type": "string"
-          },
           "phone": {
             "type": "string"
           },
@@ -2551,11 +2697,6 @@
             "type": "string",
             "description": "Tax office workplace code for VAT filings",
             "example": "2102"
-          },
-          "dic": {
-            "type": "string",
-            "description": "Tax identification number used for VAT filings",
-            "example": "9007180501"
           },
           "phone": {
             "type": "string",
@@ -2750,6 +2891,10 @@
       "CreatePaymentDto": {
         "type": "object",
         "properties": {
+          "companyId": {
+            "type": "string",
+            "description": "UUID of the company"
+          },
           "invoiceId": {
             "type": "string",
             "description": "UUID of the related invoice"
@@ -2788,6 +2933,7 @@
           }
         },
         "required": [
+          "companyId",
           "invoiceId",
           "paymentMethod",
           "amount",

@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/contexts/AuthContext';
+import { refresh as refreshTokenApi } from '@/api/auth/auth';
 import { useCompanyCreate } from '@/api/companies/companies';
 import { useUserProfileCreate } from '@/api/user-profile/user-profile';
 import { Autocomplete } from '@/components/ui/autocomplete';
@@ -68,7 +69,7 @@ function findTaxOfficeCode(financniUrad: string): string {
 export default function Onboarding() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, updateUser } = useAuth();
+  const { user, login } = useAuth();
   const { mutate: createCompany, isPending: isCreatingCompany } =
     useCompanyCreate();
   const { mutate: createProfile, isPending: isCreatingProfile } =
@@ -181,20 +182,30 @@ export default function Onboarding() {
     createCompany(
       { data: companyPayload },
       {
-        onSuccess: (companyRes) => {
+        onSuccess: () => {
           createProfile(
             { data: profilePayload },
             {
-              onSuccess: () => {
-                updateUser({ companyId: companyRes.data.id });
+              onSuccess: async () => {
+                try {
+                  const res = await refreshTokenApi({ withCredentials: true });
+                  login(res.data);
+                } catch {
+                  // proceed even if token refresh fails
+                }
                 enqueueSnackbar('Profil a firma byly úspěšně vytvořeny.', {
                   variant: 'success',
                 });
                 navigate('/');
               },
-              onError: () => {
-                // Company created but profile failed — still set companyId so user can edit profile later
-                updateUser({ companyId: companyRes.data.id });
+              onError: async () => {
+                // Company created but profile failed — refresh token so companyId is available
+                try {
+                  const res = await refreshTokenApi({ withCredentials: true });
+                  login(res.data);
+                } catch {
+                  // proceed even if token refresh fails
+                }
                 enqueueSnackbar(
                   'Firma vytvořena, ale profil se nepodařilo uložit. Můžete ho upravit v nastavení.',
                   { variant: 'warning' },

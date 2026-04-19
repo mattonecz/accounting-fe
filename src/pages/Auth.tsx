@@ -54,7 +54,7 @@ export default function Auth() {
       {
         onSuccess: (data) => {
           enqueueSnackbar('Successfully logged in!', { variant: 'success' });
-          login(data.data.access_token);
+          login(data.data);
           navigate('/');
         },
         onError: () => {
@@ -76,7 +76,7 @@ export default function Auth() {
             { data: { username: data.email, password: data.password } },
             {
               onSuccess: (res) => {
-                login(res.data.access_token);
+                login(res.data);
                 navigate('/onboarding');
               },
               onError: () => {

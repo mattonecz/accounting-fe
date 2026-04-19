@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
@@ -41,6 +41,11 @@ const splitUserName = (name?: string) => {
   return { firstName, lastName: rest.join(' ') };
 };
 
+const normalizeCodeValue = (value?: string | null) => {
+  if (value == null) return '';
+  return String(value).trim();
+};
+
 const mapProfileToForm = (
   profile?: UserProfileResponseDto | null,
   user?: UserData | null,
@@ -53,8 +58,8 @@ const mapProfileToForm = (
     email: profile?.email ?? user?.email ?? '',
     phone: profile?.phone ?? '',
     dic: profile?.dic ?? '',
-    c_ufo: profile?.c_ufo ?? '',
-    c_pracufo: profile?.c_pracufo ?? '',
+    c_ufo: normalizeCodeValue(profile?.c_ufo),
+    c_pracufo: normalizeCodeValue(profile?.c_pracufo),
   };
 };
 
@@ -104,6 +109,7 @@ export const ProfileForm = ({
   const { mutate: updateProfile, isPending: isUpdatingProfile } =
     useUserProfileUpdate();
   const isSaving = isCreatingProfile || isUpdatingProfile;
+  const isResettingRef = useRef(false);
 
   const form = useForm<CreateUserProfileDto>({
     defaultValues: {
@@ -116,12 +122,15 @@ export const ProfileForm = ({
       c_pracufo: '',
     },
   });
-  console.log({ profile });
   const { reset, setValue, watch } = form;
+
+  const resetFormValues = (values: CreateUserProfileDto) => {
+    isResettingRef.current = true;
+    reset(values);
+  };
 
   const selectedTaxOfficeCode = watch('c_ufo');
   const selectedWorkplaceCode = watch('c_pracufo');
-  console.log({ selectedTaxOfficeCode, selectedWorkplaceCode });
 
   const workplaceOptions = useMemo(() => {
     if (!selectedTaxOfficeCode) return [];
@@ -134,15 +143,20 @@ export const ProfileForm = ({
 
   useEffect(() => {
     if (profile) {
-      reset(mapProfileToForm(profile, user));
+      resetFormValues(mapProfileToForm(profile, user));
       return;
     }
     if (isMissingProfile || !isLoading) {
-      reset(mapProfileToForm(undefined, user));
+      resetFormValues(mapProfileToForm(undefined, user));
     }
-  }, [isLoading, isMissingProfile, profile, reset, user]);
+  }, [isLoading, isMissingProfile, profile, user]);
 
   useEffect(() => {
+    if (isResettingRef.current) {
+      isResettingRef.current = false;
+      return;
+    }
+
     if (!selectedTaxOfficeCode) {
       if (selectedWorkplaceCode) setValue('c_pracufo', '');
       return;
@@ -168,7 +182,7 @@ export const ProfileForm = ({
     const payload = toProfilePayload(data);
     const handleSuccess = (response: { data: UserProfileResponseDto }) => {
       queryClient.setQueryData(getUserProfileGetQueryKey(), response);
-      reset(mapProfileToForm(response.data, user));
+      resetFormValues(mapProfileToForm(response.data, user));
       enqueueSnackbar(
         hasExistingProfile
           ? 'Profil byl úspěšně upraven.'
