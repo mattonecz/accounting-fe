@@ -7,7 +7,7 @@ interface InvoiceInfoCardsProps {
 }
 
 export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
-  const counterparty = invoice.company || invoice.supplier;
+  const counterparty = invoice.contactSnapshot;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">

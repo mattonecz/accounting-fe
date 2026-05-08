@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
-import type { CreateCompanyDto } from '@/api/model';
-import { useCompanyCreate } from '@/api/companies/companies';
+import type { CreateContactDto } from '@/api/model';
+import { useCreateContact } from '@/api/contacts/contacts';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -27,21 +27,21 @@ export const CreateContactDialog = ({
   onSuccess,
 }: CreateContactDialogProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { mutate: createCompany } = useCompanyCreate();
-  const form = useForm<CreateCompanyDto>();
+  const { mutate: createContact } = useCreateContact();
+  const form = useForm<CreateContactDto>({ defaultValues: { name: '', country: '' } });
 
-  const onSubmit = (data: CreateCompanyDto) => {
-    createCompany(
+  const onSubmit = (data: CreateContactDto) => {
+    createContact(
       { data },
       {
         onSuccess: () => {
-          enqueueSnackbar('Company created successfully', { variant: 'success' });
+          enqueueSnackbar('Contact created successfully', { variant: 'success' });
           form.reset();
           onOpenChange(false);
           onSuccess();
         },
         onError: () => {
-          enqueueSnackbar('Failed to create company', { variant: 'error' });
+          enqueueSnackbar('Failed to create contact', { variant: 'error' });
         },
       },
     );
@@ -61,14 +61,14 @@ export const CreateContactDialog = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Autocomplete onChange={(data) => form.reset(data)} />
+            <Autocomplete onChange={(data) => form.reset({ ...data, description: undefined })} />
             <InputController control={form.control} name="name" label="Name" type="text" rules={{ required: 'Name is required' }} placeholder="Company name" />
-            <InputController control={form.control} name="ico" label="ICO" type="number" placeholder="1234567890" />
+            <InputController control={form.control} name="ico" label="ICO" type="text" placeholder="1234567890" />
             <InputController control={form.control} name="dic" label="DIC" type="text" placeholder="CZ1234567890" />
-            <InputController control={form.control} name="country" label="Country" type="text" placeholder="Czech Republic" />
+            <InputController control={form.control} name="country" label="Country" type="text" placeholder="Czech Republic" rules={{ required: 'Country is required' }} />
             <InputController control={form.control} name="city" label="City" type="text" placeholder="Prague" />
             <InputController control={form.control} name="street" label="Street" type="text" placeholder="123 Main St" />
-            <InputController control={form.control} name="psc" label="PSC" type="number" placeholder="12345" />
+            <InputController control={form.control} name="psc" label="PSC" type="text" placeholder="12345" />
             <InputController control={form.control} name="email" label="Email" type="email" placeholder="contact@company.com" />
             <InputController control={form.control} name="description" label="Description" type="text" placeholder="Short company note" />
             <div className="flex justify-end gap-3 pt-4">

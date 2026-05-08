@@ -16,5 +16,4 @@ export const InvoiceStatusHistoryItemDtoStatus = {
   OVERDUE: 'OVERDUE',
   PAID: 'PAID',
   CANCELLED: 'CANCELLED',
-  UPDATED: 'UPDATED',
 } as const;

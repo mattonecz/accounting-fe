@@ -164,9 +164,9 @@ export const usePaymentUpdate = <TError = AxiosError<PaymentResponseDto>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * @summary List payments by user
+ * @summary List payments by company
  */
-export const paymentListByUser = (
+export const paymentListByCompany = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<PaymentResponseDto[]>> => {
     
@@ -179,69 +179,69 @@ export const paymentListByUser = (
 
 
 
-export const getPaymentListByUserQueryKey = () => {
+export const getPaymentListByCompanyQueryKey = () => {
     return [
     `/payments/list`
     ] as const;
     }
 
     
-export const getPaymentListByUserQueryOptions = <TData = Awaited<ReturnType<typeof paymentListByUser>>, TError = AxiosError<PaymentResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getPaymentListByCompanyQueryOptions = <TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getPaymentListByUserQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getPaymentListByCompanyQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentListByUser>>> = ({ signal }) => paymentListByUser({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentListByCompany>>> = ({ signal }) => paymentListByCompany({ signal, ...axiosOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type PaymentListByUserQueryResult = NonNullable<Awaited<ReturnType<typeof paymentListByUser>>>
-export type PaymentListByUserQueryError = AxiosError<PaymentResponseDto[]>
+export type PaymentListByCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof paymentListByCompany>>>
+export type PaymentListByCompanyQueryError = AxiosError<PaymentResponseDto[]>
 
 
-export function usePaymentListByUser<TData = Awaited<ReturnType<typeof paymentListByUser>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData>> & Pick<
+export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof paymentListByUser>>,
+          Awaited<ReturnType<typeof paymentListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof paymentListByUser>>
+          Awaited<ReturnType<typeof paymentListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByUser<TData = Awaited<ReturnType<typeof paymentListByUser>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData>> & Pick<
+export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof paymentListByUser>>,
+          Awaited<ReturnType<typeof paymentListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof paymentListByUser>>
+          Awaited<ReturnType<typeof paymentListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByUser<TData = Awaited<ReturnType<typeof paymentListByUser>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary List payments by user
+ * @summary List payments by company
  */
 
-export function usePaymentListByUser<TData = Awaited<ReturnType<typeof paymentListByUser>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getPaymentListByUserQueryOptions(options)
+  const queryOptions = getPaymentListByCompanyQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import type { InvoiceResponseDto } from '@/api/model';
 import { formatDate, formatMoney, formatCompanyAddress } from './utils';
+import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
 
 interface InvoicePrintDocumentProps {
   invoice: InvoiceResponseDto;
@@ -62,12 +63,12 @@ export const InvoicePrintDocument = ({
             <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Odběratel
             </h2>
-            <p className="font-semibold">{invoice.company?.name || '-'}</p>
-            {formatCompanyAddress(invoice.company).map((line) => (
+            <p className="font-semibold">{invoice.contactSnapshot?.name || '-'}</p>
+            {formatCompanyAddress(invoice.contactSnapshot).map((line) => (
               <p key={line}>{line}</p>
             ))}
-            <p className="mt-2">IČO: {invoice.company?.ico || '-'}</p>
-            <p>DIČ: {invoice.company?.dic || '-'}</p>
+            <p className="mt-2">IČO: {invoice.contactSnapshot?.ico || '-'}</p>
+            <p>DIČ: {invoice.contactSnapshot?.dic || '-'}</p>
           </section>
 
           <section className="mb-6 overflow-hidden rounded border">
@@ -93,9 +94,9 @@ export const InvoicePrintDocument = ({
               </thead>
               <tbody>
                 {invoice.items.map((item, index) => {
-                  const quantity = item.amount || 0;
-                  const base = quantity * (item.pricePerUnit || 0);
-                  const tax = base * ((item.vat || 0) / 100);
+                  const quantity = toNumber(item.quantity);
+                  const base = quantity * toNumber(item.unitPrice);
+                  const tax = base * (toNumber(item.vatRate) / 100);
                   const total = base + tax;
 
                   return (
@@ -106,7 +107,7 @@ export const InvoicePrintDocument = ({
                         {formatMoney(base, currency)}
                       </td>
                       <td className="px-3 py-2 text-right">
-                        {item.vat}% ({formatMoney(tax, currency)})
+                        {toNumber(item.vatRate)}% ({formatMoney(tax, currency)})
                       </td>
                       <td className="px-3 py-2 text-right font-medium">
                         {formatMoney(total, currency)}

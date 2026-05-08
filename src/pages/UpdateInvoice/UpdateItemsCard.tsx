@@ -80,10 +80,10 @@ export const UpdateItemsCard = ({
 
           <FormField
             control={form.control}
-            name={`items.${index}.amount`}
+            name={`items.${index}.quantity`}
             rules={{
               required: 'Množství je povinné',
-              min: { value: 0.01, message: 'Množství musí být větší než 0' },
+              min: { value: 0, message: 'Množství musí být ≥ 0' },
             }}
             render={({ field }) => (
               <FormItem className="w-24">
@@ -105,10 +105,10 @@ export const UpdateItemsCard = ({
 
           <FormField
             control={form.control}
-            name={`items.${index}.pricePerUnit`}
+            name={`items.${index}.unitPrice`}
             rules={{
               required: 'Cena je povinná',
-              min: { value: 0.01, message: 'Cena musí být větší než 0' },
+              min: { value: 0, message: 'Cena musí být ≥ 0' },
             }}
             render={({ field }) => (
               <FormItem className="w-32">
@@ -131,7 +131,11 @@ export const UpdateItemsCard = ({
 
           <FormField
             control={form.control}
-            name={`items.${index}.vat`}
+            name={`items.${index}.vatRate`}
+            rules={{
+              min: { value: 0, message: 'DPH musí být ≥ 0' },
+              max: { value: 100, message: 'DPH musí být ≤ 100' },
+            }}
             render={({ field }) => (
               <FormItem className="w-24">
                 <FormControl>
@@ -154,9 +158,9 @@ export const UpdateItemsCard = ({
           <div className="w-32">
             <p className="font-medium">
               {formatMoney(
-                toNumber(form.watch(`items.${index}.amount`)) *
-                  toNumber(form.watch(`items.${index}.pricePerUnit`)) *
-                  (1 + toNumber(form.watch(`items.${index}.vat`)) / 100),
+                toNumber(form.watch(`items.${index}.quantity`)) *
+                  toNumber(form.watch(`items.${index}.unitPrice`)) *
+                  (1 + toNumber(form.watch(`items.${index}.vatRate`)) / 100),
               )}
             </p>
           </div>

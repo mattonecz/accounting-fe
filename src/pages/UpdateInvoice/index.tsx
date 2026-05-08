@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { FormCard } from '@/components/FormCard';
-import { useUpdateInvoiceForm } from './useUpdateInvoiceForm';
+import { useUpdateInvoiceForm, toNumber } from './useUpdateInvoiceForm';
 import { UpdateBasicInfoCard } from './UpdateBasicInfoCard';
 import { UpdateItemsCard } from './UpdateItemsCard';
 
@@ -19,7 +19,7 @@ export default function UpdateInvoice() {
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
-    sortedCompanies,
+    sortedContacts,
     sortedBanks,
     formatMoney,
     calculateInvoiceTotals,
@@ -53,6 +53,16 @@ export default function UpdateInvoice() {
     );
   }
 
+  const items = form.watch('items') ?? [];
+  const total = items.reduce(
+    (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
+    0,
+  );
+  const totalTax = items.reduce((sum, item) => {
+    const base = toNumber(item.quantity) * toNumber(item.unitPrice);
+    return sum + base * (toNumber(item.vatRate) / 100);
+  }, 0);
+
   return (
     <PageLayout className="space-y-4">
       <PageHeader
@@ -65,7 +75,7 @@ export default function UpdateInvoice() {
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <UpdateBasicInfoCard
             form={form}
-            sortedCompanies={sortedCompanies}
+            sortedContacts={sortedContacts}
             sortedBanks={sortedBanks}
             isCzkCurrency={isCzkCurrency}
           />
@@ -83,21 +93,15 @@ export default function UpdateInvoice() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
                 <p className="text-sm text-muted-foreground">Mezisoučet</p>
-                <p className="text-2xl font-bold">
-                  {formatMoney(form.watch('total'))}
-                </p>
+                <p className="text-2xl font-bold">{formatMoney(total)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">DPH celkem</p>
-                <p className="text-2xl font-bold">
-                  {formatMoney(form.watch('totalTax'))}
-                </p>
+                <p className="text-2xl font-bold">{formatMoney(totalTax)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Částka celkem</p>
-                <p className="text-2xl font-bold">
-                  {formatMoney(form.watch('totalWithTax'))}
-                </p>
+                <p className="text-2xl font-bold">{formatMoney(total + totalTax)}</p>
               </div>
             </div>
           </FormCard>

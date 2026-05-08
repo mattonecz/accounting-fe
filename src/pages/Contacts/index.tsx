@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
-import type { CompanyResponseDto } from '@/api/model';
-import { useCompanyListByUser } from '@/api/companies/companies';
+import type { ContactResponseDto } from '@/api/model';
+import { useListContacts } from '@/api/contacts/contacts';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
@@ -10,21 +10,21 @@ import { CreateContactDialog } from './CreateContactDialog';
 import { EditContactDialog } from './EditContactDialog';
 import { ContactDetailDialog } from './ContactDetailDialog';
 
-const formatAddress = (company: Pick<CompanyResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
-  [company.street, company.psc, company.city, company.country].filter(Boolean).join(', ');
+const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
+  [contact.street, contact.psc, contact.city, contact.country].filter(Boolean).join(', ');
 
 export default function Contacts() {
   const [createOpen, setCreateOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<CompanyResponseDto | null>(null);
-  const [editingContact, setEditingContact] = useState<CompanyResponseDto | null>(null);
-  const { data: companies, refetch: refetchCompanies } = useCompanyListByUser();
+  const [selectedContact, setSelectedContact] = useState<ContactResponseDto | null>(null);
+  const [editingContact, setEditingContact] = useState<ContactResponseDto | null>(null);
+  const { data: contactsResponse, refetch: refetchContacts } = useListContacts();
 
   const columns = [
-    { header: 'Name', cell: (c: CompanyResponseDto) => <span className="font-medium">{c.name}</span> },
-    { header: 'ICO', cell: (c: CompanyResponseDto) => c.ico },
+    { header: 'Name', cell: (c: ContactResponseDto) => <span className="font-medium">{c.name}</span> },
+    { header: 'ICO', cell: (c: ContactResponseDto) => c.ico },
     {
       header: 'Address',
-      cell: (c: CompanyResponseDto) => (
+      cell: (c: ContactResponseDto) => (
         <span className="text-muted-foreground">{formatAddress(c) || '-'}</span>
       ),
     },
@@ -32,7 +32,7 @@ export default function Contacts() {
       header: 'Actions',
       headerClassName: 'text-right',
       cellClassName: 'text-right',
-      cell: (c: CompanyResponseDto) => (
+      cell: (c: ContactResponseDto) => (
         <Button
           type="button"
           variant="ghost"
@@ -59,7 +59,7 @@ export default function Contacts() {
           <CreateContactDialog
             open={createOpen}
             onOpenChange={setCreateOpen}
-            onSuccess={() => refetchCompanies()}
+            onSuccess={() => refetchContacts()}
           />
         }
       />
@@ -67,7 +67,7 @@ export default function Contacts() {
       <DataTableCard
         title="All Contacts"
         columns={columns}
-        data={companies?.data}
+        data={contactsResponse?.data}
         onRowClick={setSelectedContact}
       />
 
@@ -79,7 +79,7 @@ export default function Contacts() {
       <EditContactDialog
         contact={editingContact}
         onClose={() => setEditingContact(null)}
-        onSuccess={() => refetchCompanies()}
+        onSuccess={() => refetchContacts()}
       />
     </PageLayout>
   );

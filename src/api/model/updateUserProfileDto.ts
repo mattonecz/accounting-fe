@@ -9,10 +9,6 @@
 export interface UpdateUserProfileDto {
   firstName?: string;
   lastName?: string;
-  /** Tax office code for VAT filings */
-  c_ufo?: string;
-  /** Tax office workplace code for VAT filings */
-  c_pracufo?: string;
   /** Tax identification number used for VAT filings */
   dic?: string;
   /** Phone number used in VAT filings */

@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RefreshCcw, Receipt } from 'lucide-react';
-import { useSimpleInvoiceListByUser } from '@/api/simple-invoice/simple-invoice';
+import { RefreshCcw } from 'lucide-react';
+import { useSimpleInvoiceListByCompany } from '@/api/simple-invoice/simple-invoice';
 import type { SimpleInvoiceResponseDto } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -30,7 +30,7 @@ const columns = [
     header: 'Číslo dokladu',
     cell: (i: SimpleInvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
   },
-  { header: 'Firma', cell: (i: SimpleInvoiceResponseDto) => i.company.name },
+  { header: 'Firma', cell: (i: SimpleInvoiceResponseDto) => i.contact?.name || '-' },
   { header: 'Datum vystavení', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.createdDate) },
   { header: 'Datum plnění', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.taxDate) },
   {
@@ -63,7 +63,7 @@ const SimpleInvoices = () => {
     isFetching,
     isError,
     refetch,
-  } = useSimpleInvoiceListByUser<SimpleInvoiceResponseDto[]>({
+  } = useSimpleInvoiceListByCompany<SimpleInvoiceResponseDto[]>({
     query: { select: (response) => response.data },
   });
 

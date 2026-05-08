@@ -11,11 +11,11 @@ const CreateInvoice = () => {
   const {
     form,
     fieldArray,
-    submitMode,
     isCreatingInvoice,
     isCzkCurrency,
+    isReceived,
     sortedBanks,
-    sortedCompanies,
+    sortedContacts,
     formatMoney,
     getBankAccountLabel,
     calculateTotals,
@@ -25,7 +25,7 @@ const CreateInvoice = () => {
   return (
     <PageLayout>
       <PageHeader
-        title="Vytvořit fakturu"
+        title={isReceived ? 'Vytvořit přijatou fakturu' : 'Vytvořit fakturu'}
         description="Vyplňte údaje pro vytvoření nové faktury"
         backButton
       />
@@ -37,9 +37,10 @@ const CreateInvoice = () => {
         >
           <InvoiceBasicInfoCard
             form={form}
-            sortedCompanies={sortedCompanies}
+            sortedContacts={sortedContacts}
             sortedBanks={sortedBanks}
             isCzkCurrency={isCzkCurrency}
+            isReceived={isReceived}
             getBankAccountLabel={getBankAccountLabel}
           />
 
@@ -52,13 +53,7 @@ const CreateInvoice = () => {
 
           <InvoiceSummaryCard form={form} formatMoney={formatMoney} />
 
-          <InvoiceFormActions
-            isCreatingInvoice={isCreatingInvoice}
-            submitMode={submitMode}
-            onSaveDraft={form.handleSubmit((data) =>
-              submitInvoice(data, 'draft'),
-            )}
-          />
+          <InvoiceFormActions isCreatingInvoice={isCreatingInvoice} />
         </form>
       </Form>
     </PageLayout>

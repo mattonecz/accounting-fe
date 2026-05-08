@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import type { InvoiceResponseDto } from '@/api/model';
 import { formatMoney } from './utils';
+import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
 
 interface InvoiceItemsTableProps {
   invoice: InvoiceResponseDto;
@@ -37,21 +38,20 @@ export const InvoiceItemsTable = ({
         </TableHeader>
         <TableBody>
           {invoice.items.map((item, index) => {
-            const quantity = item.amount || 0;
-            const total =
-              quantity *
-              (item.pricePerUnit || 0) *
-              (1 + (item.vat || 0) / 100);
+            const quantity = toNumber(item.quantity);
+            const unitPrice = toNumber(item.unitPrice);
+            const vatRate = toNumber(item.vatRate);
+            const total = quantity * unitPrice * (1 + vatRate / 100);
 
             return (
               <TableRow key={`${item.name}-${index}`}>
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell className="text-right">{quantity}</TableCell>
                 <TableCell className="text-right">
-                  {formatMoney(item.pricePerUnit || 0, currency)}
+                  {formatMoney(unitPrice, currency)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Badge variant="outline">{item.vat}%</Badge>
+                  <Badge variant="outline">{vatRate}%</Badge>
                 </TableCell>
                 <TableCell className="text-right font-medium">
                   {formatMoney(total, currency)}
@@ -64,7 +64,7 @@ export const InvoiceItemsTable = ({
               Celkem
             </TableCell>
             <TableCell className="text-right text-lg font-semibold">
-              {formatMoney(invoice.totalWithTax, currency)}
+              {formatMoney(toNumber(invoice.totalWithTax), currency)}
             </TableCell>
           </TableRow>
         </TableBody>

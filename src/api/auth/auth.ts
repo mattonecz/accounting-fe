@@ -33,7 +33,8 @@ import type {
 
 import type {
   LoginDto,
-  LoginResponseDto
+  LoginResponseDto,
+  UserCompanyResponseDto
 } from '.././model';
 
 
@@ -300,6 +301,95 @@ export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary List company memberships for current user
+ */
+export const authListMemberships = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<UserCompanyResponseDto[]>> => {
+    
+    
+    return axios.default.get(
+      `/auth/memberships`,options
+    );
+  }
+
+
+
+
+export const getAuthListMembershipsQueryKey = () => {
+    return [
+    `/auth/memberships`
+    ] as const;
+    }
+
+    
+export const getAuthListMembershipsQueryOptions = <TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAuthListMembershipsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authListMemberships>>> = ({ signal }) => authListMemberships({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AuthListMembershipsQueryResult = NonNullable<Awaited<ReturnType<typeof authListMemberships>>>
+export type AuthListMembershipsQueryError = AxiosError<UserCompanyResponseDto[]>
+
+
+export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authListMemberships>>,
+          TError,
+          Awaited<ReturnType<typeof authListMemberships>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authListMemberships>>,
+          TError,
+          Awaited<ReturnType<typeof authListMemberships>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List company memberships for current user
+ */
+
+export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAuthListMembershipsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

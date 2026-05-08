@@ -20,12 +20,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Loader2, Plus } from 'lucide-react';
-import { useCompanyListByUser } from '@/api/companies/companies';
+import { useListContacts } from '@/api/contacts/contacts';
 import {
-  getSimpleInvoiceListByUserQueryKey,
+  getSimpleInvoiceListByCompanyQueryKey,
   useSimpleInvoiceCreate,
 } from '@/api/simple-invoice/simple-invoice';
-import type { CompanyResponseDto, CreateSimpleInvoiceDto } from '@/api/model';
+import type { ContactResponseDto, CreateSimpleInvoiceDto } from '@/api/model';
 
 const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
   number: '',
@@ -35,7 +35,7 @@ const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
   totalTax: 0,
   totalWithTax: 0,
   description: '',
-  companyId: '',
+  contactId: '',
 });
 
 interface CreateSimpleInvoiceDialogProps {
@@ -50,8 +50,8 @@ export const CreateSimpleInvoiceDialog = ({
   const queryClient = useQueryClient();
   const form = useForm<CreateSimpleInvoiceDto>({ defaultValues: getDefaultFormValues() });
 
-  const { data: companies = [], isLoading: isCompaniesLoading } =
-    useCompanyListByUser<CompanyResponseDto[]>({
+  const { data: contacts = [], isLoading: isContactsLoading } =
+    useListContacts<ContactResponseDto[]>({
       query: { select: (response) => response.data },
     });
 
@@ -60,7 +60,7 @@ export const CreateSimpleInvoiceDialog = ({
       onSuccess: async () => {
         enqueueSnackbar('Zjednodušený doklad byl vytvořen.', { variant: 'success' });
         await queryClient.invalidateQueries({
-          queryKey: getSimpleInvoiceListByUserQueryKey(),
+          queryKey: getSimpleInvoiceListByCompanyQueryKey(),
         });
         onOpenChange(false);
         form.reset(getDefaultFormValues());
@@ -74,7 +74,7 @@ export const CreateSimpleInvoiceDialog = ({
   const onSubmit = (data: CreateSimpleInvoiceDto) => {
     createMutation.mutate({
       data: {
-        companyId: data.companyId,
+        contactId: data.contactId || undefined,
         number: data.number,
         createdDate: data.createdDate,
         taxDate: data.taxDate,
@@ -117,8 +117,7 @@ export const CreateSimpleInvoiceDialog = ({
               />
               <FormField
                 control={form.control}
-                name="companyId"
-                rules={{ required: 'Firma je povinná' }}
+                name="contactId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Firma</FormLabel>
@@ -126,14 +125,14 @@ export const CreateSimpleInvoiceDialog = ({
                       <select
                         {...field}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        disabled={isCompaniesLoading}
+                        disabled={isContactsLoading}
                       >
                         <option value="">
-                          {isCompaniesLoading ? 'Načítám firmy...' : 'Vyberte firmu'}
+                          {isContactsLoading ? 'Načítám kontakty...' : 'Vyberte kontakt'}
                         </option>
-                        {companies.map((company) => (
-                          <option key={company.id} value={company.id}>
-                            {company.name}
+                        {contacts.map((contact) => (
+                          <option key={contact.id} value={contact.id}>
+                            {contact.name}
                           </option>
                         ))}
                       </select>

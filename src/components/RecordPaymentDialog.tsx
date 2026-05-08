@@ -12,7 +12,7 @@ import {
 } from '@/api/payments/payments';
 import {
   getInvoiceGetQueryKey,
-  getInvoiceListByUserQueryKey,
+  getInvoiceListByCompanyQueryKey,
 } from '@/api/invoices/invoices';
 import {
   CreatePaymentDtoPaymentMethod,
@@ -92,6 +92,9 @@ interface RecordPaymentDialogProps {
   triggerClassName?: string;
   triggerSize?: 'default' | 'sm';
   stopPropagation?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }
 
 const getTodayDate = () => new Date().toISOString().split('T')[0];
@@ -125,8 +128,20 @@ export function RecordPaymentDialog({
   triggerClassName,
   triggerSize = 'sm',
   stopPropagation = false,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  hideTrigger = false,
 }: RecordPaymentDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = (next: boolean) => {
+    if (isControlled) {
+      controlledOnOpenChange?.(next);
+    } else {
+      setInternalOpen(next);
+    }
+  };
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { mutate: createPayment, isPending } = usePaymentCreate();
@@ -171,7 +186,7 @@ export function RecordPaymentDialog({
 
           await Promise.all([
             queryClient.invalidateQueries({
-              queryKey: getInvoiceListByUserQueryKey(),
+              queryKey: getInvoiceListByCompanyQueryKey(),
             }),
             queryClient.invalidateQueries({
               queryKey: getInvoiceGetQueryKey(invoice.id),
@@ -196,22 +211,24 @@ export function RecordPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          size={triggerSize}
-          className={triggerClassName}
-          onClick={(event) => {
-            if (stopPropagation) {
-              event.stopPropagation();
-            }
-          }}
-        >
-          <Landmark className="h-4 w-4" />
-          Zaznamenat platbu
-        </Button>
-      </DialogTrigger>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size={triggerSize}
+            className={triggerClassName}
+            onClick={(event) => {
+              if (stopPropagation) {
+                event.stopPropagation();
+              }
+            }}
+          >
+            <Landmark className="h-4 w-4" />
+            Zaznamenat platbu
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle>Zaznamenat platbu</DialogTitle>

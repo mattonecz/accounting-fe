@@ -7,7 +7,8 @@
  */
 
 export interface CreateSimpleInvoiceDto {
-  companyId: string;
+  /** UUID of the external contact */
+  contactId?: string;
   number: string;
   createdDate: string;
   taxDate: string;

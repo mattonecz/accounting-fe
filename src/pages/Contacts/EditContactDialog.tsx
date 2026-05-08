@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
-import type { CompanyResponseDto, UpdateCompanyDto } from '@/api/model';
-import { useCompanyUpdate } from '@/api/companies/companies';
+import type { ContactResponseDto, UpdateContactDto } from '@/api/model';
+import { useUpdateContact } from '@/api/contacts/contacts';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,15 +14,15 @@ import { Form } from '@/components/ui/form';
 import { InputController } from '@/components/InputController';
 
 interface EditContactDialogProps {
-  contact: CompanyResponseDto | null;
+  contact: ContactResponseDto | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
 export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDialogProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { mutate: updateCompany } = useCompanyUpdate();
-  const form = useForm<UpdateCompanyDto>();
+  const { mutate: updateContact } = useUpdateContact();
+  const form = useForm<UpdateContactDto>();
 
   if (contact) {
     const currentId = form.getValues('id');
@@ -42,19 +42,19 @@ export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDi
     }
   }
 
-  const onSubmit = (data: UpdateCompanyDto) => {
+  const onSubmit = (data: UpdateContactDto) => {
     if (!contact) return;
-    updateCompany(
+    updateContact(
       { data: { ...data, id: contact.id } },
       {
         onSuccess: () => {
-          enqueueSnackbar('Company updated successfully', { variant: 'success' });
+          enqueueSnackbar('Contact updated successfully', { variant: 'success' });
           onClose();
           form.reset();
           onSuccess();
         },
         onError: () => {
-          enqueueSnackbar('Failed to update company', { variant: 'error' });
+          enqueueSnackbar('Failed to update contact', { variant: 'error' });
         },
       },
     );
@@ -73,17 +73,17 @@ export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDi
       <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>Edit Contact</DialogTitle>
-          <DialogDescription>Update company data for the selected contact.</DialogDescription>
+          <DialogDescription>Update data for the selected contact.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <InputController control={form.control} name="name" label="Name" type="text" rules={{ required: 'Name is required' }} placeholder="Company name" />
-            <InputController control={form.control} name="ico" label="ICO" type="number" placeholder="1234567890" />
+            <InputController control={form.control} name="ico" label="ICO" type="text" placeholder="1234567890" />
             <InputController control={form.control} name="dic" label="DIC" type="text" placeholder="CZ1234567890" />
             <InputController control={form.control} name="country" label="Country" type="text" placeholder="Czech Republic" />
             <InputController control={form.control} name="city" label="City" type="text" placeholder="Prague" />
             <InputController control={form.control} name="street" label="Street" type="text" placeholder="123 Main St" />
-            <InputController control={form.control} name="psc" label="PSC" type="number" placeholder="12345" />
+            <InputController control={form.control} name="psc" label="PSC" type="text" placeholder="12345" />
             <InputController control={form.control} name="email" label="Email" type="email" placeholder="contact@company.com" />
             <InputController control={form.control} name="description" label="Description" type="text" placeholder="Short company note" />
             <div className="flex justify-end gap-3 pt-4">

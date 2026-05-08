@@ -32,10 +32,8 @@ import type {
 } from 'axios';
 
 import type {
-  AresResponseDto,
   CompanyFindByNameParams,
   CompanyResponseDto,
-  CompanySearchDto,
   CreateCompanyDto,
   UpdateCompanyDto
 } from '.././model';
@@ -167,7 +165,7 @@ export const useCompanyUpdate = <TError = AxiosError<CompanyResponseDto>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * @summary List companies by user
+ * @summary List companies the user belongs to
  */
 export const companyListByUser = (
      options?: AxiosRequestConfig
@@ -236,7 +234,7 @@ export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyLi
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary List companies by user
+ * @summary List companies the user belongs to
  */
 
 export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>(
@@ -345,7 +343,7 @@ export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TE
 
 
 /**
- * @summary Find companies by name (partial, diacritic-insensitive)
+ * @summary Find user companies by name (partial, diacritic-insensitive)
  */
 export const companyFindByName = (
     params: CompanyFindByNameParams, options?: AxiosRequestConfig
@@ -416,7 +414,7 @@ export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFi
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Find companies by name (partial, diacritic-insensitive)
+ * @summary Find user companies by name (partial, diacritic-insensitive)
  */
 
 export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(
@@ -435,65 +433,3 @@ export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFi
 
 
 
-/**
- * @summary Search in ARES
- */
-export const companySearch = (
-    companySearchDto: CompanySearchDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<AresResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/companies/search`,
-      companySearchDto,options
-    );
-  }
-
-
-
-export const getCompanySearchMutationOptions = <TError = AxiosError<AresResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companySearch>>, TError,{data: CompanySearchDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof companySearch>>, TError,{data: CompanySearchDto}, TContext> => {
-
-const mutationKey = ['companySearch'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof companySearch>>, {data: CompanySearchDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  companySearch(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CompanySearchMutationResult = NonNullable<Awaited<ReturnType<typeof companySearch>>>
-    export type CompanySearchMutationBody = CompanySearchDto
-    export type CompanySearchMutationError = AxiosError<AresResponseDto>
-
-    /**
- * @summary Search in ARES
- */
-export const useCompanySearch = <TError = AxiosError<AresResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companySearch>>, TError,{data: CompanySearchDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof companySearch>>,
-        TError,
-        {data: CompanySearchDto},
-        TContext
-      > => {
-
-      const mutationOptions = getCompanySearchMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    

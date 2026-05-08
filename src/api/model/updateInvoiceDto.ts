@@ -12,8 +12,9 @@ import type { InvoiceItemDto } from './invoiceItemDto';
 export interface UpdateInvoiceDto {
   /** UUID of the invoice */
   id: string;
-  companyId?: string;
   bankId?: string;
+  /** UUID of the external party (Contact) */
+  contactId?: string;
   number?: string;
   currency?: string;
   type?: UpdateInvoiceDtoType;
@@ -22,9 +23,6 @@ export interface UpdateInvoiceDto {
   createdDate?: string;
   taxDate?: string;
   dueDate?: string;
-  total?: number;
-  totalTax?: number;
-  totalWithTax?: number;
-  /** Array of invoice items */
+  /** Array of invoice items. Totals are recomputed server-side when provided. */
   items?: InvoiceItemDto[];
 }

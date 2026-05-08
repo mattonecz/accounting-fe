@@ -17,4 +17,6 @@ export interface UpdateCompanyDto {
   ico?: string;
   dic?: string;
   description?: string;
+  c_ufo?: string;
+  c_pracufo?: string;
 }

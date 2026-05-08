@@ -28,7 +28,16 @@ const COLUMN_HEADERS = [
   { label: '', className: 'w-10' },
 ];
 
-const DEFAULT_ITEM = { name: '', amount: 1, pricePerUnit: 0, vat: 21, units: 1 };
+const DEFAULT_ITEM = { name: '', quantity: 1, unitPrice: 0, vatRate: 21, total: 0 };
+
+const handleNumericChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  fieldOnChange: (value: number) => void,
+  onRecalculate: () => void,
+) => {
+  fieldOnChange(parseFloat(e.target.value) || 0);
+  onRecalculate();
+};
 
 export const InvoiceItemsCard = ({
   form,
@@ -37,14 +46,6 @@ export const InvoiceItemsCard = ({
   onRecalculate,
 }: InvoiceItemsCardProps) => {
   const { fields, append, remove } = fieldArray;
-
-  const handleNumericChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldOnChange: (value: number) => void,
-  ) => {
-    fieldOnChange(parseFloat(e.target.value) || 0);
-    onRecalculate();
-  };
 
   return (
     <FormCard
@@ -74,8 +75,10 @@ export const InvoiceItemsCard = ({
         </div>
 
         {fields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-2">
-            <span className="text-sm font-medium w-8">{index + 1}.</span>
+          <div key={field.id} className="flex items-start gap-2">
+            <span className="text-sm font-medium w-8 h-10 flex items-center">
+              {index + 1}.
+            </span>
 
             <FormField
               control={form.control}
@@ -93,10 +96,10 @@ export const InvoiceItemsCard = ({
 
             <FormField
               control={form.control}
-              name={`items.${index}.amount`}
+              name={`items.${index}.quantity`}
               rules={{
                 required: 'Množství je povinné',
-                min: { value: 0.01, message: 'Množství musí být větší než 0' },
+                min: { value: 0, message: 'Množství musí být ≥ 0' },
               }}
               render={({ field }) => (
                 <FormItem className="w-24">
@@ -104,7 +107,7 @@ export const InvoiceItemsCard = ({
                     <Input
                       type="number"
                       {...field}
-                      onChange={(e) => handleNumericChange(e, field.onChange)}
+                      onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -114,10 +117,10 @@ export const InvoiceItemsCard = ({
 
             <FormField
               control={form.control}
-              name={`items.${index}.pricePerUnit`}
+              name={`items.${index}.unitPrice`}
               rules={{
                 required: 'Cena je povinná',
-                min: { value: 0.01, message: 'Cena musí být větší než 0' },
+                min: { value: 0, message: 'Cena musí být ≥ 0' },
               }}
               render={({ field }) => (
                 <FormItem className="w-32">
@@ -126,7 +129,7 @@ export const InvoiceItemsCard = ({
                       type="number"
                       step="1"
                       {...field}
-                      onChange={(e) => handleNumericChange(e, field.onChange)}
+                      onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -136,7 +139,11 @@ export const InvoiceItemsCard = ({
 
             <FormField
               control={form.control}
-              name={`items.${index}.vat`}
+              name={`items.${index}.vatRate`}
+              rules={{
+                min: { value: 0, message: 'DPH musí být ≥ 0' },
+                max: { value: 100, message: 'DPH musí být ≤ 100' },
+              }}
               render={({ field }) => (
                 <FormItem className="w-24">
                   <FormControl>
@@ -144,7 +151,7 @@ export const InvoiceItemsCard = ({
                       type="number"
                       step="1"
                       {...field}
-                      onChange={(e) => handleNumericChange(e, field.onChange)}
+                      onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -152,28 +159,30 @@ export const InvoiceItemsCard = ({
               )}
             />
 
-            <div className="w-32">
+            <div className="w-32 h-10 flex items-center">
               <p className="font-medium">
                 {formatMoney(
-                  (form.watch(`items.${index}.amount`) || 0) *
-                    (form.watch(`items.${index}.pricePerUnit`) || 0) *
-                    (1 + (form.watch(`items.${index}.vat`) || 0) / 100),
+                  (form.watch(`items.${index}.quantity`) || 0) *
+                    (form.watch(`items.${index}.unitPrice`) || 0) *
+                    (1 + (form.watch(`items.${index}.vatRate`) || 0) / 100),
                 )}
               </p>
             </div>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                remove(index);
-                onRecalculate();
-              }}
-              disabled={fields.length === 1}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="h-10 flex items-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  remove(index);
+                  onRecalculate();
+                }}
+                disabled={fields.length === 1}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </div>

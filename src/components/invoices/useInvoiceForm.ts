@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import {
   CreateInvoiceDto,
   CreateInvoiceDtoStatus,
   CreateInvoiceDtoType,
 } from '@/api/model';
-import { useCompanyListByUser } from '@/api/companies/companies';
-import { useBankListByUser } from '@/api/bank/bank';
+import { useListContacts } from '@/api/contacts/contacts';
+import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -21,9 +21,15 @@ export type InvoiceSubmitMode = 'draft' | 'issued';
 
 export const useInvoiceForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isReceived = searchParams.get('type') === 'received';
+  const invoiceType = isReceived
+    ? CreateInvoiceDtoType.RECEIVED
+    : CreateInvoiceDtoType.ISSUED;
+
   const { enqueueSnackbar } = useSnackbar();
-  const { data: companies } = useCompanyListByUser();
-  const { data: banks } = useBankListByUser();
+  const { data: contacts } = useListContacts();
+  const { data: banks } = useBankListByCompany();
   const { data: invoiceNumber } = useInvoiceGetCount();
   const { mutate: createInvoice, isPending: isCreatingInvoice } =
     useInvoiceCreate();
@@ -31,7 +37,7 @@ export const useInvoiceForm = () => {
 
   const form = useForm<CreateInvoiceDto>({
     defaultValues: {
-      type: CreateInvoiceDtoType.ISSUED,
+      type: invoiceType,
       currency: 'CZK',
       createdDate: new Date().toISOString().split('T')[0],
       taxDate: new Date().toISOString().split('T')[0],
@@ -40,10 +46,7 @@ export const useInvoiceForm = () => {
         date.setDate(date.getDate() + 14);
         return date.toISOString().split('T')[0];
       })(),
-      total: 0,
-      totalTax: 0,
-      totalWithTax: 0,
-      items: [{ name: '', amount: 1, pricePerUnit: 0, vat: 21, units: 1 }],
+      items: [{ name: '', quantity: 1, unitPrice: 0, total: 0, vatRate: 21 }],
     },
   });
 
@@ -60,7 +63,7 @@ export const useInvoiceForm = () => {
     });
   });
 
-  const sortedCompanies = [...(companies?.data ?? [])].sort((a, b) =>
+  const sortedContacts = [...(contacts?.data ?? [])].sort((a, b) =>
     (a.name ?? '').localeCompare(b.name ?? '', 'cs', { sensitivity: 'base' }),
   );
 
@@ -77,12 +80,13 @@ export const useInvoiceForm = () => {
     `: ${account.number || account.iban || '-'}`;
 
   useEffect(() => {
+    if (isReceived) return;
     if (invoiceNumber?.data !== undefined) {
       const year = new Date().getFullYear();
       const number = invoiceNumber.data + 1;
       form.setValue('number', `${year}${String(number).padStart(4, '0')}`);
     }
-  }, [invoiceNumber, form]);
+  }, [invoiceNumber, form, isReceived]);
 
   useEffect(() => {
     const selectedBankId = form.getValues('bankId');
@@ -108,18 +112,10 @@ export const useInvoiceForm = () => {
 
   const calculateTotals = () => {
     const items = form.getValues('items');
-    const total = items.reduce(
-      (sum, item) => sum + (item.amount || 0) * (item.pricePerUnit || 0),
-      0,
-    );
-    const totalTax = items.reduce((sum, item) => {
-      const itemTotal = (item.amount || 0) * (item.pricePerUnit || 0);
-      return sum + itemTotal * ((item.vat || 0) / 100);
-    }, 0);
-
-    form.setValue('total', total);
-    form.setValue('totalTax', totalTax);
-    form.setValue('totalWithTax', total + totalTax);
+    items.forEach((item, index) => {
+      const computed = (item.quantity || 0) * (item.unitPrice || 0);
+      form.setValue(`items.${index}.total`, computed);
+    });
   };
 
   const submitInvoice = (data: CreateInvoiceDto, mode: InvoiceSubmitMode) => {
@@ -141,7 +137,7 @@ export const useInvoiceForm = () => {
               : 'Faktura byla úspěšně vytvořena',
             { variant: 'success' },
           );
-          navigate('/outgoing-invoices');
+          navigate(isReceived ? '/incoming-invoices' : '/outgoing-invoices');
         },
         onError: () => {
           enqueueSnackbar(
@@ -160,11 +156,12 @@ export const useInvoiceForm = () => {
     fieldArray,
     submitMode,
     isCreatingInvoice,
+    isReceived,
     selectedCurrency,
     currencyLabel,
     isCzkCurrency,
     sortedBanks,
-    sortedCompanies,
+    sortedContacts,
     formatMoney,
     getBankAccountLabel,
     calculateTotals,

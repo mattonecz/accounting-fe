@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { invoiceGetVatByMonth } from '@/api/invoices/invoices';
+import type { InvoiceGetVatByMonthDefault } from '@/api/model';
 import { simpleInvoiceGetVatByMonth } from '@/api/simple-invoice/simple-invoice';
 import { vatExport } from '@/api/vat/vat';
 import { Button } from '@/components/ui/button';
@@ -58,7 +59,7 @@ const TaxReport = () => {
       ]);
 
       return {
-        invoiceVat: invoiceVatResponse.data,
+        invoiceVat: invoiceVatResponse.data as unknown as InvoiceGetVatByMonthDefault,
         simpleInvoiceVat: simpleInvoiceVatResponse.data,
       };
     },

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSnackbar } from 'notistack';
-import { useBankListByUser, useBankSetDefault } from '@/api/bank/bank';
+import { useBankListByCompany, useBankSetDefault } from '@/api/bank/bank';
 import type { BankResponseDto } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -12,7 +12,7 @@ export default function BankAccounts() {
   const [open, setOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<BankResponseDto | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { data: bankAccounts, refetch: refetchBankAccounts } = useBankListByUser();
+  const { data: bankAccounts, refetch: refetchBankAccounts } = useBankListByCompany();
   const { mutate: setDefaultBank } = useBankSetDefault();
 
   const handleSetDefault = (account: BankResponseDto) => {

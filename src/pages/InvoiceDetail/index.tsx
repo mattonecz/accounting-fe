@@ -4,9 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useInvoiceGet } from '@/api/invoices/invoices';
 import { PageLayout } from '@/components/PageLayout';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { getPaidAmount } from './utils';
+import { generateInvoicePdf } from './generatePdf';
 import { InvoicePrintDocument } from './InvoicePrintDocument';
 import { InvoiceHeroSection } from './InvoiceHeroSection';
 import { InvoiceInfoCards } from './InvoiceInfoCards';
@@ -28,6 +27,11 @@ const InvoiceDetail = () => {
     (invoice?.totalWithTax ?? 0) - paidAmount,
     0,
   );
+
+  const handleDownloadPdf = async () => {
+    if (!invoiceRef.current || !invoice) return;
+    await generateInvoicePdf(invoiceRef.current, `faktura-${invoice.number}.pdf`);
+  };
 
   if (!id) {
     return (
@@ -52,61 +56,6 @@ const InvoiceDetail = () => {
       </PageLayout>
     );
   }
-
-  const handleDownloadPdf = async () => {
-    if (!invoiceRef.current) return;
-
-    const canvas = await html2canvas(invoiceRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      windowWidth: invoiceRef.current.scrollWidth,
-      windowHeight: invoiceRef.current.scrollHeight,
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-
-    const margin = 10;
-    const pageWidth = 210;
-    const pageHeight = 297;
-    const contentWidth = pageWidth - margin * 2;
-    const contentHeight = pageHeight - margin * 2;
-    const imgHeight = (canvas.height * contentWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = margin;
-
-    pdf.addImage(
-      imgData,
-      'PNG',
-      margin,
-      position,
-      contentWidth,
-      imgHeight,
-      '',
-      'FAST',
-    );
-    heightLeft -= contentHeight;
-
-    while (heightLeft > 0) {
-      position = margin - (imgHeight - heightLeft);
-      pdf.addPage();
-      pdf.addImage(
-        imgData,
-        'PNG',
-        margin,
-        position,
-        contentWidth,
-        imgHeight,
-        '',
-        'FAST',
-      );
-      heightLeft -= contentHeight;
-    }
-
-    pdf.save(`faktura-${invoice.number}.pdf`);
-  };
 
   return (
     <PageLayout className="bg-slate-50/40">

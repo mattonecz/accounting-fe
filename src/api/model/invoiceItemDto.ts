@@ -8,9 +8,9 @@
 
 export interface InvoiceItemDto {
   name: string;
-  pricePerUnit: number;
-  units: number;
-  /** VAT percentage */
-  vat: number;
-  amount: number;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  /** VAT rate % */
+  vatRate?: number;
 }

@@ -4,7 +4,7 @@ import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
 import { FormCard } from '@/components/FormCard';
 import { BankResponseDto } from '@/api/model/bankResponseDto';
-import { CompanyResponseDto } from '@/api/model/companyResponseDto';
+import { ContactResponseDto } from '@/api/model/contactResponseDto';
 
 const CURRENCY_OPTIONS = [
   { value: 'USD', label: 'USD - Americký dolar' },
@@ -14,9 +14,10 @@ const CURRENCY_OPTIONS = [
 
 interface InvoiceBasicInfoCardProps {
   form: UseFormReturn<CreateInvoiceDto>;
-  sortedCompanies: CompanyResponseDto[];
+  sortedContacts: ContactResponseDto[];
   sortedBanks: BankResponseDto[];
   isCzkCurrency: boolean;
+  isReceived?: boolean;
   getBankAccountLabel: (account: {
     name?: string;
     currency?: string;
@@ -27,12 +28,13 @@ interface InvoiceBasicInfoCardProps {
 
 export const InvoiceBasicInfoCard = ({
   form,
-  sortedCompanies,
+  sortedContacts,
   sortedBanks,
   isCzkCurrency,
+  isReceived = false,
   getBankAccountLabel,
 }: InvoiceBasicInfoCardProps) => {
-  const companyOptions = sortedCompanies.map((c) => ({
+  const contactOptions = sortedContacts.map((c) => ({
     value: c.id,
     label: c.name ?? '-',
   }));
@@ -47,11 +49,17 @@ export const InvoiceBasicInfoCard = ({
       <div className="max-w-3xl mx-auto space-y-4">
         <SelectController
           control={form.control}
-          name="companyId"
-          label="Odběratel"
-          placeholder="Vyberte odběratele"
-          options={companyOptions}
-          rules={{ required: 'Odběratel je povinný' }}
+          name="contactId"
+          label={isReceived ? 'Dodavatel' : 'Odběratel'}
+          placeholder={
+            isReceived ? 'Vyberte dodavatele' : 'Vyberte odběratele'
+          }
+          options={contactOptions}
+          rules={{
+            required: isReceived
+              ? 'Dodavatel je povinný'
+              : 'Odběratel je povinný',
+          }}
         />
 
         <InputController
@@ -62,15 +70,17 @@ export const InvoiceBasicInfoCard = ({
           rules={{ required: 'Číslo faktury je povinné' }}
         />
 
-        <SelectController
-          control={form.control}
-          name="bankId"
-          label="Bankovní účet"
-          placeholder="Vyberte bankovní účet"
-          options={bankOptions}
-          triggerClassName="w-[400px]"
-          rules={{ required: 'Bankovní účet je povinný' }}
-        />
+        {!isReceived && (
+          <SelectController
+            control={form.control}
+            name="bankId"
+            label="Bankovní účet"
+            placeholder="Vyberte bankovní účet"
+            options={bankOptions}
+            triggerClassName="w-[400px]"
+            rules={{ required: 'Bankovní účet je povinný' }}
+          />
+        )}
 
         <SelectController
           control={form.control}

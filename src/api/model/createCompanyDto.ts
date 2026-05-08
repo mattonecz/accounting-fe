@@ -9,7 +9,6 @@
 export interface CreateCompanyDto {
   name: string;
   country: string;
-  isOwn?: boolean;
   email?: string;
   street?: string;
   city?: string;
@@ -17,4 +16,6 @@ export interface CreateCompanyDto {
   ico?: string;
   dic?: string;
   description?: string;
+  c_ufo?: string;
+  c_pracufo?: string;
 }

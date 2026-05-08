@@ -10,8 +10,9 @@ import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
 
 export interface CreateInvoiceDto {
-  companyId: string;
   bankId: string;
+  /** UUID of the external party (Contact). */
+  contactId: string;
   number: string;
   currency: string;
   /** Direction of invoice - RECEIVED or ISSUED */
@@ -22,9 +23,6 @@ export interface CreateInvoiceDto {
   createdDate: string;
   taxDate: string;
   dueDate: string;
-  total: number;
-  totalTax: number;
-  totalWithTax: number;
-  /** Array of invoice items */
+  /** Array of invoice items. Totals are computed server-side. */
   items: InvoiceItemDto[];
 }

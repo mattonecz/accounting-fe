@@ -8,7 +8,7 @@
 
 export interface UpdateSimpleInvoiceDto {
   id: string;
-  companyId?: string;
+  contactId?: string;
   number?: string;
   createdDate?: string;
   taxDate?: string;

@@ -7,7 +7,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
-import { useCompanySearch } from '@/api/companies/companies';
+import { useAresSearch } from '@/api/ares/ares';
 import { useEffect } from 'react';
 import { EkonomickySubjektDto } from '@/api/model/ekonomickySubjektDto';
 import { Label } from './label';
@@ -37,7 +37,7 @@ export function Autocomplete({
   const debounceTimerRef = React.useRef<NodeJS.Timeout>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
-  const { mutate: searchCompanies, status, data, error } = useCompanySearch();
+  const { mutate: searchCompanies, status, data, error } = useAresSearch();
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -28,7 +28,7 @@ export const InvoiceHeroSection = ({
   onDownloadPdf,
 }: InvoiceHeroSectionProps) => {
   const navigate = useNavigate();
-  const counterparty = invoice.company || invoice.supplier;
+  const counterparty = invoice.contactSnapshot;
 
   return (
     <section className="space-y-6 rounded-[28px] border border-slate-200/80 bg-transparent px-5 py-4 md:px-7 md:py-6">

@@ -1,4 +1,4 @@
-import type { CompanyResponseDto } from '@/api/model';
+import type { ContactResponseDto } from '@/api/model';
 import {
   Dialog,
   DialogContent,
@@ -7,11 +7,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const formatAddress = (company: Pick<CompanyResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
+const formatAddress = (company: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
   [company.street, company.psc, company.city, company.country].filter(Boolean).join(', ');
 
 interface ContactDetailDialogProps {
-  contact: CompanyResponseDto | null;
+  contact: ContactResponseDto | null;
   onClose: () => void;
 }
 

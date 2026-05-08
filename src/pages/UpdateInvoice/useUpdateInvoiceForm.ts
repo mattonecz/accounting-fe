@@ -5,13 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import {
   getInvoiceGetQueryKey,
-  getInvoiceListByUserQueryKey,
+  getInvoiceListByCompanyQueryKey,
   useInvoiceGet,
   useInvoiceUpdate,
 } from '@/api/invoices/invoices';
-import { useCompanyListByUser } from '@/api/companies/companies';
-import { useBankListByUser } from '@/api/bank/bank';
+import { useListContacts } from '@/api/contacts/contacts';
+import { useBankListByCompany } from '@/api/bank/bank';
 import {
+  InvoiceResponseDto,
   UpdateInvoiceDto,
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
@@ -25,10 +26,10 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
 
 const DEFAULT_ITEM = {
   name: '',
-  amount: 1,
-  pricePerUnit: 0,
-  vat: 21,
-  units: 1,
+  quantity: 1,
+  unitPrice: 0,
+  vatRate: 21,
+  total: 0,
 };
 
 export const toNumber = (value: unknown) => {
@@ -44,27 +45,24 @@ const getDefaultValues = (): UpdateInvoiceDto => ({
   createdDate: new Date().toISOString().split('T')[0],
   taxDate: new Date().toISOString().split('T')[0],
   dueDate: new Date().toISOString().split('T')[0],
-  total: 0,
-  totalTax: 0,
-  totalWithTax: 0,
   items: [DEFAULT_ITEM],
 });
 
-const findMatchingCompanyId = (
-  invoice: NonNullable<ReturnType<typeof useInvoiceGet>['data']>['data'],
-  companies: Array<{ id: string; name: string; ico?: string }>,
+const findMatchingContactId = (
+  invoice: InvoiceResponseDto,
+  contacts: Array<{ id: string; name: string; ico?: string }>,
 ) => {
-  const snapshot = invoice.company ?? invoice.supplier;
+  const snapshot = invoice.contactSnapshot;
   return (
-    companies.find((company) => {
-      if (snapshot?.ico && company.ico) return snapshot.ico === company.ico;
-      return company.name === snapshot?.name;
+    contacts.find((contact) => {
+      if (snapshot?.ico && contact.ico) return snapshot.ico === contact.ico;
+      return contact.name === snapshot?.name;
     })?.id ?? ''
   );
 };
 
 const findMatchingBankId = (
-  invoice: NonNullable<ReturnType<typeof useInvoiceGet>['data']>['data'],
+  invoice: InvoiceResponseDto,
   banks: Array<{
     id: string;
     name?: string;
@@ -99,8 +97,8 @@ export function useUpdateInvoiceForm(id: string) {
   const queryClient = useQueryClient();
 
   const { data: invoiceResponse, isLoading, isError } = useInvoiceGet(id || '');
-  const { data: companies } = useCompanyListByUser();
-  const { data: banks } = useBankListByUser();
+  const { data: contacts } = useListContacts();
+  const { data: banks } = useBankListByCompany();
   const { mutate: updateInvoice, isPending: isUpdatingInvoice } =
     useInvoiceUpdate();
 
@@ -123,14 +121,14 @@ export function useUpdateInvoiceForm(id: string) {
     [banks?.data],
   );
 
-  const sortedCompanies = useMemo(
+  const sortedContacts = useMemo(
     () =>
-      [...(companies?.data ?? [])].sort((a, b) =>
+      [...(contacts?.data ?? [])].sort((a, b) =>
         (a.name ?? '').localeCompare(b.name ?? '', 'cs', {
           sensitivity: 'base',
         }),
       ),
-    [companies?.data],
+    [contacts?.data],
   );
 
   useEffect(() => {
@@ -139,7 +137,7 @@ export function useUpdateInvoiceForm(id: string) {
 
     form.reset({
       id: invoice.id,
-      companyId: findMatchingCompanyId(invoice, sortedCompanies),
+      contactId: findMatchingContactId(invoice, sortedContacts),
       bankId: findMatchingBankId(invoice, sortedBanks),
       number: invoice.number,
       currency: invoice.currency,
@@ -152,20 +150,17 @@ export function useUpdateInvoiceForm(id: string) {
       createdDate: invoice.createdDate,
       taxDate: invoice.taxDate,
       dueDate: invoice.dueDate,
-      total: invoice.total,
-      totalTax: invoice.totalTax,
-      totalWithTax: invoice.totalWithTax,
       items: invoice.items?.length
         ? invoice.items.map((item) => ({
             name: item.name,
-            amount: item.amount,
-            pricePerUnit: item.pricePerUnit,
-            vat: item.vat,
-            units: item.units,
+            quantity: toNumber(item.quantity),
+            unitPrice: toNumber(item.unitPrice),
+            vatRate: item.vatRate != null ? toNumber(item.vatRate) : undefined,
+            total: toNumber(item.total),
           }))
         : [DEFAULT_ITEM],
     });
-  }, [form, invoiceResponse?.data, sortedBanks, sortedCompanies]);
+  }, [form, invoiceResponse?.data, sortedBanks, sortedContacts]);
 
   useEffect(() => {
     if (selectedCurrency === 'CZK') {
@@ -183,17 +178,10 @@ export function useUpdateInvoiceForm(id: string) {
 
   const calculateInvoiceTotals = () => {
     const items = form.getValues('items') ?? [];
-    const total = items.reduce(
-      (sum, item) => sum + toNumber(item.amount) * toNumber(item.pricePerUnit),
-      0,
-    );
-    const totalTax = items.reduce((sum, item) => {
-      const itemTotal = toNumber(item.amount) * toNumber(item.pricePerUnit);
-      return sum + itemTotal * (toNumber(item.vat) / 100);
-    }, 0);
-    form.setValue('total', total);
-    form.setValue('totalTax', totalTax);
-    form.setValue('totalWithTax', total + totalTax);
+    items.forEach((item, index) => {
+      const computed = toNumber(item.quantity) * toNumber(item.unitPrice);
+      form.setValue(`items.${index}.total`, computed);
+    });
   };
 
   const handleSubmit = (data: UpdateInvoiceDto) => {
@@ -206,7 +194,7 @@ export function useUpdateInvoiceForm(id: string) {
           });
           await Promise.all([
             queryClient.invalidateQueries({
-              queryKey: getInvoiceListByUserQueryKey(),
+              queryKey: getInvoiceListByCompanyQueryKey(),
             }),
             queryClient.invalidateQueries({
               queryKey: getInvoiceGetQueryKey(id || data.id),
@@ -230,7 +218,7 @@ export function useUpdateInvoiceForm(id: string) {
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
-    sortedCompanies,
+    sortedContacts,
     sortedBanks,
     formatMoney,
     calculateInvoiceTotals,

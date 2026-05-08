@@ -1,30 +1,45 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
-import { Plus, Eye, Pencil } from 'lucide-react';
-import { useInvoiceListByUser } from '@/api/invoices/invoices';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Plus, Pencil, MoreHorizontal, Eye, Download, Landmark } from 'lucide-react';
+import { useInvoiceListByCompany } from '@/api/invoices/invoices';
 import { RecordPaymentDialog } from '@/components/RecordPaymentDialog';
 import { InvoiceStatusBadge } from '@/components/InvoiceStatusBadge';
 import { useNavigate } from 'react-router-dom';
-import { InvoiceListByUserType } from '@/api/model/invoiceListByUserType';
+import { InvoiceListByCompanyType } from '@/api/model/invoiceListByCompanyType';
 import { InvoiceResponseDto } from '@/api/model/invoiceResponseDto';
+import { InvoicePdfRenderer } from '@/components/InvoicePdfRenderer';
 
 export default function OutgoingInvoices() {
   const navigate = useNavigate();
-  const invoices = useInvoiceListByUser({ type: InvoiceListByUserType.ISSUED });
+  const invoices = useInvoiceListByCompany({ type: InvoiceListByCompanyType.ISSUED });
+  const [paymentInvoice, setPaymentInvoice] =
+    useState<InvoiceResponseDto | null>(null);
+  const [pdfInvoiceId, setPdfInvoiceId] = useState<string | null>(null);
 
   const columns = [
     {
       header: 'Číslo faktury',
-      cell: (invoice: InvoiceResponseDto) => invoice.number,
+      cell: (invoice: InvoiceResponseDto) => (
+        <span className="text-primary underline-offset-4 hover:underline">
+          {invoice.number}
+        </span>
+      ),
       cellClassName: 'font-mono font-medium',
     },
     {
       header: 'Odběratel',
       headerClassName: 'w-[32%]',
       cell: (invoice: InvoiceResponseDto) =>
-        invoice.company?.name || invoice.supplier?.name || '-',
+        invoice.contactSnapshot?.name || '-',
       cellClassName: 'min-w-[220px]',
     },
     {
@@ -48,32 +63,46 @@ export default function OutgoingInvoices() {
       headerClassName: 'text-right',
       cellClassName: 'text-right',
       cell: (invoice: InvoiceResponseDto) => (
-        <div className="flex justify-end gap-2">
-          <RecordPaymentDialog invoice={invoice} />
+        <div
+          className="flex justify-end gap-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/invoices/${invoice.id}/edit`);
-            }}
+            onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
             aria-label={`Upravit fakturu ${invoice.number}`}
             title="Upravit"
           >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/invoices/${invoice.id}`);
-            }}
-            aria-label={`Zobrazit fakturu ${invoice.number}`}
-            title="Zobrazit"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label={`Další akce pro fakturu ${invoice.number}`}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setPaymentInvoice(invoice)}>
+                <Landmark className="mr-2 h-4 w-4" />
+                Zaznamenat platbu
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`/invoices/${invoice.id}`)}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Detail
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPdfInvoiceId(invoice.id)}>
+                <Download className="mr-2 h-4 w-4" />
+                Stáhnout PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ),
     },
@@ -103,6 +132,24 @@ export default function OutgoingInvoices() {
         isError={invoices.isError}
         onRowClick={(invoice) => navigate(`/invoices/${invoice.id}`)}
       />
+
+      {paymentInvoice && (
+        <RecordPaymentDialog
+          invoice={paymentInvoice}
+          open
+          onOpenChange={(open) => {
+            if (!open) setPaymentInvoice(null);
+          }}
+          hideTrigger
+        />
+      )}
+
+      {pdfInvoiceId && (
+        <InvoicePdfRenderer
+          invoiceId={pdfInvoiceId}
+          onDone={() => setPdfInvoiceId(null)}
+        />
+      )}
     </PageLayout>
   );
 }

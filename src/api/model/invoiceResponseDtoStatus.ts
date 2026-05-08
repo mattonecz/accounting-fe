@@ -13,7 +13,6 @@ export type InvoiceResponseDtoStatus = typeof InvoiceResponseDtoStatus[keyof typ
 export const InvoiceResponseDtoStatus = {
   DRAFT: 'DRAFT',
   ISSUED: 'ISSUED',
-  OVERDUE: 'OVERDUE',
   PAID: 'PAID',
   CANCELLED: 'CANCELLED',
 } as const;

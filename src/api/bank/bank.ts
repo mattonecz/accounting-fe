@@ -165,9 +165,9 @@ export const useBankUpdate = <TError = AxiosError<BankResponseDto>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * @summary List banks by user
+ * @summary List banks by company
  */
-export const bankListByUser = (
+export const bankListByCompany = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<BankResponseDto[]>> => {
     
@@ -180,69 +180,69 @@ export const bankListByUser = (
 
 
 
-export const getBankListByUserQueryKey = () => {
+export const getBankListByCompanyQueryKey = () => {
     return [
     `/banks/list`
     ] as const;
     }
 
     
-export const getBankListByUserQueryOptions = <TData = Awaited<ReturnType<typeof bankListByUser>>, TError = AxiosError<BankResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getBankListByCompanyQueryOptions = <TData = Awaited<ReturnType<typeof bankListByCompany>>, TError = AxiosError<BankResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getBankListByUserQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getBankListByCompanyQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof bankListByUser>>> = ({ signal }) => bankListByUser({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof bankListByCompany>>> = ({ signal }) => bankListByCompany({ signal, ...axiosOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type BankListByUserQueryResult = NonNullable<Awaited<ReturnType<typeof bankListByUser>>>
-export type BankListByUserQueryError = AxiosError<BankResponseDto[]>
+export type BankListByCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof bankListByCompany>>>
+export type BankListByCompanyQueryError = AxiosError<BankResponseDto[]>
 
 
-export function useBankListByUser<TData = Awaited<ReturnType<typeof bankListByUser>>, TError = AxiosError<BankResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData>> & Pick<
+export function useBankListByCompany<TData = Awaited<ReturnType<typeof bankListByCompany>>, TError = AxiosError<BankResponseDto[]>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof bankListByUser>>,
+          Awaited<ReturnType<typeof bankListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof bankListByUser>>
+          Awaited<ReturnType<typeof bankListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBankListByUser<TData = Awaited<ReturnType<typeof bankListByUser>>, TError = AxiosError<BankResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData>> & Pick<
+export function useBankListByCompany<TData = Awaited<ReturnType<typeof bankListByCompany>>, TError = AxiosError<BankResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof bankListByUser>>,
+          Awaited<ReturnType<typeof bankListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof bankListByUser>>
+          Awaited<ReturnType<typeof bankListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBankListByUser<TData = Awaited<ReturnType<typeof bankListByUser>>, TError = AxiosError<BankResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useBankListByCompany<TData = Awaited<ReturnType<typeof bankListByCompany>>, TError = AxiosError<BankResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary List banks by user
+ * @summary List banks by company
  */
 
-export function useBankListByUser<TData = Awaited<ReturnType<typeof bankListByUser>>, TError = AxiosError<BankResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useBankListByCompany<TData = Awaited<ReturnType<typeof bankListByCompany>>, TError = AxiosError<BankResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bankListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getBankListByUserQueryOptions(options)
+  const queryOptions = getBankListByCompanyQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -254,7 +254,7 @@ export function useBankListByUser<TData = Awaited<ReturnType<typeof bankListByUs
 
 
 /**
- * @summary Set default bank for user
+ * @summary Set default bank for company
  */
 export const bankSetDefault = (
     setDefaultBankDto: SetDefaultBankDto, options?: AxiosRequestConfig
@@ -299,7 +299,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
     export type BankSetDefaultMutationError = AxiosError<BankResponseDto>
 
     /**
- * @summary Set default bank for user
+ * @summary Set default bank for company
  */
 export const useBankSetDefault = <TError = AxiosError<BankResponseDto>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bankSetDefault>>, TError,{data: SetDefaultBankDto}, TContext>, axios?: AxiosRequestConfig}

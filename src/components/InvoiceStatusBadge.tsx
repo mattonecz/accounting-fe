@@ -2,7 +2,6 @@ import { InvoiceResponseDtoStatus } from '@/api/model';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
-  AlertTriangle,
   CheckCircle2,
   FileText,
   Pencil,
@@ -29,12 +28,7 @@ const statusConfig: Record<InvoiceResponseDtoStatus, {
     className: 'border-sky-200 bg-sky-100 text-sky-700',
     icon: FileText,
   },
-  [InvoiceResponseDtoStatus.OVERDUE]: {
-    label: 'Po splatnosti',
-    className: 'border-amber-200 bg-amber-100 text-amber-700',
-    icon: AlertTriangle,
-  },
-  [InvoiceResponseDtoStatus.PAID]: {
+[InvoiceResponseDtoStatus.PAID]: {
     label: 'Uhrazena',
     className: 'border-emerald-200 bg-emerald-100 text-emerald-700',
     icon: CheckCircle2,

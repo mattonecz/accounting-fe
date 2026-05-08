@@ -6,9 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 import type { InvoiceResponseDtoStatus } from './invoiceResponseDtoStatus';
-import type { InvoiceItemDto } from './invoiceItemDto';
+import type { InvoiceItemResponseDto } from './invoiceItemResponseDto';
+import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
-import type { InvoiceCompanySnapshotDto } from './invoiceCompanySnapshotDto';
 import type { PaymentResponseDto } from './paymentResponseDto';
 import type { InvoiceStatusHistoryItemDto } from './invoiceStatusHistoryItemDto';
 
@@ -25,10 +25,12 @@ export interface InvoiceResponseDto {
   type: string;
   status: InvoiceResponseDtoStatus;
   totalWithTax: number;
-  items: InvoiceItemDto[];
+  items: InvoiceItemResponseDto[];
+  companyId: string;
+  bankId: string;
+  contactId: string;
+  contactSnapshot?: ContactSnapshotDto;
   bankAccount?: InvoiceBankAccountSnapshotDto;
-  company?: InvoiceCompanySnapshotDto;
-  supplier?: InvoiceCompanySnapshotDto;
   payments?: PaymentResponseDto[];
   statusHistory?: InvoiceStatusHistoryItemDto[];
 }

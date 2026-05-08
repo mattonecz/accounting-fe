@@ -85,6 +85,31 @@
         ]
       }
     },
+    "/auth/memberships": {
+      "get": {
+        "operationId": "authListMemberships",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserCompanyResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List company memberships for current user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/users": {
       "post": {
         "operationId": "userCreate",
@@ -145,6 +170,357 @@
         "summary": "Check email available",
         "tags": [
           "Users"
+        ]
+      }
+    },
+    "/user-companies/mine": {
+      "get": {
+        "operationId": "listMyMemberships",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserCompanyResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List current user memberships",
+        "tags": [
+          "UserCompany"
+        ]
+      }
+    },
+    "/user-companies": {
+      "get": {
+        "operationId": "listMembers",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserCompanyResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List members of the active company",
+        "tags": [
+          "UserCompany"
+        ]
+      }
+    },
+    "/user-companies/invite": {
+      "post": {
+        "operationId": "inviteMember",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCompanyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Invite existing user to active company",
+        "tags": [
+          "UserCompany"
+        ]
+      }
+    },
+    "/user-companies/{id}/role": {
+      "patch": {
+        "operationId": "changeMemberRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserCompanyRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCompanyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Change a member's role",
+        "tags": [
+          "UserCompany"
+        ]
+      }
+    },
+    "/user-companies/{id}": {
+      "delete": {
+        "operationId": "removeMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Remove a member",
+        "tags": [
+          "UserCompany"
+        ]
+      }
+    },
+    "/contacts": {
+      "post": {
+        "operationId": "createContact",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create contact",
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "put": {
+        "operationId": "updateContact",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update contact",
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "get": {
+        "operationId": "listContacts",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List contacts",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/contacts/search/by-name": {
+      "get": {
+        "operationId": "findContactsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Find contacts by name",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/contacts/{id}": {
+      "get": {
+        "operationId": "getContact",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get contact",
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteContact",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete contact",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/ares/search": {
+      "post": {
+        "operationId": "aresSearch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactSearchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AresResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Search ARES registry",
+        "tags": [
+          "Ares"
         ]
       }
     },
@@ -229,7 +605,7 @@
             }
           }
         },
-        "summary": "List companies by user",
+        "summary": "List companies the user belongs to",
         "tags": [
           "Companies"
         ]
@@ -294,22 +670,42 @@
             }
           }
         },
-        "summary": "Find companies by name (partial, diacritic-insensitive)",
+        "summary": "Find user companies by name (partial, diacritic-insensitive)",
         "tags": [
           "Companies"
         ]
       }
     },
-    "/companies/search": {
-      "post": {
-        "operationId": "companySearch",
+    "/invoice-settings": {
+      "get": {
+        "operationId": "invoiceSettingsGet",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceSettingsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get invoice settings for company",
+        "tags": [
+          "InvoiceSettings"
+        ]
+      },
+      "patch": {
+        "operationId": "invoiceSettingsUpdate",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CompanySearchDto"
+                "$ref": "#/components/schemas/UpdateInvoiceSettingsDto"
               }
             }
           }
@@ -320,15 +716,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AresResponseDto"
+                  "$ref": "#/components/schemas/InvoiceSettingsResponseDto"
                 }
               }
             }
           }
         },
-        "summary": "Search in ARES",
+        "summary": "Update invoice settings for company",
         "tags": [
-          "Companies"
+          "InvoiceSettings"
         ]
       }
     },
@@ -400,19 +796,10 @@
         "operationId": "invoiceListByCompany",
         "parameters": [
           {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "description": "UUID of the company",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "type",
             "required": false,
             "in": "query",
-            "description": "Filter by invoice type",
+            "description": "Filter by invoice type - RECEIVED or ISSUED",
             "schema": {
               "enum": [
                 "RECEIVED",
@@ -468,16 +855,7 @@
     "/invoices/count": {
       "get": {
         "operationId": "invoiceGetCount",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "",
@@ -490,7 +868,7 @@
             }
           }
         },
-        "summary": "Get count of invoices for company in current year",
+        "summary": "Get count of invoices for the active company in current year",
         "tags": [
           "Invoices"
         ]
@@ -499,16 +877,7 @@
     "/invoices/stats": {
       "get": {
         "operationId": "invoiceGetStats",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "",
@@ -535,7 +904,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "UUID of the invoice",
             "schema": {
               "type": "string"
             }
@@ -567,7 +935,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "UUID of the invoice",
             "schema": {
               "type": "string"
             }
@@ -604,16 +971,7 @@
     "/invoices/byMonth": {
       "post": {
         "operationId": "invoiceGetByMonth",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -648,16 +1006,7 @@
     "/invoices/byMonth/vat": {
       "post": {
         "operationId": "invoiceGetVatByMonth",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -669,51 +1018,8 @@
           }
         },
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "payable": {
-                      "type": "object",
-                      "properties": {
-                        "base": {
-                          "type": "number",
-                          "example": 1000
-                        },
-                        "vat": {
-                          "type": "number",
-                          "example": 200
-                        },
-                        "total": {
-                          "type": "number",
-                          "example": 1200
-                        }
-                      }
-                    },
-                    "deductible": {
-                      "type": "object",
-                      "properties": {
-                        "base": {
-                          "type": "number",
-                          "example": 500
-                        },
-                        "vat": {
-                          "type": "number",
-                          "example": 100
-                        },
-                        "total": {
-                          "type": "number",
-                          "example": 600
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "summary": "Get VAT summary by month and year using tax date",
@@ -727,18 +1033,9 @@
         "operationId": "invoiceGetByNumber",
         "parameters": [
           {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "number",
             "required": true,
             "in": "path",
-            "description": "Invoice number",
             "schema": {
               "type": "string"
             }
@@ -827,16 +1124,7 @@
     "/banks/list": {
       "get": {
         "operationId": "bankListByCompany",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "",
@@ -1038,16 +1326,7 @@
     "/simple-invoices/list": {
       "get": {
         "operationId": "simpleInvoiceListByCompany",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "",
@@ -1072,16 +1351,7 @@
     "/simple-invoices/byMonth/vat": {
       "post": {
         "operationId": "simpleInvoiceGetVatByMonth",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1231,16 +1501,7 @@
     "/payments/list": {
       "get": {
         "operationId": "paymentListByCompany",
-        "parameters": [
-          {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "default": {
             "description": "",
@@ -1398,14 +1659,6 @@
         "operationId": "vatExport",
         "parameters": [
           {
-            "name": "companyId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "year",
             "required": true,
             "in": "query",
@@ -1539,6 +1792,75 @@
           "expiresAt"
         ]
       },
+      "UserCompanyUserSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email"
+        ]
+      },
+      "UserCompanyCompanySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "UserCompanyResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserCompanyUserSummaryDto"
+          },
+          "company": {
+            "$ref": "#/components/schemas/UserCompanyCompanySummaryDto"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "companyId",
+          "role",
+          "createdAt"
+        ]
+      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
@@ -1569,13 +1891,59 @@
           "email"
         ]
       },
-      "CreateCompanyDto": {
+      "CreateUserCompanyDto": {
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "string"
+          },
+          "userEmail": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
+          }
+        },
+        "required": [
+          "companyId",
+          "userEmail",
+          "role"
+        ]
+      },
+      "UpdateUserCompanyRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "CreateContactDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
           "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
             "type": "string"
           },
           "street": {
@@ -1602,7 +1970,7 @@
           "country"
         ]
       },
-      "CompanyResponseDto": {
+      "ContactResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1612,6 +1980,12 @@
             "type": "string"
           },
           "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
             "type": "string"
           },
           "street": {
@@ -1639,7 +2013,7 @@
           "country"
         ]
       },
-      "UpdateCompanyDto": {
+      "UpdateContactDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1649,6 +2023,12 @@
             "type": "string"
           },
           "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
             "type": "string"
           },
           "street": {
@@ -1674,7 +2054,7 @@
           "id"
         ]
       },
-      "CompanySearchDto": {
+      "ContactSearchDto": {
         "type": "object",
         "properties": {
           "obchodniJmeno": {
@@ -1856,135 +2236,228 @@
           "ekonomickeSubjekty"
         ]
       },
-      "InvoiceItemDto": {
+      "CreateCompanyDto": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "example": "Product A"
+            "type": "string"
           },
-          "quantity": {
-            "type": "number",
-            "example": 2
+          "country": {
+            "type": "string"
           },
-          "price": {
-            "type": "number",
-            "example": 100
+          "email": {
+            "type": "string"
           },
-          "taxRate": {
-            "type": "number",
-            "example": 21,
-            "description": "Tax rate percentage"
+          "street": {
+            "type": "string"
           },
-          "total": {
-            "type": "number",
-            "example": 200
+          "city": {
+            "type": "string"
           },
-          "totalWithTax": {
-            "type": "number",
-            "example": 242
+          "psc": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "c_ufo": {
+            "type": "string"
+          },
+          "c_pracufo": {
+            "type": "string"
           }
         },
         "required": [
           "name",
-          "quantity",
-          "price",
-          "taxRate",
-          "total",
-          "totalWithTax"
+          "country"
         ]
       },
-      "CreateInvoiceDto": {
+      "CompanyResponseDto": {
         "type": "object",
         "properties": {
-          "companyId": {
+          "id": {
             "type": "string"
           },
-          "bankId": {
+          "name": {
             "type": "string"
           },
-          "number": {
-            "type": "string",
-            "example": "20250001"
+          "country": {
+            "type": "string"
           },
-          "currency": {
-            "type": "string",
-            "example": "CZK"
+          "email": {
+            "type": "string"
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "RECEIVED",
-              "ISSUED"
-            ],
-            "example": "RECEIVED",
-            "description": "Direction of invoice - RECEIVED or ISSUED"
+          "street": {
+            "type": "string"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DRAFT",
-              "ISSUED",
-              "OVERDUE",
-              "PAID",
-              "CANCELLED"
-            ],
-            "example": "ISSUED",
-            "description": "Invoice status. Defaults to ISSUED when omitted."
+          "city": {
+            "type": "string"
           },
-          "exchangeRate": {
-            "type": "number",
-            "example": 24.85
+          "psc": {
+            "type": "string"
           },
-          "createdDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-20"
+          "ico": {
+            "type": "string"
           },
-          "taxDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-21"
+          "dic": {
+            "type": "string"
           },
-          "dueDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-07-20"
+          "description": {
+            "type": "string"
           },
-          "total": {
-            "type": "number",
-            "example": 1000
+          "c_ufo": {
+            "type": "string"
           },
-          "totalTax": {
-            "type": "number",
-            "example": 150
-          },
-          "totalWithTax": {
-            "type": "number",
-            "example": 1150
-          },
-          "items": {
-            "description": "Array of invoice items",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InvoiceItemDto"
-            }
+          "c_pracufo": {
+            "type": "string"
           }
         },
         "required": [
-          "companyId",
-          "bankId",
-          "number",
-          "currency",
-          "type",
-          "createdDate",
-          "taxDate",
-          "dueDate",
-          "total",
-          "totalTax",
-          "totalWithTax",
-          "items"
+          "id",
+          "name",
+          "country"
         ]
+      },
+      "UpdateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "c_ufo": {
+            "type": "string"
+          },
+          "c_pracufo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "InvoiceSettingsResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "invoicePrefix": {
+            "type": "string"
+          },
+          "invoiceNumberFormat": {
+            "type": "string"
+          },
+          "nextInvoiceNumber": {
+            "type": "number"
+          },
+          "dueDaysDefault": {
+            "type": "number"
+          },
+          "defaultHeaderText": {
+            "type": "string"
+          },
+          "defaultFooterText": {
+            "type": "string"
+          },
+          "defaultVatRate": {
+            "type": "number"
+          },
+          "logoUrl": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "currency",
+          "invoiceNumberFormat",
+          "nextInvoiceNumber",
+          "dueDaysDefault",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateInvoiceSettingsDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code",
+            "example": "CZK"
+          },
+          "invoicePrefix": {
+            "type": "string",
+            "example": "FAK"
+          },
+          "invoiceNumberFormat": {
+            "type": "string",
+            "example": "{YYYY}-{0001}"
+          },
+          "nextInvoiceNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "dueDaysDefault": {
+            "type": "number",
+            "example": 14
+          },
+          "defaultHeaderText": {
+            "type": "string"
+          },
+          "defaultFooterText": {
+            "type": "string"
+          },
+          "defaultVatRate": {
+            "type": "number",
+            "example": 21
+          },
+          "logoUrl": {
+            "type": "string"
+          }
+        }
       },
       "InvoiceBankAccountSnapshotDto": {
         "type": "object",
@@ -2006,7 +2479,194 @@
           }
         }
       },
-      "InvoiceCompanySnapshotDto": {
+      "InvoiceItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Product A"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 2
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 100
+          },
+          "total": {
+            "type": "number",
+            "example": 200
+          },
+          "vatRate": {
+            "type": "number",
+            "example": 21,
+            "description": "VAT rate %"
+          }
+        },
+        "required": [
+          "name",
+          "quantity",
+          "unitPrice",
+          "total"
+        ]
+      },
+      "CreateInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "bankId": {
+            "type": "string",
+            "description": "UUID of a managed Bank row. Provide this OR `bankSnapshot`, not both. Required for ISSUED invoices."
+          },
+          "bankSnapshot": {
+            "description": "Direct bank-account snapshot, e.g. for RECEIVED invoices where the supplier account is captured ad-hoc instead of as a managed Bank row. Mutually exclusive with `bankId`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceBankAccountSnapshotDto"
+              }
+            ]
+          },
+          "contactId": {
+            "type": "string",
+            "description": "UUID of the external party (Contact)."
+          },
+          "number": {
+            "type": "string",
+            "example": "20250001"
+          },
+          "currency": {
+            "type": "string",
+            "example": "CZK"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIVED",
+              "ISSUED"
+            ],
+            "example": "RECEIVED",
+            "description": "Direction of invoice - RECEIVED or ISSUED"
+          },
+          "vatMode": {
+            "type": "string",
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ],
+            "example": "STANDARD",
+            "description": "VAT regime under which the invoice was issued/received."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "ISSUED",
+            "description": "Invoice status. Defaults to ISSUED when omitted."
+          },
+          "exchangeRate": {
+            "type": "number",
+            "example": 24.85
+          },
+          "createdDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-20"
+          },
+          "duzpDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-21"
+          },
+          "dueDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-07-20"
+          },
+          "items": {
+            "description": "Array of invoice items. Totals are computed server-side.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemDto"
+            }
+          },
+          "variableSymbol": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "specificSymbol": {
+            "type": "string",
+            "example": "0308"
+          },
+          "konstantSymbol": {
+            "type": "string",
+            "example": "0558"
+          },
+          "note": {
+            "type": "string",
+            "description": "Public note shown on the invoice."
+          },
+          "internalNote": {
+            "type": "string",
+            "description": "Internal note, not shown to the counterparty."
+          },
+          "originalNumber": {
+            "type": "string",
+            "description": "Supplier-provided invoice number (typically used on RECEIVED invoices to keep the supplier's original reference)."
+          }
+        },
+        "required": [
+          "contactId",
+          "number",
+          "currency",
+          "type",
+          "vatMode",
+          "createdDate",
+          "duzpDate",
+          "dueDate",
+          "items"
+        ]
+      },
+      "InvoiceItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "unitPrice": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "vatRate": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "quantity",
+          "unitPrice",
+          "total",
+          "createdAt"
+        ]
+      },
+      "ContactSnapshotDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -2029,6 +2689,12 @@
           },
           "psc": {
             "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
           }
         }
       },
@@ -2036,9 +2702,6 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
-          },
-          "companyId": {
             "type": "string"
           },
           "invoiceId": {
@@ -2075,7 +2738,6 @@
         },
         "required": [
           "id",
-          "companyId",
           "invoiceId",
           "paymentMethod",
           "amount",
@@ -2116,10 +2778,9 @@
               "ISSUED",
               "OVERDUE",
               "PAID",
-              "CANCELLED",
-              "UPDATED"
+              "CANCELLED"
             ],
-            "example": "UPDATED"
+            "example": "ISSUED"
           },
           "datetime": {
             "type": "string",
@@ -2143,9 +2804,6 @@
           "id": {
             "type": "string"
           },
-          "companyId": {
-            "type": "string"
-          },
           "number": {
             "type": "string"
           },
@@ -2153,7 +2811,7 @@
             "format": "date-time",
             "type": "string"
           },
-          "taxDate": {
+          "duzpDate": {
             "format": "date-time",
             "type": "string"
           },
@@ -2176,12 +2834,19 @@
           "type": {
             "type": "string"
           },
+          "vatMode": {
+            "type": "string",
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ]
+          },
           "status": {
             "type": "string",
             "enum": [
               "DRAFT",
               "ISSUED",
-              "OVERDUE",
               "PAID",
               "CANCELLED"
             ]
@@ -2192,17 +2857,41 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/InvoiceItemDto"
+              "$ref": "#/components/schemas/InvoiceItemResponseDto"
             }
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "bankId": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
+          "variableSymbol": {
+            "type": "string"
+          },
+          "specificSymbol": {
+            "type": "string"
+          },
+          "konstantSymbol": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "internalNote": {
+            "type": "string"
+          },
+          "originalNumber": {
+            "type": "string"
+          },
+          "contactSnapshot": {
+            "$ref": "#/components/schemas/ContactSnapshotDto"
           },
           "bankAccount": {
             "$ref": "#/components/schemas/InvoiceBankAccountSnapshotDto"
-          },
-          "company": {
-            "$ref": "#/components/schemas/InvoiceCompanySnapshotDto"
-          },
-          "supplier": {
-            "$ref": "#/components/schemas/InvoiceCompanySnapshotDto"
           },
           "payments": {
             "type": "array",
@@ -2219,18 +2908,20 @@
         },
         "required": [
           "id",
-          "companyId",
           "number",
           "createdDate",
-          "taxDate",
+          "duzpDate",
           "dueDate",
           "total",
           "totalTax",
           "currency",
           "type",
+          "vatMode",
           "status",
           "totalWithTax",
-          "items"
+          "items",
+          "companyId",
+          "contactId"
         ]
       },
       "PaginatedInvoiceResponseDto": {
@@ -2382,11 +3073,20 @@
             "type": "string",
             "description": "UUID of the invoice"
           },
-          "companyId": {
-            "type": "string"
-          },
           "bankId": {
             "type": "string"
+          },
+          "bankSnapshot": {
+            "description": "Direct bank-account snapshot (mutually exclusive with `bankId`). Setting this clears `bankId`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceBankAccountSnapshotDto"
+              }
+            ]
+          },
+          "contactId": {
+            "type": "string",
+            "description": "UUID of the external party (Contact)"
           },
           "number": {
             "type": "string",
@@ -2404,12 +3104,20 @@
             ],
             "example": "ISSUED"
           },
+          "vatMode": {
+            "type": "string",
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ],
+            "example": "STANDARD"
+          },
           "status": {
             "type": "string",
             "enum": [
               "DRAFT",
               "ISSUED",
-              "OVERDUE",
               "PAID",
               "CANCELLED"
             ],
@@ -2424,7 +3132,7 @@
             "type": "string",
             "example": "2025-06-20"
           },
-          "taxDate": {
+          "duzpDate": {
             "format": "date",
             "type": "string",
             "example": "2025-06-21"
@@ -2434,24 +3142,30 @@
             "type": "string",
             "example": "2025-07-20"
           },
-          "total": {
-            "type": "number",
-            "example": 1000
-          },
-          "totalTax": {
-            "type": "number",
-            "example": 150
-          },
-          "totalWithTax": {
-            "type": "number",
-            "example": 1150
-          },
           "items": {
-            "description": "Array of invoice items",
+            "description": "Array of invoice items. Totals are recomputed server-side when provided.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InvoiceItemDto"
             }
+          },
+          "variableSymbol": {
+            "type": "string"
+          },
+          "specificSymbol": {
+            "type": "string"
+          },
+          "konstantSymbol": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "internalNote": {
+            "type": "string"
+          },
+          "originalNumber": {
+            "type": "string"
           }
         },
         "required": [
@@ -2466,7 +3180,6 @@
             "enum": [
               "DRAFT",
               "ISSUED",
-              "OVERDUE",
               "PAID",
               "CANCELLED"
             ],
@@ -2503,10 +3216,6 @@
       "CreateBankDto": {
         "type": "object",
         "properties": {
-          "companyId": {
-            "type": "string",
-            "description": "UUID of the company this bank belongs to"
-          },
           "name": {
             "type": "string"
           },
@@ -2524,7 +3233,6 @@
           }
         },
         "required": [
-          "companyId",
           "name",
           "currency"
         ]
@@ -2533,9 +3241,6 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
-          },
-          "companyId": {
             "type": "string"
           },
           "name": {
@@ -2559,7 +3264,6 @@
         },
         "required": [
           "id",
-          "companyId",
           "name",
           "currency",
           "default"
@@ -2602,15 +3306,10 @@
           "bankId": {
             "type": "string",
             "description": "UUID of the bank to set as default"
-          },
-          "companyId": {
-            "type": "string",
-            "description": "UUID of the company"
           }
         },
         "required": [
-          "bankId",
-          "companyId"
+          "bankId"
         ]
       },
       "CreateUserProfileDto": {
@@ -2622,15 +3321,10 @@
           "lastName": {
             "type": "string"
           },
-          "c_ufo": {
+          "dic": {
             "type": "string",
-            "description": "Tax office code for VAT filings",
-            "example": "452"
-          },
-          "c_pracufo": {
-            "type": "string",
-            "description": "Tax office workplace code for VAT filings",
-            "example": "2102"
+            "description": "Tax identification number used for VAT filings",
+            "example": "9007180501"
           },
           "phone": {
             "type": "string",
@@ -2660,10 +3354,7 @@
           "lastName": {
             "type": "string"
           },
-          "c_ufo": {
-            "type": "string"
-          },
-          "c_pracufo": {
+          "dic": {
             "type": "string"
           },
           "phone": {
@@ -2688,15 +3379,10 @@
           "lastName": {
             "type": "string"
           },
-          "c_ufo": {
+          "dic": {
             "type": "string",
-            "description": "Tax office code for VAT filings",
-            "example": "452"
-          },
-          "c_pracufo": {
-            "type": "string",
-            "description": "Tax office workplace code for VAT filings",
-            "example": "2102"
+            "description": "Tax identification number used for VAT filings",
+            "example": "9007180501"
           },
           "phone": {
             "type": "string",
@@ -2713,8 +3399,9 @@
       "CreateSimpleInvoiceDto": {
         "type": "object",
         "properties": {
-          "companyId": {
-            "type": "string"
+          "contactId": {
+            "type": "string",
+            "description": "UUID of the external contact"
           },
           "number": {
             "type": "string",
@@ -2725,7 +3412,7 @@
             "type": "string",
             "example": "2025-06-20"
           },
-          "taxDate": {
+          "duzpDate": {
             "format": "date",
             "type": "string",
             "example": "2025-07-20"
@@ -2747,10 +3434,9 @@
           }
         },
         "required": [
-          "companyId",
           "number",
           "createdDate",
-          "taxDate",
+          "duzpDate",
           "total",
           "totalTax",
           "totalWithTax"
@@ -2762,6 +3448,12 @@
           "id": {
             "type": "string"
           },
+          "companyId": {
+            "type": "string"
+          },
+          "contactId": {
+            "type": "string"
+          },
           "number": {
             "type": "string"
           },
@@ -2769,7 +3461,7 @@
             "format": "date-time",
             "type": "string"
           },
-          "taxDate": {
+          "duzpDate": {
             "format": "date-time",
             "type": "string"
           },
@@ -2785,19 +3477,19 @@
           "description": {
             "type": "string"
           },
-          "company": {
-            "$ref": "#/components/schemas/CompanyResponseDto"
+          "contact": {
+            "$ref": "#/components/schemas/ContactResponseDto"
           }
         },
         "required": [
           "id",
+          "companyId",
           "number",
           "createdDate",
-          "taxDate",
+          "duzpDate",
           "total",
           "totalTax",
-          "totalWithTax",
-          "company"
+          "totalWithTax"
         ]
       },
       "GetSimpleInvoiceVatByMonthDto": {
@@ -2851,7 +3543,7 @@
           "id": {
             "type": "string"
           },
-          "companyId": {
+          "contactId": {
             "type": "string"
           },
           "number": {
@@ -2863,7 +3555,7 @@
             "type": "string",
             "example": "2025-06-20"
           },
-          "taxDate": {
+          "duzpDate": {
             "format": "date",
             "type": "string",
             "example": "2025-07-20"
@@ -2891,10 +3583,6 @@
       "CreatePaymentDto": {
         "type": "object",
         "properties": {
-          "companyId": {
-            "type": "string",
-            "description": "UUID of the company"
-          },
           "invoiceId": {
             "type": "string",
             "description": "UUID of the related invoice"
@@ -2933,7 +3621,6 @@
           }
         },
         "required": [
-          "companyId",
           "invoiceId",
           "paymentMethod",
           "amount",

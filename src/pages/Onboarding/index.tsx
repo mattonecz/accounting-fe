@@ -3,7 +3,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/contexts/AuthContext';
-import { refresh as refreshTokenApi } from '@/api/auth/auth';
 import { useCompanyCreate } from '@/api/companies/companies';
 import { useUserProfileCreate } from '@/api/user-profile/user-profile';
 import { Autocomplete } from '@/components/ui/autocomplete';
@@ -69,7 +68,7 @@ function findTaxOfficeCode(financniUrad: string): string {
 export default function Onboarding() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, login } = useAuth();
+  const { user, refreshActiveCompany } = useAuth();
   const { mutate: createCompany, isPending: isCreatingCompany } =
     useCompanyCreate();
   const { mutate: createProfile, isPending: isCreatingProfile } =
@@ -161,12 +160,13 @@ export default function Onboarding() {
     const companyPayload: CreateCompanyDto = {
       name: data.companyName,
       country: data.country,
-      isOwn: true,
       ico: data.ico || undefined,
       dic: data.companyDic || undefined,
       street: data.street || undefined,
       city: data.city || undefined,
       psc: data.psc || undefined,
+      c_ufo: data.c_ufo || undefined,
+      c_pracufo: data.c_pracufo || undefined,
     };
 
     const profilePayload: CreateUserProfileDto = {
@@ -175,8 +175,6 @@ export default function Onboarding() {
       email: data.email.trim() || undefined,
       phone: data.phone.trim() || undefined,
       dic: data.dic.trim() || undefined,
-      c_ufo: data.c_ufo || undefined,
-      c_pracufo: data.c_pracufo || undefined,
     };
 
     createCompany(
@@ -187,25 +185,14 @@ export default function Onboarding() {
             { data: profilePayload },
             {
               onSuccess: async () => {
-                try {
-                  const res = await refreshTokenApi({ withCredentials: true });
-                  login(res.data);
-                } catch {
-                  // proceed even if token refresh fails
-                }
+                await refreshActiveCompany();
                 enqueueSnackbar('Profil a firma byly úspěšně vytvořeny.', {
                   variant: 'success',
                 });
                 navigate('/');
               },
               onError: async () => {
-                // Company created but profile failed — refresh token so companyId is available
-                try {
-                  const res = await refreshTokenApi({ withCredentials: true });
-                  login(res.data);
-                } catch {
-                  // proceed even if token refresh fails
-                }
+                await refreshActiveCompany();
                 enqueueSnackbar(
                   'Firma vytvořena, ale profil se nepodařilo uložit. Můžete ho upravit v nastavení.',
                   { variant: 'warning' },

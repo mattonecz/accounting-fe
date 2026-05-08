@@ -16,7 +16,6 @@ import UpdateInvoice from './pages/UpdateInvoice';
 import SimpleInvoices from './pages/SimpleInvoices';
 import InvoiceDetail from './pages/InvoiceDetail';
 import TaxReport from './pages/TaxReport';
-import Profile from './pages/Profile';
 import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
 import NotFound from './pages/NotFound';
@@ -38,7 +37,7 @@ const App = () => (
               <Route
                 path="/onboarding"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireNoCompany>
                     <Onboarding />
                   </ProtectedRoute>
                 }
@@ -82,7 +81,6 @@ const App = () => (
                             element={<InvoiceDetail />}
                           />
                           <Route path="/tax-report" element={<TaxReport />} />
-                          <Route path="/profile" element={<Profile />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </div>

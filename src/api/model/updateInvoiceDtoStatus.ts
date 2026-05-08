@@ -13,7 +13,6 @@ export type UpdateInvoiceDtoStatus = typeof UpdateInvoiceDtoStatus[keyof typeof 
 export const UpdateInvoiceDtoStatus = {
   DRAFT: 'DRAFT',
   ISSUED: 'ISSUED',
-  OVERDUE: 'OVERDUE',
   PAID: 'PAID',
   CANCELLED: 'CANCELLED',
 } as const;

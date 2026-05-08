@@ -7,7 +7,6 @@ import {
   FileInput,
   Wallet,
   LogOut,
-  UserCircle,
   Calculator,
   Receipt,
 } from 'lucide-react';
@@ -15,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useSnackbar } from 'notistack';
+import { SettingsMenu } from '@/components/settings/SettingsMenu';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -24,7 +24,6 @@ const navigation = [
   { name: 'Faktury přijaté', href: '/incoming-invoices', icon: FileText },
   { name: 'Zjednodušené doklady', href: '/invoices/simple', icon: Receipt },
   { name: 'Přehled DPH', href: '/tax-report', icon: Calculator },
-  { name: 'Profil', href: '/profile', icon: UserCircle },
 ];
 
 export const Sidebar = () => {
@@ -66,8 +65,9 @@ export const Sidebar = () => {
         })}
       </nav>
       <div className="border-t border-border p-4">
-        <div className="mb-3 text-sm text-muted-foreground">
-          {user?.name || user?.email}
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">{user?.name || user?.email}</span>
+          <SettingsMenu />
         </div>
         <Button
           onClick={handleLogout}

@@ -5,10 +5,12 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import type { CompanyResponseDto } from './companyResponseDto';
+import type { ContactResponseDto } from './contactResponseDto';
 
 export interface SimpleInvoiceResponseDto {
   id: string;
+  companyId: string;
+  contactId?: string;
   number: string;
   createdDate: string;
   taxDate: string;
@@ -16,5 +18,5 @@ export interface SimpleInvoiceResponseDto {
   totalTax: number;
   totalWithTax: number;
   description?: string;
-  company: CompanyResponseDto;
+  contact?: ContactResponseDto;
 }

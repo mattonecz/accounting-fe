@@ -166,9 +166,9 @@ export const useSimpleInvoiceUpdate = <TError = AxiosError<SimpleInvoiceResponse
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * @summary List simple invoices by user
+ * @summary List simple invoices by company
  */
-export const simpleInvoiceListByUser = (
+export const simpleInvoiceListByCompany = (
      options?: AxiosRequestConfig
  ): Promise<AxiosResponse<SimpleInvoiceResponseDto[]>> => {
     
@@ -181,69 +181,69 @@ export const simpleInvoiceListByUser = (
 
 
 
-export const getSimpleInvoiceListByUserQueryKey = () => {
+export const getSimpleInvoiceListByCompanyQueryKey = () => {
     return [
     `/simple-invoices/list`
     ] as const;
     }
 
     
-export const getSimpleInvoiceListByUserQueryOptions = <TData = Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getSimpleInvoiceListByCompanyQueryOptions = <TData = Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getSimpleInvoiceListByUserQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getSimpleInvoiceListByCompanyQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof simpleInvoiceListByUser>>> = ({ signal }) => simpleInvoiceListByUser({ signal, ...axiosOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>> = ({ signal }) => simpleInvoiceListByCompany({ signal, ...axiosOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type SimpleInvoiceListByUserQueryResult = NonNullable<Awaited<ReturnType<typeof simpleInvoiceListByUser>>>
-export type SimpleInvoiceListByUserQueryError = AxiosError<SimpleInvoiceResponseDto[]>
+export type SimpleInvoiceListByCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>>
+export type SimpleInvoiceListByCompanyQueryError = AxiosError<SimpleInvoiceResponseDto[]>
 
 
-export function useSimpleInvoiceListByUser<TData = Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData>> & Pick<
+export function useSimpleInvoiceListByCompany<TData = Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof simpleInvoiceListByUser>>,
+          Awaited<ReturnType<typeof simpleInvoiceListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof simpleInvoiceListByUser>>
+          Awaited<ReturnType<typeof simpleInvoiceListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSimpleInvoiceListByUser<TData = Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData>> & Pick<
+export function useSimpleInvoiceListByCompany<TData = Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof simpleInvoiceListByUser>>,
+          Awaited<ReturnType<typeof simpleInvoiceListByCompany>>,
           TError,
-          Awaited<ReturnType<typeof simpleInvoiceListByUser>>
+          Awaited<ReturnType<typeof simpleInvoiceListByCompany>>
         > , 'initialData'
       >, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSimpleInvoiceListByUser<TData = Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useSimpleInvoiceListByCompany<TData = Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary List simple invoices by user
+ * @summary List simple invoices by company
  */
 
-export function useSimpleInvoiceListByUser<TData = Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
+export function useSimpleInvoiceListByCompany<TData = Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError = AxiosError<SimpleInvoiceResponseDto[]>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof simpleInvoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getSimpleInvoiceListByUserQueryOptions(options)
+  const queryOptions = getSimpleInvoiceListByCompanyQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
