@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/ui/form';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -8,6 +9,7 @@ import { InvoiceSummaryCard } from '@/components/invoices/InvoiceSummaryCard';
 import { InvoiceFormActions } from '@/components/invoices/InvoiceFormActions';
 
 const CreateInvoice = () => {
+  const { t } = useTranslation();
   const {
     form,
     fieldArray,
@@ -26,8 +28,8 @@ const CreateInvoice = () => {
   return (
     <PageLayout>
       <PageHeader
-        title={isReceived ? 'Vytvořit přijatou fakturu' : 'Vytvořit fakturu'}
-        description="Vyplňte údaje pro vytvoření nové faktury"
+        title={isReceived ? t('invoices.create.titleReceived') : t('invoices.create.title')}
+        description={t('invoices.create.description')}
         backButton
       />
 

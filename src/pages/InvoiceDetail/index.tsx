@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,6 +15,7 @@ import { PaymentsCard } from './PaymentsCard';
 import { StatusHistoryCard } from './StatusHistoryCard';
 
 const InvoiceDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError } = useInvoiceGet(id || '');
@@ -23,10 +25,7 @@ const InvoiceDetail = () => {
   const currency = invoice?.currency || 'CZK';
   const payments = invoice?.payments ?? [];
   const paidAmount = useMemo(() => getPaidAmount(invoice), [invoice]);
-  const remainingAmount = Math.max(
-    (invoice?.totalWithTax ?? 0) - paidAmount,
-    0,
-  );
+  const remainingAmount = Math.max((invoice?.totalWithTax ?? 0) - paidAmount, 0);
 
   const handleDownloadPdf = async () => {
     if (!invoiceRef.current || !invoice) return;
@@ -36,7 +35,7 @@ const InvoiceDetail = () => {
   if (!id) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">Neplatné ID faktury.</p>
+        <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>
       </PageLayout>
     );
   }
@@ -44,7 +43,7 @@ const InvoiceDetail = () => {
   if (isLoading) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">Načítám fakturu...</p>
+        <p className="text-muted-foreground">{t('invoices.detail.loading')}</p>
       </PageLayout>
     );
   }
@@ -52,7 +51,7 @@ const InvoiceDetail = () => {
   if (isError || !invoice) {
     return (
       <PageLayout>
-        <p className="text-destructive">Fakturu se nepodařilo načíst.</p>
+        <p className="text-destructive">{t('invoices.detail.loadError')}</p>
       </PageLayout>
     );
   }
@@ -76,10 +75,10 @@ const InvoiceDetail = () => {
         </Button>
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            Detail faktury
+            {t('invoices.detail.title')}
           </p>
           <p className="text-sm text-muted-foreground">
-            Faktura {invoice.number}
+            {t('invoices.detail.subtitle', { number: invoice.number })}
           </p>
         </div>
       </div>

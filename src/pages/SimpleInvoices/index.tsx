@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,49 +13,11 @@ import type { SimpleInvoiceResponseDto } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
+import { formatDate, formatMoney } from '@/lib/formatters';
 import { CreateSimpleInvoiceDialog } from './CreateSimpleInvoiceDialog';
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
-    currency: 'CZK',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('cs-CZ').format(new Date(date));
-
-const columns = [
-  {
-    header: 'Číslo dokladu',
-    cell: (i: SimpleInvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
-  },
-  { header: 'Firma', cell: (i: SimpleInvoiceResponseDto) => i.contact?.name || '-' },
-  { header: 'Datum vystavení', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.createdDate) },
-  { header: 'Datum plnění', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.duzpDate) },
-  {
-    header: 'Základ',
-    headerClassName: 'text-right',
-    cellClassName: 'text-right',
-    cell: (i: SimpleInvoiceResponseDto) => formatCurrency(i.total),
-  },
-  {
-    header: 'DPH',
-    headerClassName: 'text-right',
-    cellClassName: 'text-right',
-    cell: (i: SimpleInvoiceResponseDto) => formatCurrency(i.totalTax),
-  },
-  {
-    header: 'Celkem s DPH',
-    headerClassName: 'text-right',
-    cellClassName: 'text-right',
-    cell: (i: SimpleInvoiceResponseDto) => formatCurrency(i.totalWithTax),
-  },
-  { header: 'Poznámka', cell: (i: SimpleInvoiceResponseDto) => i.description || '-' },
-];
-
 const SimpleInvoices = () => {
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const {
@@ -80,16 +43,47 @@ const SimpleInvoices = () => {
     [invoices],
   );
 
+  const lang = i18n.language;
+
+  const columns = [
+    {
+      header: t('simpleInvoices.columns.number'),
+      cell: (i: SimpleInvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
+    },
+    { header: t('simpleInvoices.columns.company'), cell: (i: SimpleInvoiceResponseDto) => i.contact?.name || '-' },
+    { header: t('invoices.fields.createdDate'), cell: (i: SimpleInvoiceResponseDto) => formatDate(i.createdDate, lang) },
+    { header: t('invoices.fields.duzpDate'), cell: (i: SimpleInvoiceResponseDto) => formatDate(i.duzpDate, lang) },
+    {
+      header: t('simpleInvoices.columns.base'),
+      headerClassName: 'text-right',
+      cellClassName: 'text-right',
+      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.total, 'CZK', lang),
+    },
+    {
+      header: t('simpleInvoices.columns.vat'),
+      headerClassName: 'text-right',
+      cellClassName: 'text-right',
+      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.totalTax, 'CZK', lang),
+    },
+    {
+      header: t('simpleInvoices.columns.totalWithVat'),
+      headerClassName: 'text-right',
+      cellClassName: 'text-right',
+      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.totalWithTax, 'CZK', lang),
+    },
+    { header: t('invoices.fields.note'), cell: (i: SimpleInvoiceResponseDto) => i.description || '-' },
+  ];
+
   return (
     <PageLayout>
       <PageHeader
-        title="Zjednodušené doklady"
-        description="Přehled a evidence zjednodušených daňových dokladů z reálných dat"
+        title={t('nav.simpleInvoices')}
+        description={t('simpleInvoices.description')}
         actions={
           <>
             <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCcw className="mr-2 h-4 w-4" />
-              Obnovit
+              {t('common.refresh')}
             </Button>
             <CreateSimpleInvoiceDialog open={open} onOpenChange={setOpen} />
           </>
@@ -99,33 +93,33 @@ const SimpleInvoices = () => {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Počet dokladů</CardDescription>
+            <CardDescription>{t('simpleInvoices.stats.count')}</CardDescription>
             <CardTitle className="text-3xl">{invoices.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Celkové DPH</CardDescription>
-            <CardTitle className="text-3xl">{formatCurrency(soucty.totalTax)}</CardTitle>
+            <CardDescription>{t('simpleInvoices.stats.totalVat')}</CardDescription>
+            <CardTitle className="text-3xl">{formatMoney(soucty.totalTax, 'CZK', lang)}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Celkem s DPH</CardDescription>
-            <CardTitle className="text-3xl">{formatCurrency(soucty.totalWithTax)}</CardTitle>
+            <CardDescription>{t('simpleInvoices.stats.totalWithVat')}</CardDescription>
+            <CardTitle className="text-3xl">{formatMoney(soucty.totalWithTax, 'CZK', lang)}</CardTitle>
           </CardHeader>
         </Card>
       </div>
 
       <DataTableCard
-        title="Seznam zjednodušených dokladů"
+        title={t('simpleInvoices.listTitle')}
         columns={columns}
         data={invoices}
         isLoading={isLoading}
         isError={isError}
-        emptyMessage="Zatím nemáte evidovaný žádný zjednodušený doklad."
-        loadingMessage="Načítám zjednodušené doklady…"
-        errorMessage="Nepodařilo se načíst zjednodušené doklady. Zkuste načtení zopakovat."
+        emptyMessage={t('simpleInvoices.empty')}
+        loadingMessage={t('simpleInvoices.loading')}
+        errorMessage={t('simpleInvoices.error')}
       />
     </PageLayout>
   );

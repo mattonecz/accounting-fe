@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardContent,
@@ -13,21 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { months } from './MonthSelector';
+import { formatMoney } from '@/lib/formatters';
 
 type VatTotals = {
   base: number;
   vat: number;
   total: number;
 };
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
-    currency: 'CZK',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
 
 interface VatBreakdownTableProps {
   vydaneFaktury: VatTotals;
@@ -59,103 +52,75 @@ export const VatBreakdownTable = ({
   selectedYear,
   isLoading,
   isError,
-}: VatBreakdownTableProps) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Rozpad DPH za vybrané období</CardTitle>
-      <CardDescription>
-        Data jsou načtena podle data zdanitelného plnění za měsíc{' '}
-        {months[selectedMonth]} {selectedYear}.
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      {isLoading ? (
-        <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-          Načítám přehled DPH…
-        </div>
-      ) : isError ? (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
-          Nepodařilo se načíst podklady pro přehled DPH. Zkuste načtení
-          zopakovat.
-        </div>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Typ dokladu</TableHead>
-                <TableHead className="text-right">Základ</TableHead>
-                <TableHead className="text-right">DPH</TableHead>
-                <TableHead className="text-right">Celkem</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Vydané faktury</TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(vydaneFaktury.base)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatCurrency(vydaneFaktury.vat)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(vydaneFaktury.total)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Přijaté faktury</TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(prijateFaktury.base)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatCurrency(prijateFaktury.vat)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(prijateFaktury.total)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">
-                  Zjednodušené doklady
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(zjednoduseneDoklady.base)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatCurrency(zjednoduseneDoklady.vat)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(zjednoduseneDoklady.total)}
-                </TableCell>
-              </TableRow>
-              <TableRow className="bg-muted/50 font-semibold">
-                <TableCell>Součet na vstupu</TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(zakladNaVstupu)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(vstupniDPH)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(obratNaVstupu)}
-                </TableCell>
-              </TableRow>
-              <TableRow className="bg-muted/30 font-semibold">
-                <TableCell>Součet na výstupu</TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(zakladNaVystupu)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(vystupniDPH)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(obratNaVystupu)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </CardContent>
-  </Card>
-);
+}: VatBreakdownTableProps) => {
+  const { t, i18n } = useTranslation();
+  const monthName = t(`taxReport.months.${selectedMonth}`);
+  const fmt = (n: number) => formatMoney(n, 'CZK', i18n.language);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('taxReport.breakdown.title')}</CardTitle>
+        <CardDescription>
+          {t('taxReport.breakdown.description', { month: monthName, year: selectedYear })}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+            {t('taxReport.breakdown.loading')}
+          </div>
+        ) : isError ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+            {t('taxReport.breakdown.error')}
+          </div>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('taxReport.breakdown.columns.type')}</TableHead>
+                  <TableHead className="text-right">{t('taxReport.breakdown.columns.base')}</TableHead>
+                  <TableHead className="text-right">{t('taxReport.breakdown.columns.vat')}</TableHead>
+                  <TableHead className="text-right">{t('taxReport.breakdown.columns.total')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.issued')}</TableCell>
+                  <TableCell className="text-right">{fmt(vydaneFaktury.base)}</TableCell>
+                  <TableCell className="text-right font-medium">{fmt(vydaneFaktury.vat)}</TableCell>
+                  <TableCell className="text-right">{fmt(vydaneFaktury.total)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.received')}</TableCell>
+                  <TableCell className="text-right">{fmt(prijateFaktury.base)}</TableCell>
+                  <TableCell className="text-right font-medium">{fmt(prijateFaktury.vat)}</TableCell>
+                  <TableCell className="text-right">{fmt(prijateFaktury.total)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.simple')}</TableCell>
+                  <TableCell className="text-right">{fmt(zjednoduseneDoklady.base)}</TableCell>
+                  <TableCell className="text-right font-medium">{fmt(zjednoduseneDoklady.vat)}</TableCell>
+                  <TableCell className="text-right">{fmt(zjednoduseneDoklady.total)}</TableCell>
+                </TableRow>
+                <TableRow className="bg-muted/50 font-semibold">
+                  <TableCell>{t('taxReport.breakdown.rows.inputTotal')}</TableCell>
+                  <TableCell className="text-right">{fmt(zakladNaVstupu)}</TableCell>
+                  <TableCell className="text-right">{fmt(vstupniDPH)}</TableCell>
+                  <TableCell className="text-right">{fmt(obratNaVstupu)}</TableCell>
+                </TableRow>
+                <TableRow className="bg-muted/30 font-semibold">
+                  <TableCell>{t('taxReport.breakdown.rows.outputTotal')}</TableCell>
+                  <TableCell className="text-right">{fmt(zakladNaVystupu)}</TableCell>
+                  <TableCell className="text-right">{fmt(vystupniDPH)}</TableCell>
+                  <TableCell className="text-right">{fmt(obratNaVystupu)}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

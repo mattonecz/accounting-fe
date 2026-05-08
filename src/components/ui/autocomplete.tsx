@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Command,
   CommandEmpty,
@@ -28,6 +29,7 @@ export function Autocomplete({
   disabled = false,
   className,
 }: AutocompleteProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<EkonomickySubjektDto[]>(
     [],
@@ -121,7 +123,7 @@ export function Autocomplete({
       ref={wrapperRef}
       className="grid w-full grid-cols-[200px_minmax(0,1fr)] items-start gap-4"
     >
-      <Label className="pt-2 text-right">Vyhledat v ARES</Label>
+      <Label className="pt-2 text-right">{t('autocomplete.label')}</Label>
       <div className="relative min-w-0">
         <input
           type="text"
@@ -132,7 +134,7 @@ export function Autocomplete({
               setOpen(true);
             }
           }}
-          placeholder="Zadejte název nebo celé IČO"
+          placeholder={t('autocomplete.placeholder')}
           disabled={disabled}
           className={cn(
             'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -145,13 +147,13 @@ export function Autocomplete({
               <CommandList>
                 {loading && (
                   <div className="py-6 text-center text-sm text-muted-foreground">
-                    Loading suggestions...
+                    {t('autocomplete.loading')}
                   </div>
                 )}
                 {!loading &&
                   suggestions.length === 0 &&
                   inputValue.length > 0 && (
-                    <CommandEmpty>No suggestions found.</CommandEmpty>
+                    <CommandEmpty>{t('autocomplete.empty')}</CommandEmpty>
                   )}
                 {!loading && suggestions.length > 0 && (
                   <CommandGroup>

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import * as axios from 'axios';
 import {
   getInvoiceSettingsGetQueryKey,
@@ -62,6 +63,7 @@ const toPayload = (data: FormValues): UpdateInvoiceSettingsDto => ({
 });
 
 export const InvoiceDefaultsForm = () => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
@@ -85,10 +87,10 @@ export const InvoiceDefaultsForm = () => {
         onSuccess: (response) => {
           queryClient.setQueryData(getInvoiceSettingsGetQueryKey(), response);
           reset(mapToForm(response.data));
-          enqueueSnackbar('Výchozí hodnoty byly úspěšně uloženy.', { variant: 'success' });
+          enqueueSnackbar(t('settings.defaults.messages.saveSuccess'), { variant: 'success' });
         },
         onError: () => {
-          enqueueSnackbar('Uložení výchozích hodnot se nepodařilo.', { variant: 'error' });
+          enqueueSnackbar(t('settings.defaults.messages.saveError'), { variant: 'error' });
         },
       },
     );
@@ -98,7 +100,7 @@ export const InvoiceDefaultsForm = () => {
     return (
       <Card>
         <CardContent className="p-6 text-sm text-muted-foreground">
-          Načítám výchozí hodnoty...
+          {t('settings.defaults.loading')}
         </CardContent>
       </Card>
     );
@@ -110,56 +112,54 @@ export const InvoiceDefaultsForm = () => {
         {is404 && (
           <Card className="border-dashed">
             <CardContent className="p-6 text-sm text-muted-foreground">
-              Výchozí hodnoty zatím nejsou nastaveny. Po uložení se vytvoří nový záznam.
+              {t('settings.defaults.notSetHint')}
             </CardContent>
           </Card>
         )}
 
         <Card>
           <CardHeader>
-            <CardTitle>Výchozí hodnoty faktur</CardTitle>
-            <CardDescription>
-              Hodnoty předvyplněné při vytváření nové faktury.
-            </CardDescription>
+            <CardTitle>{t('settings.defaults.card.title')}</CardTitle>
+            <CardDescription>{t('settings.defaults.card.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <FormLabel>Měna</FormLabel>
+              <FormLabel>{t('settings.defaults.fields.currency')}</FormLabel>
               <Input value={settings?.currency ?? 'CZK'} disabled className="w-full" />
             </div>
 
             <InputController
               control={form.control}
               name="invoicePrefix"
-              label="Prefix faktury"
+              label={t('settings.defaults.fields.invoicePrefix')}
               placeholder="FV"
               variant="vertical"
             />
             <InputController
               control={form.control}
               name="invoiceNumberFormat"
-              label="Formát čísla faktury"
+              label={t('settings.defaults.fields.invoiceNumberFormat')}
               placeholder="{YYYY}{0001}"
               variant="vertical"
             />
             <InputController
               control={form.control}
               name="nextInvoiceNumber"
-              label="Další číslo faktury"
+              label={t('settings.defaults.fields.nextInvoiceNumber')}
               type="number"
               variant="vertical"
             />
             <InputController
               control={form.control}
               name="dueDaysDefault"
-              label="Splatnost (dní)"
+              label={t('settings.defaults.fields.dueDaysDefault')}
               type="number"
               variant="vertical"
             />
             <InputController
               control={form.control}
               name="defaultVatRate"
-              label="Výchozí sazba DPH (%)"
+              label={t('settings.defaults.fields.defaultVatRate')}
               type="number"
               variant="vertical"
             />
@@ -168,7 +168,7 @@ export const InvoiceDefaultsForm = () => {
               name="defaultHeaderText"
               render={({ field, fieldState }) => (
                 <FormItem className="space-y-2 md:col-span-2">
-                  <FormLabel>Výchozí text záhlaví</FormLabel>
+                  <FormLabel>{t('settings.defaults.fields.defaultHeaderText')}</FormLabel>
                   <FormControl>
                     <Textarea {...field} className="w-full resize-none" rows={3} />
                   </FormControl>
@@ -181,7 +181,7 @@ export const InvoiceDefaultsForm = () => {
               name="defaultFooterText"
               render={({ field, fieldState }) => (
                 <FormItem className="space-y-2 md:col-span-2">
-                  <FormLabel>Výchozí text zápatí</FormLabel>
+                  <FormLabel>{t('settings.defaults.fields.defaultFooterText')}</FormLabel>
                   <FormControl>
                     <Textarea {...field} className="w-full resize-none" rows={3} />
                   </FormControl>
@@ -192,7 +192,7 @@ export const InvoiceDefaultsForm = () => {
             <InputController
               control={form.control}
               name="logoUrl"
-              label="URL loga"
+              label={t('settings.defaults.fields.logoUrl')}
               placeholder="https://..."
               variant="vertical"
               containerClassName="md:col-span-2"
@@ -202,7 +202,7 @@ export const InvoiceDefaultsForm = () => {
 
         <div className="flex justify-end">
           <Button type="submit" size="lg" disabled={isSaving}>
-            {isSaving ? 'Ukládám...' : 'Uložit změny'}
+            {isSaving ? t('common.saving') : t('common.saveChanges')}
           </Button>
         </div>
       </form>

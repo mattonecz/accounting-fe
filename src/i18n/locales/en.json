@@ -1,0 +1,870 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "actions": "Actions",
+    "back": "Back",
+    "optional": "Optional",
+    "errorLoad": "Failed to load",
+    "refresh": "Refresh",
+    "detail": "Detail"
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "minZero": "Value must be ≥ 0",
+    "maxN": "Value must be ≤ {{max}}",
+    "email": "Enter a valid email"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "contacts": "Contacts",
+    "bankAccounts": "Bank Accounts",
+    "invoicesIssued": "Issued Invoices",
+    "invoicesReceived": "Received Invoices",
+    "simpleInvoices": "Simple Invoices",
+    "taxReport": "VAT Report",
+    "logout": "Log out"
+  },
+  "auth": {
+    "title": "FreelanceBooks",
+    "description": "Manage your freelance finances with ease",
+    "login": "Login",
+    "register": "Register",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "password": "Password"
+    },
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "••••••••"
+    },
+    "validation": {
+      "usernameRequired": "Username is required",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required"
+    },
+    "messages": {
+      "loginSuccess": "Successfully logged in!",
+      "loginError": "Invalid username or password",
+      "registerSuccess": "Account created successfully!",
+      "registerError": "This email address is already registered",
+      "logoutSuccess": "Logged out successfully"
+    }
+  },
+  "invoices": {
+    "create": {
+      "title": "Create Invoice",
+      "titleReceived": "Create Received Invoice",
+      "description": "Fill in the details to create a new invoice"
+    },
+    "update": {
+      "title": "Edit Invoice",
+      "description": "Update the invoice details and save changes",
+      "loading": "Loading invoice...",
+      "saving": "Saving changes...",
+      "save": "Save Changes"
+    },
+    "detail": {
+      "backLabel": "Invoice Detail",
+      "backNumber": "Invoice {{number}}",
+      "invalidId": "Invalid invoice ID.",
+      "loading": "Loading invoice...",
+      "error": "Failed to load invoice.",
+      "invoice": {
+        "title": "Invoice",
+        "number": "Invoice Number",
+        "supplierNumber": "Supplier Number",
+        "createdDate": "Issue Date",
+        "dueDate": "Due Date",
+        "duzpDate": "Tax Date",
+        "vatMode": "VAT Mode"
+      },
+      "hero": {
+        "total": "Total",
+        "paid": "Paid",
+        "remaining": "Remaining",
+        "editLabel": "Edit invoice",
+        "moreLabel": "More actions",
+        "print": "Print"
+      },
+      "notes": {
+        "title": "Notes",
+        "note": "Note",
+        "internalNote": "Internal Note",
+        "internalNoteDisclaimer": "Not visible to the counterparty."
+      },
+      "bank": {
+        "title": "Payment Details",
+        "supplierAccount": "Supplier Bank Account",
+        "account": "Bank Account",
+        "name": "Bank",
+        "number": "Account Number",
+        "iban": "IBAN",
+        "swift": "SWIFT"
+      },
+      "symbols": {
+        "title": "Payment Symbols",
+        "vs": "VS",
+        "ss": "SS",
+        "ks": "KS"
+      },
+      "payments": {
+        "heading_one": "Payment",
+        "heading_other": "Payments",
+        "empty": "No payments recorded for this invoice yet."
+      },
+      "statusHistory": {
+        "title": "Status History",
+        "empty": "No status history available for this invoice yet.",
+        "statusChange": "Status change",
+        "changes_one": "{{count}} change",
+        "changes_other": "{{count}} changes"
+      },
+      "items": {
+        "title": "Invoice Items",
+        "columns": {
+          "item": "Item",
+          "quantity": "Quantity",
+          "unitPrice": "Unit Price",
+          "vat": "VAT",
+          "total": "Total"
+        }
+      }
+    },
+    "list": {
+      "columns": {
+        "number": "Invoice Number",
+        "contact": "Customer",
+        "supplier": "Supplier",
+        "amount": "Amount",
+        "status": "Status",
+        "createdDate": "Issue Date",
+        "dueDate": "Due Date",
+        "actions": "Actions"
+      },
+      "allInvoices": "All Invoices",
+      "emptyIssued": "No issued invoices found.",
+      "emptyReceived": "No received invoices found.",
+      "loading": "Loading invoices...",
+      "error": "Failed to load invoices.",
+      "titleIssued": "Issued Invoices",
+      "titleReceived": "Received Invoices",
+      "descriptionIssued": "Track your issued invoices",
+      "descriptionReceived": "Track your received invoices"
+    },
+    "fields": {
+      "number": "Invoice Number",
+      "originalNumber": "Supplier Number",
+      "currency": "Currency",
+      "vatMode": "VAT Mode",
+      "exchangeRate": "Exchange Rate",
+      "createdDate": "Issue Date",
+      "duzpDate": "Tax Date",
+      "dueDate": "Due Date",
+      "contact": "Customer",
+      "supplier": "Supplier",
+      "bank": "Bank Account",
+      "bankSupplier": "Supplier Bank Account",
+      "bankName": "Bank Name",
+      "bankNumber": "Account Number",
+      "bankIban": "IBAN",
+      "bankSwift": "SWIFT/BIC",
+      "variableSymbol": "Variable Symbol",
+      "specificSymbol": "Specific Symbol",
+      "konstantSymbol": "Constant Symbol",
+      "note": "Note",
+      "internalNote": "Internal Note",
+      "vatRate": "VAT %",
+      "status": "Status",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price"
+    },
+    "placeholders": {
+      "number": "20250001",
+      "originalNumber": "Supplier invoice number",
+      "selectCurrency": "Select currency",
+      "selectVatMode": "Select VAT mode",
+      "exchangeRate": "Optional",
+      "selectContact": "Select customer",
+      "selectSupplier": "Select supplier",
+      "selectBank": "Select bank account",
+      "bankName": "Optional",
+      "bankNumber": "123456789/0100",
+      "bankIban": "CZ65...",
+      "bankSwift": "Optional",
+      "variableSymbol": "Optional",
+      "specificSymbol": "Optional",
+      "konstantSymbol": "Optional",
+      "note": "Will appear on the invoice",
+      "internalNote": "Not visible to the counterparty",
+      "itemDescription": "Item description",
+      "selectStatus": "Select status"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "ISSUED": "Issued",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled",
+      "OVERDUE": "Overdue",
+      "UPDATED": "Updated"
+    },
+    "vatModes": {
+      "STANDARD": "Standard",
+      "NON_VAT_PAYER": "Non-VAT Payer",
+      "REVERSE_CHARGE": "Reverse Charge"
+    },
+    "paymentMethods": {
+      "BANK_TRANSFER": "Bank Transfer",
+      "CASH": "Cash",
+      "CARD": "Card",
+      "OTHER": "Other"
+    },
+    "summary": {
+      "title": "Invoice Summary",
+      "subtotal": "Subtotal",
+      "total": "Total Amount",
+      "totalTax": "Total VAT"
+    },
+    "items": {
+      "title": "Invoice Items",
+      "add": "Add Item",
+      "addItem": "Add Item",
+      "columns": {
+        "description": "Description",
+        "quantity": "Quantity",
+        "price": "Price",
+        "vatRate": "VAT %",
+        "vatRatePct": "VAT %",
+        "total": "Total"
+      },
+      "validation": {
+        "descriptionRequired": "Description is required",
+        "quantityRequired": "Quantity is required",
+        "quantityMin": "Quantity must be ≥ 0",
+        "priceRequired": "Price is required",
+        "priceMin": "Price must be ≥ 0",
+        "vatMin": "VAT must be ≥ 0",
+        "vatMax": "VAT must be ≤ 100"
+      }
+    },
+    "actions": {
+      "create": "Create Invoice",
+      "createDraft": "Save as Draft",
+      "edit": "Edit",
+      "editAriaLabel": "Edit invoice {{number}}",
+      "moreAriaLabel": "More actions for invoice {{number}}",
+      "detail": "Detail",
+      "recordPayment": "Record Payment",
+      "downloadPdf": "Download PDF",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
+      "savingChanges": "Saving changes...",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "created": "Invoice created successfully",
+      "createFailed": "Failed to create invoice",
+      "draftCreated": "Invoice draft created successfully",
+      "draftCreateFailed": "Failed to create invoice draft",
+      "updated": "Invoice updated successfully",
+      "updateFailed": "Failed to update invoice"
+    },
+    "validation": {
+      "numberRequired": "Invoice number is required",
+      "contactRequired": "Customer is required",
+      "supplierRequired": "Supplier is required",
+      "vatModeRequired": "VAT mode is required",
+      "createdDateRequired": "Issue date is required",
+      "duzpDateRequired": "Tax date is required",
+      "dueDateRequired": "Due date is required",
+      "bankRequired": "Bank account is required"
+    },
+    "sections": {
+      "basicInfo": "Basic Information",
+      "items": "Invoice Items",
+      "bank": "Bank Account",
+      "bankSupplier": "Supplier Bank Account",
+      "paymentSymbols": "Payment Symbols",
+      "notes": "Notes",
+      "optionalDetails": "Payment symbols & notes"
+    }
+  },
+  "payments": {
+    "title": "Record Payment",
+    "invoice": "Invoice {{number}}",
+    "fields": {
+      "date": "Payment Date",
+      "amount": "Amount",
+      "reference": "Variable Symbol",
+      "method": "Payment Method"
+    },
+    "placeholders": {
+      "selectMethod": "Select payment method"
+    },
+    "actions": {
+      "record": "Record Payment",
+      "save": "Save Payment",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "success": "Payment recorded successfully",
+      "error": "Failed to record payment"
+    },
+    "validation": {
+      "amountRequired": "Amount is required",
+      "dateRequired": "Payment date is required",
+      "referenceRequired": "Variable symbol is required"
+    }
+  },
+  "simpleInvoices": {
+    "title": "Simple Invoices",
+    "description": "Overview and records of simplified tax documents",
+    "listTitle": "Simple Invoice List",
+    "empty": "No simple invoices recorded yet.",
+    "loading": "Loading simple invoices…",
+    "error": "Failed to load simple invoices. Please try again.",
+    "stats": {
+      "count": "Document Count",
+      "totalVat": "Total VAT",
+      "totalWithVat": "Total with VAT"
+    },
+    "fields": {
+      "number": "Document Number",
+      "company": "Company",
+      "base": "Base",
+      "vat": "VAT",
+      "totalWithVat": "Total with VAT"
+    },
+    "placeholders": {
+      "contact": "Select contact",
+      "description": "Additional document information..."
+    },
+    "dialog": {
+      "title": "Create Simple Invoice",
+      "submit": "Create Document"
+    },
+    "messages": {
+      "createSuccess": "Simple invoice created successfully.",
+      "createError": "Failed to create simple invoice."
+    },
+    "list": {
+      "title": "Simple Invoice List",
+      "empty": "No simple invoices recorded yet.",
+      "loading": "Loading simple invoices…",
+      "error": "Failed to load simple invoices. Please try again."
+    },
+    "columns": {
+      "number": "Document Number",
+      "contact": "Company",
+      "company": "Company",
+      "createdDate": "Issue Date",
+      "duzpDate": "Tax Date",
+      "base": "Base",
+      "vat": "VAT",
+      "totalWithVat": "Total with VAT",
+      "note": "Note"
+    },
+    "cards": {
+      "count": "Document Count",
+      "totalVat": "Total VAT",
+      "totalWithVat": "Total with VAT"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "create": "New Document"
+    },
+    "create": {
+      "title": "Create Simple Invoice",
+      "fields": {
+        "number": "Document Number",
+        "contact": "Company",
+        "createdDate": "Issue Date",
+        "duzpDate": "Tax Date",
+        "base": "Base",
+        "vat": "VAT",
+        "totalWithVat": "Total with VAT",
+        "note": "Note"
+      },
+      "placeholders": {
+        "contact": "Select contact",
+        "contactLoading": "Loading contacts...",
+        "note": "Additional document information..."
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "submit": "Create Document",
+        "submitting": "Saving"
+      },
+      "validation": {
+        "numberRequired": "Document number is required",
+        "createdDateRequired": "Issue date is required",
+        "duzpDateRequired": "Tax date is required",
+        "baseRequired": "Base amount is required",
+        "baseMin": "Base amount must be a positive number or zero",
+        "vatRequired": "VAT is required",
+        "vatMin": "VAT must be a positive number or zero",
+        "totalWithVatRequired": "Total with VAT is required",
+        "totalWithVatMin": "Total with VAT must be a positive number or zero"
+      },
+      "messages": {
+        "created": "Simple invoice created successfully.",
+        "createFailed": "Failed to create simple invoice."
+      }
+    }
+  },
+  "bankAccounts": {
+    "title": "Bank Accounts",
+    "description": "Track your business bank accounts",
+    "fields": {
+      "name": "Account Name",
+      "number": "Account Number",
+      "iban": "IBAN",
+      "swift": "SWIFT/BIC",
+      "currency": "Currency"
+    },
+    "placeholders": {
+      "name": "Main CZK Account",
+      "number": "1234567890",
+      "iban": "CZ65 0800 0000 1234 5678 9012",
+      "swift": "CEKOCZPP",
+      "currency": "CZK"
+    },
+    "validation": {
+      "nameRequired": "Account name is required",
+      "numberOrIbanRequired": "Either account number or IBAN must be filled",
+      "currencyRequired": "Currency is required"
+    },
+    "create": {
+      "title": "Add Bank Account",
+      "trigger": "Add Account"
+    },
+    "edit": {
+      "title": "Edit Bank Account",
+      "description": "Update the account name, identifier and currency."
+    },
+    "defaultAccount": "Default account",
+    "setAsDefault": "Set as default",
+    "setNameAsDefault": "Set {{name}} as default account",
+    "actions": {
+      "cancel": "Cancel",
+      "create": "Add Account",
+      "save": "Save Changes"
+    },
+    "messages": {
+      "created": "{{name}} has been added successfully.",
+      "createFailed": "Failed to add bank account",
+      "updated": "{{name}} has been updated successfully.",
+      "updateFailed": "Failed to update bank account",
+      "setDefault": "{{name}} is now the default account.",
+      "setDefaultFailed": "Failed to set default account"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "description": "Manage your clients and vendors",
+    "allContacts": "All Contacts",
+    "columns": {
+      "name": "Name",
+      "ico": "ICO",
+      "address": "Address",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Name",
+      "ico": "ICO",
+      "dic": "DIC",
+      "country": "Country",
+      "city": "City",
+      "street": "Street",
+      "psc": "ZIP Code",
+      "email": "Email",
+      "description": "Description"
+    },
+    "placeholders": {
+      "name": "Company name",
+      "ico": "1234567890",
+      "dic": "CZ1234567890",
+      "country": "Czech Republic",
+      "city": "Prague",
+      "street": "123 Main St",
+      "psc": "12345",
+      "email": "contact@company.com",
+      "description": "Short company note"
+    },
+    "detail": {
+      "description": "Contact details and registered company information.",
+      "ico": "ICO",
+      "dic": "DIC",
+      "address": "Address",
+      "city": "City",
+      "country": "Country",
+      "email": "Email"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "countryRequired": "Country is required"
+    },
+    "actions": {
+      "add": "Add Contact",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "create": "Add Contact",
+      "save": "Save Changes"
+    },
+    "create": {
+      "title": "Add New Contact"
+    },
+    "edit": {
+      "title": "Edit Contact",
+      "description": "Update data for the selected contact."
+    },
+    "messages": {
+      "created": "Contact created successfully",
+      "createFailed": "Failed to create contact",
+      "updated": "Contact updated successfully",
+      "updateFailed": "Failed to update contact"
+    }
+  },
+  "taxReport": {
+    "title": "VAT Report",
+    "description": "Monthly VAT summary from issued and received documents including simplified cost invoices",
+    "actions": {
+      "refresh": "Refresh",
+      "export": "Generate VAT & KH",
+      "exporting": "Generating..."
+    },
+    "statCards": {
+      "inputVat": "Input VAT",
+      "outputVat": "Output VAT",
+      "simpleInvoices": "Simple Invoices",
+      "result": "Period Result",
+      "inputVatTrend": "Received invoices and simple invoices",
+      "outputVatTrend": "Issued invoices only",
+      "simpleInvoicesTrend": "Cost documents included in input VAT",
+      "vatDue": "VAT payable",
+      "vatRefund": "VAT refund"
+    },
+    "breakdown": {
+      "title": "VAT Breakdown for Selected Period",
+      "description": "Data loaded by tax date for {{month}} {{year}}.",
+      "loading": "Loading VAT report…",
+      "error": "Failed to load VAT report data. Please try again.",
+      "columns": {
+        "type": "Document Type",
+        "base": "Base",
+        "vat": "VAT",
+        "total": "Total"
+      },
+      "rows": {
+        "issued": "Issued Invoices",
+        "received": "Received Invoices",
+        "simple": "Simple Invoices",
+        "inputTotal": "Input Total",
+        "outputTotal": "Output Total"
+      }
+    },
+    "explanation": {
+      "title": "What This Means",
+      "description": "Simple invoices are treated as received cost documents and contribute to VAT deductions.",
+      "vatDueLabel": "VAT Payable / Refundable",
+      "vatDue": "For the selected period, you have a VAT liability.",
+      "vatRefund": "For the selected period, you are entitled to a VAT refund.",
+      "inputVatDesc": "Input VAT represents the deduction from received invoices and simplified cost documents.",
+      "outputVatDesc": "Output VAT contains VAT from issued invoices only.",
+      "dataNote": "The report uses monthly summaries from backend endpoints, so it reflects real accounting data without any fictional figures.",
+      "updating": "Updating data…"
+    },
+    "months": {
+      "0": "January",
+      "1": "February",
+      "2": "March",
+      "3": "April",
+      "4": "May",
+      "5": "June",
+      "6": "July",
+      "7": "August",
+      "8": "September",
+      "9": "October",
+      "10": "November",
+      "11": "December"
+    }
+  },
+  "settings": {
+    "menu": {
+      "personal": "Personal Info",
+      "billing": "Billing Info",
+      "defaults": "Invoice Defaults",
+      "language": "Language"
+    },
+    "personal": {
+      "dialogTitle": "Personal Info",
+      "dialogDescription": "Contact details stored in your user profile.",
+      "cardTitle": "Personal Info",
+      "cardDescription": "Basic contact details stored in your user profile.",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Contact Email",
+        "phone": "Phone",
+        "dic": "Tax ID"
+      },
+      "placeholders": {
+        "firstName": "John",
+        "lastName": "Smith",
+        "email": "john@example.com",
+        "phone": "+1 555 123 456",
+        "dic": "CZ12345678"
+      },
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "emailInvalid": "Enter a valid email"
+      },
+      "actions": {
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "create": "Create Profile",
+        "creating": "Creating..."
+      },
+      "messages": {
+        "updated": "Profile updated successfully.",
+        "updateFailed": "Failed to update profile.",
+        "created": "Profile created successfully.",
+        "createFailed": "Failed to create profile."
+      }
+    },
+    "billing": {
+      "dialogTitle": "Billing Info",
+      "dialogDescription": "Company details and tax filing settings.",
+      "cardTitle": "Billing Info",
+      "cardDescription": "Company details used on issued documents and other outputs.",
+      "taxCardTitle": "Tax Filing Details",
+      "taxCardDescription": "Tax office and workplace fields come from official MOJE daně codebooks.",
+      "loading": "Loading billing info...",
+      "errorTitle": "Failed to load billing info",
+      "errorDescription": "Could not load the company assigned to this account.",
+      "missingNew": "No billing company is assigned to this account yet. A new record will be created on save.",
+      "missingExisting": "The company assigned to this account was not found. A new record will be created on save.",
+      "fields": {
+        "name": "Company Name",
+        "ico": "ICO",
+        "dic": "Tax ID",
+        "country": "Country",
+        "street": "Street Address",
+        "city": "City",
+        "psc": "ZIP Code",
+        "taxOffice": "Tax Office",
+        "workplace": "Tax Office Branch"
+      },
+      "placeholders": {
+        "name": "ACME Ltd.",
+        "ico": "12345678",
+        "dic": "CZ12345678",
+        "country": "Czech Republic",
+        "street": "Masarykova 12",
+        "city": "Brno",
+        "psc": "60200",
+        "taxOffice": "Select tax office",
+        "workplace": "Select tax office branch"
+      },
+      "validation": {
+        "nameRequired": "Company name is required",
+        "countryRequired": "Country is required"
+      },
+      "taxOfficeClear": "Not selected",
+      "workplaceClear": "Not selected",
+      "workplaceHintNoOffice": "Select a tax office first.",
+      "workplaceHintSpecial": "For the specialized tax office, the branch is automatically set to code 4000.",
+      "workplaceHintNormal": "Only branches belonging to the selected tax office are shown.",
+      "actions": {
+        "save": "Save Company",
+        "saving": "Saving company...",
+        "create": "Create Company",
+        "creating": "Creating company..."
+      },
+      "messages": {
+        "updated": "Billing info updated successfully.",
+        "updateFailed": "Failed to update billing info.",
+        "created": "Billing info created successfully.",
+        "createFailed": "Failed to create billing info."
+      }
+    },
+    "defaults": {
+      "dialogTitle": "Invoice Defaults",
+      "dialogDescription": "Values pre-filled when creating a new invoice.",
+      "cardTitle": "Invoice Default Values",
+      "cardDescription": "Values pre-filled when creating a new invoice.",
+      "loading": "Loading invoice defaults...",
+      "notSet": "Invoice defaults are not set yet. A new record will be created on save.",
+      "fields": {
+        "currency": "Currency",
+        "prefix": "Invoice Prefix",
+        "numberFormat": "Invoice Number Format",
+        "nextNumber": "Next Invoice Number",
+        "dueDays": "Due Days",
+        "vatRate": "Default VAT Rate (%)",
+        "headerText": "Default Header Text",
+        "footerText": "Default Footer Text",
+        "logoUrl": "Logo URL"
+      },
+      "actions": {
+        "save": "Save Changes",
+        "saving": "Saving..."
+      },
+      "messages": {
+        "saved": "Invoice defaults saved successfully.",
+        "saveFailed": "Failed to save invoice defaults."
+      }
+    }
+  },
+  "currencies": {
+    "USD": "USD - US Dollar",
+    "EUR": "EUR - Euro",
+    "CZK": "CZK - Czech Koruna"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome back! Here's your financial overview.",
+    "cards": {
+      "income": "Total Income",
+      "expenses": "Total Expenses",
+      "balance": "Net Balance",
+      "fromLastMonth": "{{percent}}% from last month",
+      "recentIncoming": "Recent Incoming Invoices",
+      "recentOutgoing": "Recent Outgoing Invoices",
+      "recentIncomingDesc": "Latest invoices you received.",
+      "recentOutgoingDesc": "Latest invoices you issued."
+    },
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending"
+    },
+    "loading": "Loading {{title}}...",
+    "loadError": "Unable to load {{title}}.",
+    "noData": "No records yet."
+  },
+  "onboarding": {
+    "title": "Profile Setup",
+    "subtitle": "Fill in your details and company information to complete registration.",
+    "personal": {
+      "title": "Personal Info",
+      "description": "Basic contact details for your profile.",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Contact Email",
+        "phone": "Phone"
+      },
+      "placeholders": {
+        "firstName": "John",
+        "lastName": "Smith",
+        "email": "john@example.com",
+        "phone": "+1 555 123 456"
+      }
+    },
+    "company": {
+      "title": "Company",
+      "description": "Your company details. Enter ICO or name to search in ARES.",
+      "fields": {
+        "name": "Company Name",
+        "ico": "ICO",
+        "dic": "Company Tax ID",
+        "country": "Country",
+        "street": "Street",
+        "city": "City",
+        "psc": "ZIP Code"
+      },
+      "placeholders": {
+        "name": "Company Ltd.",
+        "ico": "12345678",
+        "dic": "CZ12345678",
+        "country": "CZ",
+        "street": "Main St 1",
+        "city": "Prague",
+        "psc": "110 00"
+      }
+    },
+    "tax": {
+      "title": "Tax Filing Details",
+      "description": "Tax office and workplace fields come from official MOJE daně codebooks.",
+      "fields": {
+        "dic": "Tax ID",
+        "taxOffice": "Tax Office",
+        "workplace": "Tax Office Branch"
+      },
+      "placeholders": {
+        "dic": "CZ12345678",
+        "taxOffice": "Select tax office",
+        "workplace": "Select tax office branch"
+      },
+      "hints": {
+        "noOffice": "Select a tax office first.",
+        "special": "For the specialized tax office, the branch is automatically set to code 4000.",
+        "normal": "Only branches belonging to the selected tax office are shown."
+      }
+    },
+    "actions": {
+      "complete": "Complete Registration",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "success": "Profile and company created successfully.",
+      "partial": "Company created, but profile could not be saved. You can edit it in settings.",
+      "companyFailed": "Failed to create company."
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "companyNameRequired": "Company name is required"
+    },
+    "taxOfficeClear": "Not selected"
+  },
+  "autocomplete": {
+    "label": "Search in ARES",
+    "placeholder": "Enter company name or full ICO",
+    "loading": "Loading suggestions...",
+    "empty": "No suggestions found."
+  },
+  "aiChat": {
+    "title": "AI Assistant",
+    "description": "Ask a question and continue the conversation in this session.",
+    "placeholder": "Type your message here",
+    "hint": "Press Enter to send, Shift+Enter for a new line.",
+    "emptyState": "Start with a short question about invoices, contacts, or accounting.",
+    "send": "Send",
+    "typing": "AI is typing...",
+    "processing": "Processing receipt...",
+    "openLabel": "Open AI chat",
+    "uploadReceipt": "Upload receipt image",
+    "uploading": "Uploading receipt image: {{name}}",
+    "metrics": {
+      "model": "Model",
+      "duration": "Duration",
+      "promptTokens": "Prompt tokens",
+      "completionTokens": "Completion tokens",
+      "totalTokens": "Total tokens",
+      "cost": "Cost"
+    },
+    "receiptResult": {
+      "title": "Receipt parsing result:",
+      "vendor": "Vendor",
+      "total": "Total",
+      "vat": "VAT",
+      "date": "Date"
+    },
+    "messages": {
+      "chatFailed": "AI chat request failed",
+      "receiptSuccess": "Receipt processed successfully",
+      "receiptFailed": "Receipt parsing failed"
+    },
+    "receiptFailedMessage": "Receipt parsing failed."
+  }
+}

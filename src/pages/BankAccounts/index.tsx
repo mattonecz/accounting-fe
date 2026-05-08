@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { useBankListByCompany, useBankSetDefault } from '@/api/bank/bank';
 import type { BankResponseDto } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
@@ -9,6 +10,7 @@ import { EditBankDialog } from './EditBankDialog';
 import { BankAccountCard } from './BankAccountCard';
 
 export default function BankAccounts() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<BankResponseDto | null>(null);
   const { enqueueSnackbar } = useSnackbar();
@@ -21,11 +23,11 @@ export default function BankAccounts() {
       { data: { bankId: account.id } },
       {
         onSuccess: () => {
-          enqueueSnackbar(`${account.name} is now the default account.`, { variant: 'success' });
+          enqueueSnackbar(t('bankAccounts.messages.setDefault', { name: account.name }), { variant: 'success' });
           refetchBankAccounts();
         },
         onError: () => {
-          enqueueSnackbar('Failed to set default account', { variant: 'error' });
+          enqueueSnackbar(t('bankAccounts.messages.setDefaultFailed'), { variant: 'error' });
         },
       },
     );
@@ -39,8 +41,8 @@ export default function BankAccounts() {
   return (
     <PageLayout>
       <PageHeader
-        title="Bank Accounts"
-        description="Track your business accounts"
+        title={t('bankAccounts.title')}
+        description={t('bankAccounts.description')}
         actions={
           <CreateBankDialog
             open={open}

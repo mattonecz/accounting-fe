@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import type { ContactResponseDto, UpdateContactDto } from '@/api/model';
 import { useUpdateContact } from '@/api/contacts/contacts';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface EditContactDialogProps {
 }
 
 export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDialogProps) => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { mutate: updateContact } = useUpdateContact();
   const form = useForm<UpdateContactDto>();
@@ -48,13 +50,13 @@ export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDi
       { data: { ...data, id: contact.id } },
       {
         onSuccess: () => {
-          enqueueSnackbar('Contact updated successfully', { variant: 'success' });
+          enqueueSnackbar(t('contacts.messages.updated'), { variant: 'success' });
           onClose();
           form.reset();
           onSuccess();
         },
         onError: () => {
-          enqueueSnackbar('Failed to update contact', { variant: 'error' });
+          enqueueSnackbar(t('contacts.messages.updateFailed'), { variant: 'error' });
         },
       },
     );
@@ -72,25 +74,25 @@ export const EditContactDialog = ({ contact, onClose, onSuccess }: EditContactDi
     >
       <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
-          <DialogTitle>Edit Contact</DialogTitle>
-          <DialogDescription>Update data for the selected contact.</DialogDescription>
+          <DialogTitle>{t('contacts.edit.title')}</DialogTitle>
+          <DialogDescription>{t('contacts.edit.description')}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <InputController control={form.control} name="name" label="Name" type="text" rules={{ required: 'Name is required' }} placeholder="Company name" />
-            <InputController control={form.control} name="ico" label="ICO" type="text" placeholder="1234567890" />
-            <InputController control={form.control} name="dic" label="DIC" type="text" placeholder="CZ1234567890" />
-            <InputController control={form.control} name="country" label="Country" type="text" placeholder="Czech Republic" />
-            <InputController control={form.control} name="city" label="City" type="text" placeholder="Prague" />
-            <InputController control={form.control} name="street" label="Street" type="text" placeholder="123 Main St" />
-            <InputController control={form.control} name="psc" label="PSC" type="text" placeholder="12345" />
-            <InputController control={form.control} name="email" label="Email" type="email" placeholder="contact@company.com" />
-            <InputController control={form.control} name="description" label="Description" type="text" placeholder="Short company note" />
+            <InputController control={form.control} name="name" label={t('contacts.fields.name')} type="text" rules={{ required: t('validation.required', { field: t('contacts.fields.name') }) }} placeholder={t('contacts.placeholders.name')} />
+            <InputController control={form.control} name="ico" label={t('contacts.fields.ico')} type="text" placeholder="1234567890" />
+            <InputController control={form.control} name="dic" label={t('contacts.fields.dic')} type="text" placeholder="CZ1234567890" />
+            <InputController control={form.control} name="country" label={t('contacts.fields.country')} type="text" placeholder={t('contacts.placeholders.country')} />
+            <InputController control={form.control} name="city" label={t('contacts.fields.city')} type="text" placeholder={t('contacts.placeholders.city')} />
+            <InputController control={form.control} name="street" label={t('contacts.fields.street')} type="text" placeholder={t('contacts.placeholders.street')} />
+            <InputController control={form.control} name="psc" label={t('contacts.fields.psc')} type="text" placeholder="12345" />
+            <InputController control={form.control} name="email" label={t('contacts.fields.email')} type="email" placeholder={t('contacts.placeholders.email')} />
+            <InputController control={form.control} name="description" label={t('contacts.fields.description')} type="text" placeholder={t('contacts.placeholders.description')} />
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => { onClose(); form.reset(); }}>
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t('contacts.actions.save')}</Button>
             </div>
           </form>
         </Form>

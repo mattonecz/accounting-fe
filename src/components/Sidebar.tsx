@@ -10,31 +10,33 @@ import {
   Calculator,
   Receipt,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useSnackbar } from 'notistack';
 import { SettingsMenu } from '@/components/settings/SettingsMenu';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Contacts', href: '/contacts', icon: Users },
-  { name: 'Bank Accounts', href: '/bank-accounts', icon: Building2 },
-  { name: 'Faktury vydané', href: '/outgoing-invoices', icon: FileInput },
-  { name: 'Faktury přijaté', href: '/incoming-invoices', icon: FileText },
-  { name: 'Zjednodušené doklady', href: '/invoices/simple', icon: Receipt },
-  { name: 'Přehled DPH', href: '/tax-report', icon: Calculator },
-];
-
 export const Sidebar = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
+  const navigation = [
+    { name: t('nav.dashboard'), href: '/', icon: Home },
+    { name: t('nav.contacts'), href: '/contacts', icon: Users },
+    { name: t('nav.bankAccounts'), href: '/bank-accounts', icon: Building2 },
+    { name: t('nav.invoicesIssued'), href: '/outgoing-invoices', icon: FileInput },
+    { name: t('nav.invoicesReceived'), href: '/incoming-invoices', icon: FileText },
+    { name: t('nav.simpleInvoices'), href: '/invoices/simple', icon: Receipt },
+    { name: t('nav.taxReport'), href: '/tax-report', icon: Calculator },
+  ];
+
   const handleLogout = () => {
     logout();
-    enqueueSnackbar('Logged out successfully', { variant: 'success' });
+    enqueueSnackbar(t('auth.messages.logoutSuccess'), { variant: 'success' });
     navigate('/auth');
   };
 
@@ -49,7 +51,7 @@ export const Sidebar = () => {
           const isActive = location.pathname === item.href;
           return (
             <Link
-              key={item.name}
+              key={item.href}
               to={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -75,7 +77,7 @@ export const Sidebar = () => {
           className="w-full justify-start gap-2"
         >
           <LogOut className="h-4 w-4" />
-          Logout
+          {t('nav.logout')}
         </Button>
       </div>
     </div>

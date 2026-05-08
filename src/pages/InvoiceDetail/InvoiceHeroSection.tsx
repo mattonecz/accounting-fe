@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -27,6 +28,7 @@ export const InvoiceHeroSection = ({
   remainingAmount,
   onDownloadPdf,
 }: InvoiceHeroSectionProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const counterparty = invoice.contactSnapshot;
 
@@ -64,24 +66,24 @@ export const InvoiceHeroSection = ({
             variant="outline"
             size="icon"
             onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
-            aria-label="Upravit fakturu"
+            aria-label={t('invoices.actions.edit')}
           >
             <Pencil className="h-4 w-4" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" aria-label="Další akce">
+              <Button variant="outline" size="icon" aria-label={t('common.moreActions')}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onClick={() => window.print()}>
                 <Printer className="mr-2 h-4 w-4" />
-                Tisk
+                {t('invoices.actions.print')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onDownloadPdf}>
                 <Download className="mr-2 h-4 w-4" />
-                PDF
+                {t('invoices.actions.downloadPdf')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -90,19 +92,19 @@ export const InvoiceHeroSection = ({
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-slate-200 pt-4 text-base text-muted-foreground md:text-lg">
         <div>
-          Celkem:{' '}
+          {t('invoices.detail.hero.total')}{' '}
           <span className="font-semibold text-slate-900">
             {formatMoney(invoice.totalWithTax, currency)}
           </span>
         </div>
         <div>
-          Uhrazeno:{' '}
+          {t('invoices.detail.hero.paid')}{' '}
           <span className="font-semibold text-slate-900">
             {formatMoney(paidAmount, currency)}
           </span>
         </div>
         <div>
-          Zbývá:{' '}
+          {t('invoices.detail.hero.remaining')}{' '}
           <span className="font-semibold text-slate-900">
             {formatMoney(remainingAmount, currency)}
           </span>

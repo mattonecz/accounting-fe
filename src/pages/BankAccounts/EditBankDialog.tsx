@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import type { BankResponseDto, UpdateBankDto } from '@/api/model';
 import { useBankUpdate } from '@/api/bank/bank';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface EditBankDialogProps {
 }
 
 export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogProps) => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { mutate: updateBank } = useBankUpdate();
   const form = useForm<UpdateBankDto>();
@@ -48,13 +50,13 @@ export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogPr
       { data: { ...data, id: account.id } },
       {
         onSuccess: () => {
-          enqueueSnackbar(`${data.name} has been updated successfully.`, { variant: 'success' });
+          enqueueSnackbar(t('bankAccounts.messages.updated', { name: data.name }), { variant: 'success' });
           form.reset();
           onClose();
           onSuccess();
         },
         onError: () => {
-          enqueueSnackbar('Failed to update bank account', { variant: 'error' });
+          enqueueSnackbar(t('bankAccounts.messages.updateFailed'), { variant: 'error' });
         },
       },
     );
@@ -72,29 +74,29 @@ export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogPr
     >
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Bank Account</DialogTitle>
-          <DialogDescription>Update account name, identifier and currency.</DialogDescription>
+          <DialogTitle>{t('bankAccounts.edit.title')}</DialogTitle>
+          <DialogDescription>{t('bankAccounts.edit.description')}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <InputController
               control={form.control}
               name="name"
-              label="Název účtu"
+              label={t('bankAccounts.fields.name')}
               type="text"
-              rules={{ required: 'Název účtu je povinný' }}
+              rules={{ required: t('validation.required', { field: t('bankAccounts.fields.name') }) }}
               placeholder="ČSOB CZK"
             />
             <InputController
               control={form.control}
               name="number"
-              label="Číslo účtu"
+              label={t('bankAccounts.fields.number')}
               type="text"
               placeholder="1234567890"
               rules={{
                 validate: (value) => {
                   const iban = form.getValues('iban');
-                  if (!value && !iban) return 'Buď číslo účtu nebo IBAN musí být vyplněno';
+                  if (!value && !iban) return t('bankAccounts.validation.numberOrIbanRequired');
                   return true;
                 },
               }}
@@ -102,13 +104,13 @@ export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogPr
             <InputController
               control={form.control}
               name="iban"
-              label="IBAN"
+              label={t('bankAccounts.fields.iban')}
               type="text"
               placeholder="CZ65 0800 0000 1234 5678 9012"
               rules={{
                 validate: (value) => {
                   const number = form.getValues('number');
-                  if (!value && !number) return 'Buď číslo účtu nebo IBAN musí být vyplněno';
+                  if (!value && !number) return t('bankAccounts.validation.numberOrIbanRequired');
                   return true;
                 },
               }}
@@ -116,16 +118,16 @@ export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogPr
             <InputController
               control={form.control}
               name="swift"
-              label="SWIFT/BIC"
+              label={t('bankAccounts.fields.swift')}
               type="text"
               placeholder="08000000123456789012"
             />
             <InputController
               control={form.control}
               name="currency"
-              label="Měna"
+              label={t('bankAccounts.fields.currency')}
               placeholder="CZK"
-              rules={{ required: 'Měna je povinná' }}
+              rules={{ required: t('validation.required', { field: t('bankAccounts.fields.currency') }) }}
             />
             <div className="flex justify-end gap-3 pt-4">
               <Button
@@ -136,9 +138,9 @@ export const EditBankDialog = ({ account, onClose, onSuccess }: EditBankDialogPr
                   form.reset();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t('bankAccounts.actions.save')}</Button>
             </div>
           </form>
         </Form>

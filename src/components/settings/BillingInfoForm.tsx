@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import {
   getCompanyGetQueryKey,
   useCompanyCreate,
@@ -75,6 +76,7 @@ interface BillingInfoFormProps {
 }
 
 export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
+  const { t } = useTranslation();
   const [companyFallback, setCompanyFallback] = useState<CompanyResponseDto | null>(null);
 
   const {
@@ -90,7 +92,7 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     return (
       <Card>
         <CardContent className="p-6 text-sm text-muted-foreground">
-          Načítám fakturační údaje firmy...
+          {t('settings.billing.loading')}
         </CardContent>
       </Card>
     );
@@ -100,17 +102,13 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     return (
       <Card className="border-destructive/30">
         <CardHeader>
-          <CardTitle>Fakturační údaje se nepodařilo načíst</CardTitle>
-          <CardDescription>Nepodařilo se načíst firmu přiřazenou k účtu.</CardDescription>
+          <CardTitle>{t('settings.billing.errorTitle')}</CardTitle>
+          <CardDescription>{t('settings.billing.errorDescription')}</CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
-  // Mount the form only after company data has settled, so `defaultValues` on
-  // the first render already has the loaded values (Radix Select latches its
-  // internal "no match" state on the first render, so loading values via a
-  // post-mount reset/`values` sync doesn't update the displayed label).
   return (
     <BillingInfoFormContent
       key={company?.id ?? 'new'}
@@ -132,6 +130,7 @@ const BillingInfoFormContent = ({
   company,
   onCompanyCreated,
 }: BillingInfoFormContentProps) => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
@@ -142,8 +141,8 @@ const BillingInfoFormContent = ({
   const isSaving = isCreatingCompany || isUpdatingCompany;
 
   const missingCompanyMessage = companyId
-    ? 'Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.'
-    : 'K účtu zatím není přiřazená fakturační firma. Po uložení se vytvoří nový záznam.';
+    ? t('settings.billing.missingCompanyExisting')
+    : t('settings.billing.missingCompanyNew');
 
   const form = useForm<CompanyFormValues>({
     defaultValues: mapCompanyToForm(company),
@@ -162,8 +161,6 @@ const BillingInfoFormContent = ({
     );
   }, [selectedTaxOfficeCode]);
 
-  // Sanitize c_pracufo when the user changes c_ufo to a different office.
-  // Skipped on the initial render because defaultValues already match.
   useEffect(() => {
     if (!selectedTaxOfficeCode) {
       if (selectedWorkplaceCode) setValue('c_pracufo', '');
@@ -174,11 +171,8 @@ const BillingInfoFormContent = ({
         setValue('c_pracufo', SPECIAL_TAX_OFFICE_WORKPLACE_CODE);
       return;
     }
-    const hasMatchingWorkplace = workplaceOptions.some(
-      (w) => w.code === selectedWorkplaceCode,
-    );
-    if (selectedWorkplaceCode && !hasMatchingWorkplace)
-      setValue('c_pracufo', '');
+    const hasMatchingWorkplace = workplaceOptions.some((w) => w.code === selectedWorkplaceCode);
+    if (selectedWorkplaceCode && !hasMatchingWorkplace) setValue('c_pracufo', '');
   }, [selectedTaxOfficeCode, selectedWorkplaceCode, setValue, workplaceOptions]);
 
   const onSubmit = (data: CompanyFormValues) => {
@@ -193,16 +187,16 @@ const BillingInfoFormContent = ({
       reset(mapCompanyToForm(response.data));
       enqueueSnackbar(
         hasExistingCompany
-          ? 'Fakturační údaje byly úspěšně upraveny.'
-          : 'Fakturační údaje byly úspěšně vytvořeny.',
+          ? t('settings.billing.messages.updateSuccess')
+          : t('settings.billing.messages.createSuccess'),
         { variant: 'success' },
       );
     };
     const handleError = () => {
       enqueueSnackbar(
         hasExistingCompany
-          ? 'Úprava fakturačních údajů se nepodařila.'
-          : 'Vytvoření fakturačních údajů se nepodařilo.',
+          ? t('settings.billing.messages.updateError')
+          : t('settings.billing.messages.createError'),
         { variant: 'error' },
       );
     };
@@ -219,10 +213,10 @@ const BillingInfoFormContent = ({
   const taxOfficeSelectOptions = TAX_OFFICE_OPTIONS.map((o) => ({ value: o.code, label: o.label }));
   const workplaceSelectOptions = workplaceOptions.map((o) => ({ value: o.code, label: o.label }));
   const workplaceDescription = !selectedTaxOfficeCode
-    ? 'Nejdřív vyberte finanční úřad.'
+    ? t('settings.billing.taxOfficeHint.selectFirst')
     : selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
-      ? 'U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.'
-      : 'Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu.';
+      ? t('settings.billing.taxOfficeHint.special')
+      : t('settings.billing.taxOfficeHint.normal');
 
   return (
     <Form {...form}>
@@ -237,76 +231,100 @@ const BillingInfoFormContent = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Fakturační údaje</CardTitle>
-            <CardDescription>
-              Údaje firmy používané na vystavených dokladech a dalších výstupech.
-            </CardDescription>
+            <CardTitle>{t('settings.billing.card.title')}</CardTitle>
+            <CardDescription>{t('settings.billing.card.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <InputController
               control={form.control}
               name="name"
-              label="Název firmy"
+              label={t('settings.billing.fields.name')}
               placeholder="ACME s.r.o."
               variant="vertical"
               containerClassName="md:col-span-2"
               rules={{
-                required: 'Název firmy je povinný',
-                validate: (value) => (value?.trim().length ?? 0) > 0 || 'Název firmy je povinný',
+                required: t('validation.required', { field: t('settings.billing.fields.name') }),
+                validate: (value) =>
+                  (value?.trim().length ?? 0) > 0 ||
+                  t('validation.required', { field: t('settings.billing.fields.name') }),
               }}
             />
-            <InputController control={form.control} name="ico" label="IČO" placeholder="12345678" variant="vertical" />
-            <InputController control={form.control} name="dic" label="DIČ" placeholder="CZ12345678" variant="vertical" />
+            <InputController
+              control={form.control}
+              name="ico"
+              label={t('invoices.fields.ico')}
+              placeholder="12345678"
+              variant="vertical"
+            />
+            <InputController
+              control={form.control}
+              name="dic"
+              label={t('invoices.fields.dic')}
+              placeholder="CZ12345678"
+              variant="vertical"
+            />
             <InputController
               control={form.control}
               name="country"
-              label="Stát"
-              placeholder="Česká republika"
+              label={t('settings.billing.fields.country')}
+              placeholder={t('settings.billing.placeholders.country')}
               variant="vertical"
               rules={{
-                required: 'Stát je povinný',
-                validate: (value) => (value?.trim().length ?? 0) > 0 || 'Stát je povinný',
+                required: t('validation.required', { field: t('settings.billing.fields.country') }),
+                validate: (value) =>
+                  (value?.trim().length ?? 0) > 0 ||
+                  t('validation.required', { field: t('settings.billing.fields.country') }),
               }}
             />
             <InputController
               control={form.control}
               name="street"
-              label="Ulice a č.p."
-              placeholder="Masarykova 12"
+              label={t('settings.billing.fields.street')}
+              placeholder={t('settings.billing.placeholders.street')}
               variant="vertical"
               containerClassName="md:col-span-2"
             />
-            <InputController control={form.control} name="city" label="Město" placeholder="Brno" variant="vertical" />
-            <InputController control={form.control} name="psc" label="PSČ" placeholder="60200" variant="vertical" />
+            <InputController
+              control={form.control}
+              name="city"
+              label={t('settings.billing.fields.city')}
+              placeholder={t('settings.billing.placeholders.city')}
+              variant="vertical"
+            />
+            <InputController
+              control={form.control}
+              name="psc"
+              label={t('settings.billing.fields.psc')}
+              placeholder="60200"
+              variant="vertical"
+            />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Údaje pro daňová podání</CardTitle>
-            <CardDescription>
-              Pole finančního úřadu a pracoviště vycházejí z oficiálních číselníků MOJE daně.
-            </CardDescription>
+            <CardTitle>{t('settings.billing.taxCard.title')}</CardTitle>
+            <CardDescription>{t('settings.billing.taxCard.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <SelectController
               control={form.control}
               name="c_ufo"
-              label="Finanční úřad"
-              placeholder="Vyberte finanční úřad"
+              label={t('settings.billing.fields.taxOffice')}
+              placeholder={t('settings.billing.placeholders.taxOffice')}
               options={taxOfficeSelectOptions}
               variant="vertical"
-              clearLabel="Nevybráno"
+              clearLabel={t('common.notSelected')}
             />
             <SelectController
               control={form.control}
               name="c_pracufo"
-              label="Územní pracoviště"
-              placeholder="Vyberte územní pracoviště"
+              label={t('settings.billing.fields.taxWorkplace')}
+              placeholder={t('settings.billing.placeholders.taxWorkplace')}
               options={workplaceSelectOptions}
               variant="vertical"
               containerClassName="md:col-span-2"
-              clearLabel={selectedTaxOfficeCode !== SPECIAL_TAX_OFFICE_CODE ? 'Nevybráno' : undefined}
+              clearLabel={selectedTaxOfficeCode !== SPECIAL_TAX_OFFICE_CODE ? t('common.notSelected') : undefined}
               disabled={!selectedTaxOfficeCode || selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE}
               description={workplaceDescription}
             />
@@ -316,8 +334,8 @@ const BillingInfoFormContent = ({
         <div className="flex justify-end">
           <Button type="submit" size="lg" disabled={isSaving}>
             {isSaving
-              ? hasExistingCompany ? 'Ukládám firmu...' : 'Vytvářím firmu...'
-              : hasExistingCompany ? 'Uložit firmu' : 'Vytvořit firmu'}
+              ? hasExistingCompany ? t('settings.billing.actions.saving') : t('settings.billing.actions.creating')
+              : hasExistingCompany ? t('settings.billing.actions.save') : t('settings.billing.actions.create')}
           </Button>
         </div>
       </form>

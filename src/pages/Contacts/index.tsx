@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
 import type { ContactResponseDto } from '@/api/model';
@@ -14,22 +15,23 @@ const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'ps
   [contact.street, contact.psc, contact.city, contact.country].filter(Boolean).join(', ');
 
 export default function Contacts() {
+  const { t } = useTranslation();
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ContactResponseDto | null>(null);
   const [editingContact, setEditingContact] = useState<ContactResponseDto | null>(null);
   const { data: contactsResponse, refetch: refetchContacts } = useListContacts();
 
   const columns = [
-    { header: 'Name', cell: (c: ContactResponseDto) => <span className="font-medium">{c.name}</span> },
-    { header: 'ICO', cell: (c: ContactResponseDto) => c.ico },
+    { header: t('contacts.columns.name'), cell: (c: ContactResponseDto) => <span className="font-medium">{c.name}</span> },
+    { header: t('contacts.columns.ico'), cell: (c: ContactResponseDto) => c.ico },
     {
-      header: 'Address',
+      header: t('contacts.columns.address'),
       cell: (c: ContactResponseDto) => (
         <span className="text-muted-foreground">{formatAddress(c) || '-'}</span>
       ),
     },
     {
-      header: 'Actions',
+      header: t('contacts.columns.actions'),
       headerClassName: 'text-right',
       cellClassName: 'text-right',
       cell: (c: ContactResponseDto) => (
@@ -44,7 +46,7 @@ export default function Contacts() {
           }}
         >
           <Pencil className="h-4 w-4" />
-          Edit
+          {t('common.edit')}
         </Button>
       ),
     },
@@ -53,8 +55,8 @@ export default function Contacts() {
   return (
     <PageLayout>
       <PageHeader
-        title="Contacts"
-        description="Manage your clients and vendors"
+        title={t('contacts.title')}
+        description={t('contacts.description')}
         actions={
           <CreateContactDialog
             open={createOpen}
@@ -65,7 +67,7 @@ export default function Contacts() {
       />
 
       <DataTableCard
-        title="All Contacts"
+        title={t('contacts.allContacts')}
         columns={columns}
         data={contactsResponse?.data}
         onRowClick={setSelectedContact}

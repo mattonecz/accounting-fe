@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bot, ImageUp, MessageSquare, SendHorizonal } from 'lucide-react';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { useAiChatChat } from '@/api/ai-chat/ai-chat';
 import { useDocumentParseReceipt } from '@/api/documents/documents';
 import type { ChatResponseDto, ParseReceiptResponseDto } from '@/api/model';
@@ -19,9 +20,7 @@ import { cn } from '@/lib/utils';
 
 const getLastAssistantIndex = (history: ChatResponseDto['history']) =>
   history.reduce<number>((foundIndex, item, index) => {
-    if (item.role === 'assistant') {
-      return index;
-    }
+    if (item.role === 'assistant') return index;
     return foundIndex;
   }, -1);
 
@@ -32,19 +31,19 @@ type ClientChatMessage = {
   content: string;
 };
 
-const formatReceiptResult = (result: ParseReceiptResponseDto) => {
-  const { vendor, total, vat, currency, date } = result.data;
-
-  return [
-    'Výsledek parsování účtenky:',
-    `Dodavatel: ${vendor || '-'}`,
-    `Celkem: ${total ?? '-'}${currency ? ` ${currency}` : ''}`,
-    `DPH: ${vat ?? '-'}`,
-    `Datum: ${date || '-'}`,
-  ].join('\n');
-};
-
 export const AiChatDialog = () => {
+  const { t } = useTranslation();
+
+  const formatReceiptResult = (result: ParseReceiptResponseDto) => {
+    const { vendor, total, vat, currency, date } = result.data;
+    return [
+      t('aiChat.receiptResult.title'),
+      `${t('aiChat.receiptResult.vendor')}: ${vendor || '-'}`,
+      `${t('aiChat.receiptResult.total')}: ${total ?? '-'}${currency ? ` ${currency}` : ''}`,
+      `${t('aiChat.receiptResult.vat')}: ${vat ?? '-'}`,
+      `${t('aiChat.receiptResult.date')}: ${date || '-'}`,
+    ].join('\n');
+  };
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [chat, setChat] = useState<ChatResponseDto | null>(null);
@@ -78,75 +77,44 @@ export const AiChatDialog = () => {
 
   const handleSubmit = async () => {
     const userInput = input.trim();
-    if (!userInput || isPending) {
-      return;
-    }
+    if (!userInput || isPending) return;
 
     setPendingUserMessage(userInput);
     setInput('');
 
     try {
-      const response = await sendMessage({
-        data: {
-          userInput,
-        },
-      });
-
+      const response = await sendMessage({ data: { userInput } });
       setChat(response.data);
       setPendingUserMessage('');
     } catch {
       setPendingUserMessage('');
       setInput(userInput);
-      enqueueSnackbar('AI chat request failed', { variant: 'error' });
+      enqueueSnackbar(t('aiChat.messages.chatFailed'), { variant: 'error' });
     }
   };
 
   const handleReceiptSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    if (!file || isParsingReceipt) return;
 
-    if (!file || isParsingReceipt) {
-      return;
-    }
-
-    setClientMessages((currentMessages) => [
-      ...currentMessages,
-      {
-        role: 'user',
-        content: `Nahrávám obrázek účtenky: ${file.name}`,
-      },
+    setClientMessages((msgs) => [
+      ...msgs,
+      { role: 'user', content: t('aiChat.uploading', { name: file.name }) },
     ]);
 
     try {
-      const response = await parseReceipt({
-        data: {
-          file,
-        },
-      });
-
+      const response = await parseReceipt({ data: { file } });
       console.log('receipt/parse result', response.data);
-
-      setClientMessages((currentMessages) => [
-        ...currentMessages,
-        {
-          role: 'assistant',
-          content: formatReceiptResult(response.data),
-        },
+      setClientMessages((msgs) => [
+        ...msgs,
+        { role: 'assistant', content: formatReceiptResult(response.data) },
       ]);
-
-      enqueueSnackbar('Účtenka byla úspěšně zpracována', {
-        variant: 'success',
-      });
+      enqueueSnackbar(t('aiChat.messages.receiptSuccess'), { variant: 'success' });
     } catch {
-      enqueueSnackbar('Parsování účtenky selhalo', {
-        variant: 'error',
-      });
-
-      setClientMessages((currentMessages) => [
-        ...currentMessages,
-        {
-          role: 'assistant',
-          content: 'Parsování účtenky selhalo.',
-        },
+      enqueueSnackbar(t('aiChat.messages.receiptFailed'), { variant: 'error' });
+      setClientMessages((msgs) => [
+        ...msgs,
+        { role: 'assistant', content: t('aiChat.receiptFailedMessage') },
       ]);
     } finally {
       event.target.value = '';
@@ -161,18 +129,16 @@ export const AiChatDialog = () => {
           className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg"
         >
           <MessageSquare className="h-5 w-5" />
-          <span className="sr-only">Open AI chat</span>
+          <span className="sr-only">{t('aiChat.openLabel')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="flex h-[min(80vh,720px)] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
-            AI Assistant
+            {t('aiChat.title')}
           </DialogTitle>
-          <DialogDescription>
-            Ask a question and continue the conversation in this session.
-          </DialogDescription>
+          <DialogDescription>{t('aiChat.description')}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1 bg-muted/20 px-6 py-4">
@@ -180,7 +146,7 @@ export const AiChatDialog = () => {
             {allMessages.length === 0 && !pendingUserMessage ? (
               <div className="flex flex-1 items-center justify-center">
                 <div className="max-w-sm rounded-xl border border-dashed bg-background/80 px-5 py-6 text-center text-sm text-muted-foreground">
-                  Start with a short question about invoices, contacts, or accounting.
+                  {t('aiChat.emptyState')}
                 </div>
               </div>
             ) : (
@@ -215,23 +181,23 @@ export const AiChatDialog = () => {
                           {chat.metrics.model}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">Duration</span>
+                          <span className="block font-medium text-foreground">{t('aiChat.metrics.duration')}</span>
                           {chat.metrics.durationMs} ms
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">Prompt tokens</span>
+                          <span className="block font-medium text-foreground">{t('aiChat.metrics.promptTokens')}</span>
                           {chat.metrics.tokens.promptTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">Completion tokens</span>
+                          <span className="block font-medium text-foreground">{t('aiChat.metrics.completionTokens')}</span>
                           {chat.metrics.tokens.completionTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">Total tokens</span>
+                          <span className="block font-medium text-foreground">{t('aiChat.metrics.totalTokens')}</span>
                           {chat.metrics.tokens.totalTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">Cost</span>
+                          <span className="block font-medium text-foreground">{t('aiChat.metrics.cost')}</span>
                           {formatUsd(chat.metrics.estimatedCostUsd)}
                         </div>
                       </div>
@@ -252,7 +218,7 @@ export const AiChatDialog = () => {
             {isPending ? (
               <div className="flex justify-start">
                 <div className="rounded-2xl border bg-background px-4 py-3 text-sm text-muted-foreground shadow-sm">
-                  AI is typing...
+                  {t('aiChat.typing')}
                 </div>
               </div>
             ) : null}
@@ -260,7 +226,7 @@ export const AiChatDialog = () => {
             {isParsingReceipt ? (
               <div className="flex justify-start">
                 <div className="rounded-2xl border bg-background px-4 py-3 text-sm text-muted-foreground shadow-sm">
-                  Zpracovávám účtenku...
+                  {t('aiChat.processing')}
                 </div>
               </div>
             ) : null}
@@ -292,13 +258,11 @@ export const AiChatDialog = () => {
                   void handleSubmit();
                 }
               }}
-              placeholder="Type your message here"
+              placeholder={t('aiChat.placeholder')}
               className="min-h-[96px] resize-none"
             />
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">
-                Press Enter to send, Shift+Enter for a new line.
-              </p>
+              <p className="text-xs text-muted-foreground">{t('aiChat.hint')}</p>
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
@@ -306,14 +270,14 @@ export const AiChatDialog = () => {
                   size="icon"
                   disabled={isParsingReceipt}
                   onClick={() => fileInputRef.current?.click()}
-                  aria-label="Nahrát obrázek účtenky"
-                  title="Nahrát obrázek účtenky"
+                  aria-label={t('aiChat.uploadReceipt')}
+                  title={t('aiChat.uploadReceipt')}
                 >
                   <ImageUp className="h-4 w-4" />
                 </Button>
                 <Button type="submit" className="gap-2" disabled={isPending || !input.trim()}>
                   <SendHorizonal className="h-4 w-4" />
-                  Send
+                  {t('aiChat.send')}
                 </Button>
               </div>
             </div>

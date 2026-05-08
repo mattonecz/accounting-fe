@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   FormControl,
@@ -16,6 +19,12 @@ import {
 import { FormCard } from '@/components/FormCard';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
+import { Button } from '@/components/ui/button';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
@@ -40,14 +49,6 @@ interface UpdateBasicInfoCardProps {
   isVatPayer: boolean;
 }
 
-const VAT_MODE_OPTIONS = [
-  { value: UpdateInvoiceDtoVatMode.STANDARD, label: 'Standardní' },
-  {
-    value: UpdateInvoiceDtoVatMode.REVERSE_CHARGE,
-    label: 'Přenesená daňová povinnost',
-  },
-];
-
 export const UpdateBasicInfoCard = ({
   form,
   sortedContacts,
@@ -55,45 +56,45 @@ export const UpdateBasicInfoCard = ({
   isCzkCurrency,
   isVatPayer,
 }: UpdateBasicInfoCardProps) => {
+  const { t } = useTranslation();
+  const [optionalOpen, setOptionalOpen] = useState(false);
   const invoiceType = useWatch({ control: form.control, name: 'type' });
   const isReceived = invoiceType === UpdateInvoiceDtoType.RECEIVED;
-  const contactLabel = isReceived ? 'Dodavatel' : 'Odběratel';
-  const contactPlaceholder = isReceived
-    ? 'Vyberte dodavatele'
-    : 'Vyberte odběratele';
-  const contactRequiredMessage = isReceived
-    ? 'Dodavatel je povinný'
-    : 'Odběratel je povinný';
+
+  const vatModeOptions = [
+    { value: UpdateInvoiceDtoVatMode.STANDARD, label: t('invoices.vatModes.STANDARD') },
+    { value: UpdateInvoiceDtoVatMode.REVERSE_CHARGE, label: t('invoices.vatModes.REVERSE_CHARGE') },
+  ];
 
   return (
     <>
-      <FormCard title="Základní informace" titleClassName="text-center">
+      <FormCard title={t('invoices.sections.basicInfo')} titleClassName="text-center">
         <div className="mx-auto max-w-3xl space-y-4">
           <FormField
             control={form.control}
             name="status"
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">Stav</FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.status')}</FormLabel>
                 <div className="flex flex-col">
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[250px]">
-                        <SelectValue placeholder="Vyberte stav" />
+                        <SelectValue placeholder={t('invoices.placeholders.selectStatus')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       <SelectItem value={UpdateInvoiceDtoStatus.DRAFT}>
-                        Koncept
+                        {t('invoices.statuses.DRAFT')}
                       </SelectItem>
                       <SelectItem value={UpdateInvoiceDtoStatus.ISSUED}>
-                        Vystavena
+                        {t('invoices.statuses.ISSUED')}
                       </SelectItem>
                       <SelectItem value={UpdateInvoiceDtoStatus.PAID}>
-                        Uhrazena
+                        {t('invoices.statuses.PAID')}
                       </SelectItem>
                       <SelectItem value={UpdateInvoiceDtoStatus.CANCELLED}>
-                        Zrušena
+                        {t('invoices.statuses.CANCELLED')}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -106,17 +107,23 @@ export const UpdateBasicInfoCard = ({
           <FormField
             control={form.control}
             name="contactId"
-            rules={{ required: contactRequiredMessage }}
+            rules={{
+              required: isReceived
+                ? t('validation.required', { field: t('invoices.fields.supplier') })
+                : t('validation.required', { field: t('invoices.fields.contact') }),
+            }}
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
                 <FormLabel className="w-[200px] text-right">
-                  {contactLabel}
+                  {isReceived ? t('invoices.fields.supplier') : t('invoices.fields.contact')}
                 </FormLabel>
                 <div className="flex flex-col">
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[350px]">
-                        <SelectValue placeholder={contactPlaceholder} />
+                        <SelectValue placeholder={
+                          isReceived ? t('invoices.placeholders.selectSupplier') : t('invoices.placeholders.selectContact')
+                        } />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -136,17 +143,17 @@ export const UpdateBasicInfoCard = ({
           <InputController
             control={form.control}
             name="number"
-            label="Číslo faktury"
+            label={t('invoices.fields.number')}
             placeholder="20250001"
-            rules={{ required: 'Číslo faktury je povinné' }}
+            rules={{ required: t('validation.required', { field: t('invoices.fields.number') }) }}
           />
 
           {isReceived && (
             <InputController
               control={form.control}
               name="originalNumber"
-              label="Číslo dodavatele"
-              placeholder="Číslo na faktuře dodavatele"
+              label={t('invoices.fields.originalNumber')}
+              placeholder={t('invoices.placeholders.originalNumber')}
             />
           )}
 
@@ -155,18 +162,18 @@ export const UpdateBasicInfoCard = ({
             name="currency"
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">Měna</FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.currency')}</FormLabel>
                 <div className="flex flex-col">
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[250px]">
-                        <SelectValue placeholder="Vyberte měnu" />
+                        <SelectValue placeholder={t('invoices.placeholders.selectCurrency')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="USD">USD - Americký dolar</SelectItem>
-                      <SelectItem value="EUR">EUR - Euro</SelectItem>
-                      <SelectItem value="CZK">CZK - Česká koruna</SelectItem>
+                      <SelectItem value="USD">{t('currencies.USD')}</SelectItem>
+                      <SelectItem value="EUR">{t('currencies.EUR')}</SelectItem>
+                      <SelectItem value="CZK">{t('currencies.CZK')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -179,10 +186,10 @@ export const UpdateBasicInfoCard = ({
             <SelectController
               control={form.control}
               name="vatMode"
-              label="Režim DPH"
-              placeholder="Vyberte režim DPH"
-              options={VAT_MODE_OPTIONS}
-              rules={{ required: 'Režim DPH je povinný' }}
+              label={t('invoices.fields.vatMode')}
+              placeholder={t('invoices.placeholders.selectVatMode')}
+              options={vatModeOptions}
+              rules={{ required: t('validation.required', { field: t('invoices.fields.vatMode') }) }}
             />
           )}
 
@@ -192,19 +199,17 @@ export const UpdateBasicInfoCard = ({
               name="exchangeRate"
               render={({ field }) => (
                 <FormItem className="flex items-center gap-4">
-                  <FormLabel className="w-[200px] text-right">Kurz</FormLabel>
+                  <FormLabel className="w-[200px] text-right">{t('invoices.fields.exchangeRate')}</FormLabel>
                   <div className="flex flex-col">
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
-                        placeholder="Volitelně"
+                        placeholder={t('common.optional')}
                         className="w-[100px]"
                         {...field}
                         value={field.value ?? ''}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || undefined)
-                        }
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -217,12 +222,10 @@ export const UpdateBasicInfoCard = ({
           <FormField
             control={form.control}
             name="createdDate"
-            rules={{ required: 'Datum vystavení je povinné' }}
+            rules={{ required: t('validation.required', { field: t('invoices.fields.createdDate') }) }}
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">
-                  Datum vystavení
-                </FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.createdDate')}</FormLabel>
                 <div className="flex flex-col">
                   <FormControl>
                     <Input type="date" className="w-[160px]" {...field} />
@@ -236,12 +239,10 @@ export const UpdateBasicInfoCard = ({
           <FormField
             control={form.control}
             name="duzpDate"
-            rules={{ required: 'Datum zdanitelného plnění je povinné' }}
+            rules={{ required: t('validation.required', { field: t('invoices.fields.duzpDate') }) }}
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">
-                  Datum zdanitelného plnění
-                </FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.duzpDate')}</FormLabel>
                 <div className="flex flex-col">
                   <FormControl>
                     <Input type="date" className="w-[160px]" {...field} />
@@ -255,12 +256,10 @@ export const UpdateBasicInfoCard = ({
           <FormField
             control={form.control}
             name="dueDate"
-            rules={{ required: 'Datum splatnosti je povinné' }}
+            rules={{ required: t('validation.required', { field: t('invoices.fields.dueDate') }) }}
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">
-                  Datum splatnosti
-                </FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.dueDate')}</FormLabel>
                 <div className="flex flex-col">
                   <FormControl>
                     <Input type="date" className="w-[160px]" {...field} />
@@ -270,55 +269,19 @@ export const UpdateBasicInfoCard = ({
               </FormItem>
             )}
           />
-        </div>
-      </FormCard>
 
-      <FormCard
-        title={isReceived ? 'Bankovní účet dodavatele' : 'Bankovní účet'}
-        titleClassName="text-center"
-      >
-        <div className="mx-auto max-w-3xl space-y-4">
-          {isReceived ? (
-            <>
-              <InputController
-                control={form.control}
-                name="bankSnapshot.name"
-                label="Název banky"
-                placeholder="Volitelně"
-              />
-              <InputController
-                control={form.control}
-                name="bankSnapshot.number"
-                label="Číslo účtu"
-                placeholder="123456789/0100"
-              />
-              <InputController
-                control={form.control}
-                name="bankSnapshot.iban"
-                label="IBAN"
-                placeholder="CZ65..."
-              />
-              <InputController
-                control={form.control}
-                name="bankSnapshot.swift"
-                label="SWIFT/BIC"
-                placeholder="Volitelně"
-              />
-            </>
-          ) : (
+          {!isReceived && (
             <FormField
               control={form.control}
               name="bankId"
               render={({ field }) => (
                 <FormItem className="flex items-center gap-4">
-                  <FormLabel className="w-[200px] text-right">
-                    Bankovní účet
-                  </FormLabel>
+                  <FormLabel className="w-[200px] text-right">{t('invoices.fields.bank')}</FormLabel>
                   <div className="flex flex-col">
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-[400px]">
-                          <SelectValue placeholder="Vyberte bankovní účet" />
+                          <SelectValue placeholder={t('invoices.placeholders.selectBank')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -338,47 +301,65 @@ export const UpdateBasicInfoCard = ({
         </div>
       </FormCard>
 
-      <FormCard title="Platební symboly" titleClassName="text-center">
-        <div className="mx-auto max-w-3xl space-y-4">
-          <InputController
-            control={form.control}
-            name="variableSymbol"
-            label="Variabilní symbol"
-            placeholder="Volitelně"
-          />
-          <InputController
-            control={form.control}
-            name="specificSymbol"
-            label="Specifický symbol"
-            placeholder="Volitelně"
-          />
-          <InputController
-            control={form.control}
-            name="konstantSymbol"
-            label="Konstantní symbol"
-            placeholder="Volitelně"
-          />
-        </div>
-      </FormCard>
+      <Collapsible open={optionalOpen} onOpenChange={setOptionalOpen}>
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/50 data-[state=open]:hidden"
+          >
+            <span>{t('invoices.sections.optionalDetails')}</span>
+            <ChevronDown className="h-4 w-4 shrink-0" />
+          </button>
+        </CollapsibleTrigger>
 
-      <FormCard title="Poznámky" titleClassName="text-center">
-        <div className="mx-auto max-w-3xl space-y-4">
-          <InputController
-            control={form.control}
-            name="note"
-            label="Poznámka"
-            placeholder="Zobrazí se na faktuře"
-            variant="vertical"
-          />
-          <InputController
-            control={form.control}
-            name="internalNote"
-            label="Interní poznámka"
-            placeholder="Není viditelná pro protistranu"
-            variant="vertical"
-          />
-        </div>
-      </FormCard>
+        <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
+          <div className="rounded-lg border bg-card">
+            <div className="flex items-center justify-between border-b px-6 py-4">
+              <span className="text-sm font-medium text-foreground">
+                {t('invoices.sections.optionalDetails')}
+              </span>
+              <CollapsibleTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+
+            <div className="space-y-6 p-6">
+              {isReceived && (
+                <FormCard title={t('invoices.sections.bankSupplier')} titleClassName="text-center">
+                  <div className="mx-auto max-w-3xl space-y-4">
+                    <InputController control={form.control} name="bankSnapshot.name" label={t('invoices.fields.bankName')} placeholder={t('common.optional')} />
+                    <InputController control={form.control} name="bankSnapshot.number" label={t('invoices.fields.bankNumber')} placeholder="123456789/0100" />
+                    <InputController control={form.control} name="bankSnapshot.iban" label={t('invoices.fields.bankIban')} placeholder="CZ65..." />
+                    <InputController control={form.control} name="bankSnapshot.swift" label={t('invoices.fields.bankSwift')} placeholder={t('common.optional')} />
+                  </div>
+                </FormCard>
+              )}
+
+              <FormCard title={t('invoices.sections.paymentSymbols')} titleClassName="text-center">
+                <div className="mx-auto max-w-3xl space-y-4">
+                  <InputController control={form.control} name="variableSymbol" label={t('invoices.fields.variableSymbol')} placeholder={t('common.optional')} />
+                  <InputController control={form.control} name="specificSymbol" label={t('invoices.fields.specificSymbol')} placeholder={t('common.optional')} />
+                  <InputController control={form.control} name="konstantSymbol" label={t('invoices.fields.konstantSymbol')} placeholder={t('common.optional')} />
+                </div>
+              </FormCard>
+
+              <FormCard title={t('invoices.sections.notes')} titleClassName="text-center">
+                <div className="mx-auto max-w-3xl space-y-4">
+                  <InputController control={form.control} name="note" label={t('invoices.fields.note')} placeholder={t('invoices.placeholders.note')} variant="vertical" />
+                  <InputController control={form.control} name="internalNote" label={t('invoices.fields.internalNote')} placeholder={t('invoices.placeholders.internalNote')} variant="vertical" />
+                </div>
+              </FormCard>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </>
   );
 };

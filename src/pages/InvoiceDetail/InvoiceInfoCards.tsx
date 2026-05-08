@@ -1,8 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  type InvoiceResponseDto,
-  InvoiceResponseDtoVatMode,
-} from '@/api/model';
+import type { InvoiceResponseDto } from '@/api/model';
 import { Lock } from 'lucide-react';
 import { formatDate, formatCompanyAddress } from './utils';
 
@@ -10,22 +8,14 @@ interface InvoiceInfoCardsProps {
   invoice: InvoiceResponseDto;
 }
 
-const VAT_MODE_LABELS: Record<InvoiceResponseDtoVatMode, string> = {
-  STANDARD: 'Standardní',
-  NON_VAT_PAYER: 'Neplátce DPH',
-  REVERSE_CHARGE: 'Přenesená daňová povinnost',
-};
-
 export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
+  const { t } = useTranslation();
   const counterparty = invoice.contactSnapshot;
   const isReceived = invoice.type === 'RECEIVED';
   const bank = invoice.bankAccount;
-  const hasBankInfo =
-    !!bank?.name || !!bank?.number || !!bank?.iban || !!bank?.swift;
+  const hasBankInfo = !!bank?.name || !!bank?.number || !!bank?.iban || !!bank?.swift;
   const hasPaymentSymbols =
-    !!invoice.variableSymbol ||
-    !!invoice.specificSymbol ||
-    !!invoice.konstantSymbol;
+    !!invoice.variableSymbol || !!invoice.specificSymbol || !!invoice.konstantSymbol;
 
   return (
     <div className="space-y-4">
@@ -33,14 +23,14 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
         <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
             <CardTitle className="text-3xl tracking-tight text-slate-900">
-              Faktura
+              {t('invoices.detail.invoice.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <div className="text-base text-muted-foreground">
-                  Číslo faktury
+                  {t('invoices.fields.number')}
                 </div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
                   {invoice.number}
@@ -49,7 +39,7 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
               {isReceived && invoice.originalNumber && (
                 <div>
                   <div className="text-base text-muted-foreground">
-                    Číslo dodavatele
+                    {t('invoices.fields.originalNumber')}
                   </div>
                   <div className="mt-1 text-xl font-semibold text-slate-900">
                     {invoice.originalNumber}
@@ -58,30 +48,30 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
               )}
               <div>
                 <div className="text-base text-muted-foreground">
-                  Datum vystavení
+                  {t('invoices.fields.createdDate')}
                 </div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
                   {formatDate(invoice.createdDate)}
                 </div>
               </div>
               <div>
-                <div className="text-base text-muted-foreground">Splatnost</div>
+                <div className="text-base text-muted-foreground">{t('invoices.fields.dueDate')}</div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
                   {formatDate(invoice.dueDate)}
                 </div>
               </div>
               <div>
                 <div className="text-base text-muted-foreground">
-                  Datum plnění
+                  {t('invoices.fields.duzpDate')}
                 </div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
                   {formatDate(invoice.duzpDate)}
                 </div>
               </div>
               <div>
-                <div className="text-base text-muted-foreground">Režim DPH</div>
+                <div className="text-base text-muted-foreground">{t('invoices.fields.vatMode')}</div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
-                  {VAT_MODE_LABELS[invoice.vatMode] ?? invoice.vatMode}
+                  {t(`invoices.vatModes.${invoice.vatMode}`, invoice.vatMode)}
                 </div>
               </div>
             </div>
@@ -91,7 +81,9 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
         <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
             <CardTitle className="text-3xl tracking-tight text-slate-900">
-              {isReceived ? 'Dodavatel' : 'Odběratel'}
+              {isReceived
+                ? t('invoices.fields.supplier')
+                : t('invoices.fields.contact')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-base">
@@ -102,13 +94,13 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <div className="text-base text-muted-foreground">IČO</div>
+                <div className="text-base text-muted-foreground">{t('contacts.fields.ico')}</div>
                 <div className="mt-1 text-lg font-medium text-slate-900">
                   {counterparty?.ico || '-'}
                 </div>
               </div>
               <div>
-                <div className="text-base text-muted-foreground">DIČ</div>
+                <div className="text-base text-muted-foreground">{t('contacts.fields.dic')}</div>
                 <div className="mt-1 text-lg font-medium text-slate-900">
                   {counterparty?.dic || '-'}
                 </div>
@@ -131,36 +123,38 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
         <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight text-slate-900">
-              Platební údaje
+              {t('invoices.detail.bank.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             {hasBankInfo && (
               <div className="space-y-2">
                 <div className="text-base font-medium text-slate-900">
-                  {isReceived ? 'Bankovní účet dodavatele' : 'Bankovní účet'}
+                  {isReceived
+                    ? t('invoices.detail.bank.supplierAccount')
+                    : t('invoices.detail.bank.account')}
                 </div>
                 {bank?.name && (
                   <div>
-                    <span className="text-muted-foreground">Banka: </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.bank.name')}: </span>
                     <span className="text-slate-900">{bank.name}</span>
                   </div>
                 )}
                 {bank?.number && (
                   <div>
-                    <span className="text-muted-foreground">Číslo účtu: </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.bank.number')}: </span>
                     <span className="text-slate-900">{bank.number}</span>
                   </div>
                 )}
                 {bank?.iban && (
                   <div>
-                    <span className="text-muted-foreground">IBAN: </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.bank.iban')}: </span>
                     <span className="text-slate-900">{bank.iban}</span>
                   </div>
                 )}
                 {bank?.swift && (
                   <div>
-                    <span className="text-muted-foreground">SWIFT: </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.bank.swift')}: </span>
                     <span className="text-slate-900">{bank.swift}</span>
                   </div>
                 )}
@@ -169,30 +163,24 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
             {hasPaymentSymbols && (
               <div className="space-y-2">
                 <div className="text-base font-medium text-slate-900">
-                  Platební symboly
+                  {t('invoices.detail.symbols.title')}
                 </div>
                 {invoice.variableSymbol && (
                   <div>
-                    <span className="text-muted-foreground">VS: </span>
-                    <span className="text-slate-900">
-                      {invoice.variableSymbol}
-                    </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.symbols.vs')}: </span>
+                    <span className="text-slate-900">{invoice.variableSymbol}</span>
                   </div>
                 )}
                 {invoice.specificSymbol && (
                   <div>
-                    <span className="text-muted-foreground">SS: </span>
-                    <span className="text-slate-900">
-                      {invoice.specificSymbol}
-                    </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.symbols.ss')}: </span>
+                    <span className="text-slate-900">{invoice.specificSymbol}</span>
                   </div>
                 )}
                 {invoice.konstantSymbol && (
                   <div>
-                    <span className="text-muted-foreground">KS: </span>
-                    <span className="text-slate-900">
-                      {invoice.konstantSymbol}
-                    </span>
+                    <span className="text-muted-foreground">{t('invoices.detail.symbols.ks')}: </span>
+                    <span className="text-slate-900">{invoice.konstantSymbol}</span>
                   </div>
                 )}
               </div>
@@ -205,29 +193,25 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
         <Card className="border-slate-200/80 shadow-sm">
           <CardHeader>
             <CardTitle className="text-2xl tracking-tight text-slate-900">
-              Poznámky
+              {t('invoices.detail.notes.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {invoice.note && (
               <div>
-                <div className="text-base text-muted-foreground">Poznámka</div>
-                <p className="mt-1 whitespace-pre-wrap text-slate-900">
-                  {invoice.note}
-                </p>
+                <div className="text-base text-muted-foreground">{t('invoices.detail.notes.note')}</div>
+                <p className="mt-1 whitespace-pre-wrap text-slate-900">{invoice.note}</p>
               </div>
             )}
             {invoice.internalNote && (
               <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
                 <div className="flex items-center gap-2 text-base font-medium text-amber-900">
                   <Lock className="h-4 w-4" />
-                  Interní poznámka
+                  {t('invoices.detail.notes.internalNote')}
                 </div>
-                <p className="mt-1 whitespace-pre-wrap text-amber-900">
-                  {invoice.internalNote}
-                </p>
+                <p className="mt-1 whitespace-pre-wrap text-amber-900">{invoice.internalNote}</p>
                 <p className="mt-2 text-xs text-amber-700">
-                  Není viditelná pro protistranu.
+                  {t('invoices.detail.notes.internalNoteDisclaimer')}
                 </p>
               </div>
             )}

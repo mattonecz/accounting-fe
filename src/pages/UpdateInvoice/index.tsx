@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -9,6 +10,7 @@ import { UpdateBasicInfoCard } from './UpdateBasicInfoCard';
 import { UpdateItemsCard } from './UpdateItemsCard';
 
 export default function UpdateInvoice() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -33,7 +35,7 @@ export default function UpdateInvoice() {
   if (!id) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">Neplatné ID faktury.</p>
+        <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>
       </PageLayout>
     );
   }
@@ -41,7 +43,7 @@ export default function UpdateInvoice() {
   if (isLoading) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">Načítám fakturu k úpravě...</p>
+        <p className="text-muted-foreground">{t('invoices.update.loading')}</p>
       </PageLayout>
     );
   }
@@ -49,7 +51,7 @@ export default function UpdateInvoice() {
   if (isError || !invoiceResponse?.data) {
     return (
       <PageLayout>
-        <p className="text-destructive">Fakturu se nepodařilo načíst.</p>
+        <p className="text-destructive">{t('invoices.detail.loadError')}</p>
       </PageLayout>
     );
   }
@@ -69,8 +71,8 @@ export default function UpdateInvoice() {
   return (
     <PageLayout className="space-y-4">
       <PageHeader
-        title="Upravit fakturu"
-        description="Upravte údaje faktury a uložte změny"
+        title={t('invoices.update.title')}
+        description={t('invoices.update.description')}
         backButton
       />
 
@@ -94,7 +96,7 @@ export default function UpdateInvoice() {
             isVatPayer={isVatPayer}
           />
 
-          <FormCard title="Souhrn faktury">
+          <FormCard title={t('invoices.summary.title')}>
             <div
               className={`grid grid-cols-1 gap-4 ${
                 isVatPayer ? 'md:grid-cols-3' : 'md:grid-cols-1'
@@ -102,18 +104,18 @@ export default function UpdateInvoice() {
             >
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {isVatPayer ? 'Mezisoučet' : 'Částka celkem'}
+                  {isVatPayer ? t('invoices.summary.subtotal') : t('invoices.summary.total')}
                 </p>
                 <p className="text-2xl font-bold">{formatMoney(total)}</p>
               </div>
               {isVatPayer && (
                 <>
                   <div>
-                    <p className="text-sm text-muted-foreground">DPH celkem</p>
+                    <p className="text-sm text-muted-foreground">{t('invoices.summary.totalTax')}</p>
                     <p className="text-2xl font-bold">{formatMoney(totalTax)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Částka celkem</p>
+                    <p className="text-sm text-muted-foreground">{t('invoices.summary.total')}</p>
                     <p className="text-2xl font-bold">{formatMoney(total + totalTax)}</p>
                   </div>
                 </>
@@ -122,15 +124,11 @@ export default function UpdateInvoice() {
           </FormCard>
 
           <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate(-1)}
-            >
-              Zrušit
+            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isUpdatingInvoice}>
-              {isUpdatingInvoice ? 'Ukládám změny...' : 'Uložit změny'}
+              {isUpdatingInvoice ? t('invoices.update.saving') : t('invoices.update.save')}
             </Button>
           </div>
         </form>

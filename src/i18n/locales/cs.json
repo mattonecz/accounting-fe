@@ -1,0 +1,871 @@
+{
+  "common": {
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "loading": "Načítám...",
+    "saving": "Ukládám...",
+    "actions": "Akce",
+    "back": "Zpět",
+    "optional": "Volitelně",
+    "errorLoad": "Nepodařilo se načíst",
+    "refresh": "Obnovit",
+    "detail": "Detail"
+  },
+  "validation": {
+    "required": "{{field}} je povinné",
+    "minZero": "Hodnota musí být ≥ 0",
+    "maxN": "Hodnota musí být ≤ {{max}}",
+    "email": "Zadejte platný e-mail"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "contacts": "Kontakty",
+    "bankAccounts": "Bankovní účty",
+    "invoicesIssued": "Faktury vydané",
+    "invoicesReceived": "Faktury přijaté",
+    "simpleInvoices": "Zjednodušené doklady",
+    "taxReport": "Přehled DPH",
+    "logout": "Odhlásit"
+  },
+  "auth": {
+    "title": "FreelanceBooks",
+    "description": "Spravujte své freelance finance snadno",
+    "login": "Přihlásit se",
+    "register": "Registrovat se",
+    "signIn": "Přihlásit se",
+    "createAccount": "Vytvořit účet",
+    "fields": {
+      "username": "Uživatelské jméno",
+      "email": "E-mail",
+      "password": "Heslo"
+    },
+    "placeholders": {
+      "email": "vas@email.cz",
+      "password": "••••••••"
+    },
+    "validation": {
+      "usernameRequired": "Uživatelské jméno je povinné",
+      "emailRequired": "E-mail je povinný",
+      "passwordRequired": "Heslo je povinné"
+    },
+    "messages": {
+      "loginSuccess": "Přihlášení proběhlo úspěšně!",
+      "loginError": "Neplatné uživatelské jméno nebo heslo",
+      "registerSuccess": "Účet byl úspěšně vytvořen!",
+      "registerError": "Tato e-mailová adresa je již registrována",
+      "logoutSuccess": "Odhlášení proběhlo úspěšně"
+    }
+  },
+  "invoices": {
+    "create": {
+      "title": "Vytvořit fakturu",
+      "titleReceived": "Vytvořit přijatou fakturu",
+      "description": "Vyplňte údaje pro vytvoření nové faktury"
+    },
+    "update": {
+      "title": "Upravit fakturu",
+      "description": "Upravte údaje faktury a uložte změny",
+      "loading": "Načítám fakturu...",
+      "saving": "Ukládám změny...",
+      "save": "Uložit změny"
+    },
+    "detail": {
+      "backLabel": "Detail faktury",
+      "backNumber": "Faktura {{number}}",
+      "invalidId": "Neplatné ID faktury.",
+      "loading": "Načítám fakturu...",
+      "error": "Fakturu se nepodařilo načíst.",
+      "invoice": {
+        "title": "Faktura",
+        "number": "Číslo faktury",
+        "supplierNumber": "Číslo dodavatele",
+        "createdDate": "Datum vystavení",
+        "dueDate": "Splatnost",
+        "duzpDate": "Datum plnění",
+        "vatMode": "Režim DPH"
+      },
+      "hero": {
+        "total": "Celkem",
+        "paid": "Uhrazeno",
+        "remaining": "Zbývá",
+        "editLabel": "Upravit fakturu",
+        "moreLabel": "Další akce",
+        "print": "Tisk"
+      },
+      "notes": {
+        "title": "Poznámky",
+        "note": "Poznámka",
+        "internalNote": "Interní poznámka",
+        "internalNoteDisclaimer": "Není viditelná pro protistranu."
+      },
+      "bank": {
+        "title": "Platební údaje",
+        "supplierAccount": "Bankovní účet dodavatele",
+        "account": "Bankovní účet",
+        "name": "Banka",
+        "number": "Číslo účtu",
+        "iban": "IBAN",
+        "swift": "SWIFT"
+      },
+      "symbols": {
+        "title": "Platební symboly",
+        "vs": "VS",
+        "ss": "SS",
+        "ks": "KS"
+      },
+      "payments": {
+        "heading_one": "Platba",
+        "heading_other": "Platby",
+        "empty": "K této faktuře zatím nejsou evidované žádné platby."
+      },
+      "statusHistory": {
+        "title": "Historie stavů",
+        "empty": "K této faktuře zatím není k dispozici historie stavů.",
+        "statusChange": "Změna stavu",
+        "changes_one": "{{count}} změna",
+        "changes_few": "{{count}} změny",
+        "changes_other": "{{count}} změn"
+      },
+      "items": {
+        "title": "Položky faktury",
+        "columns": {
+          "item": "Položka",
+          "quantity": "Množství",
+          "unitPrice": "Cena za jednotku",
+          "vat": "DPH",
+          "total": "Celkem"
+        }
+      }
+    },
+    "list": {
+      "columns": {
+        "number": "Číslo faktury",
+        "contact": "Odběratel",
+        "supplier": "Dodavatel",
+        "amount": "Částka",
+        "status": "Stav",
+        "createdDate": "Datum vystavení",
+        "dueDate": "Datum splatnosti",
+        "actions": "Akce"
+      },
+      "allInvoices": "Všechny faktury",
+      "emptyIssued": "Žádné vydané faktury.",
+      "emptyReceived": "Žádné přijaté faktury.",
+      "loading": "Načítám faktury...",
+      "error": "Nepodařilo se načíst faktury.",
+      "titleIssued": "Faktury vydané",
+      "titleReceived": "Faktury přijaté",
+      "descriptionIssued": "Sledujte faktury vydané",
+      "descriptionReceived": "Sledujte faktury přijaté"
+    },
+    "fields": {
+      "number": "Číslo faktury",
+      "originalNumber": "Číslo dodavatele",
+      "currency": "Měna",
+      "vatMode": "Režim DPH",
+      "exchangeRate": "Kurz",
+      "createdDate": "Datum vystavení",
+      "duzpDate": "Datum zdanitelného plnění",
+      "dueDate": "Datum splatnosti",
+      "contact": "Odběratel",
+      "supplier": "Dodavatel",
+      "bank": "Bankovní účet",
+      "bankSupplier": "Bankovní účet dodavatele",
+      "bankName": "Název banky",
+      "bankNumber": "Číslo účtu",
+      "bankIban": "IBAN",
+      "bankSwift": "SWIFT/BIC",
+      "variableSymbol": "Variabilní symbol",
+      "specificSymbol": "Specifický symbol",
+      "konstantSymbol": "Konstantní symbol",
+      "note": "Poznámka",
+      "internalNote": "Interní poznámka",
+      "vatRate": "DPH %",
+      "status": "Stav",
+      "quantity": "Množství",
+      "unitPrice": "Cena za jednotku"
+    },
+    "placeholders": {
+      "number": "20250001",
+      "originalNumber": "Číslo na faktuře dodavatele",
+      "selectCurrency": "Vyberte měnu",
+      "selectVatMode": "Vyberte režim DPH",
+      "exchangeRate": "Volitelně",
+      "selectContact": "Vyberte odběratele",
+      "selectSupplier": "Vyberte dodavatele",
+      "selectBank": "Vyberte bankovní účet",
+      "bankName": "Volitelně",
+      "bankNumber": "123456789/0100",
+      "bankIban": "CZ65...",
+      "bankSwift": "Volitelně",
+      "variableSymbol": "Volitelně",
+      "specificSymbol": "Volitelně",
+      "konstantSymbol": "Volitelně",
+      "note": "Zobrazí se na faktuře",
+      "internalNote": "Není viditelná pro protistranu",
+      "itemDescription": "Popis položky",
+      "selectStatus": "Vyberte stav"
+    },
+    "statuses": {
+      "DRAFT": "Koncept",
+      "ISSUED": "Vystavena",
+      "PAID": "Uhrazena",
+      "CANCELLED": "Zrušena",
+      "OVERDUE": "Po splatnosti",
+      "UPDATED": "Upravena"
+    },
+    "vatModes": {
+      "STANDARD": "Standardní",
+      "NON_VAT_PAYER": "Neplátce DPH",
+      "REVERSE_CHARGE": "Přenesená daňová povinnost"
+    },
+    "paymentMethods": {
+      "BANK_TRANSFER": "Bankovní převod",
+      "CASH": "Hotovost",
+      "CARD": "Kartou",
+      "OTHER": "Jiná metoda"
+    },
+    "summary": {
+      "title": "Souhrn faktury",
+      "subtotal": "Mezisoučet",
+      "total": "Částka celkem",
+      "totalTax": "DPH celkem"
+    },
+    "items": {
+      "title": "Položky faktury",
+      "add": "Přidat položku",
+      "addItem": "Přidat položku",
+      "columns": {
+        "description": "Popis",
+        "quantity": "Množství",
+        "price": "Cena",
+        "vatRate": "DPH %",
+        "vatRatePct": "DPH %",
+        "total": "Celkem"
+      },
+      "validation": {
+        "descriptionRequired": "Popis je povinný",
+        "quantityRequired": "Množství je povinné",
+        "quantityMin": "Množství musí být ≥ 0",
+        "priceRequired": "Cena je povinná",
+        "priceMin": "Cena musí být ≥ 0",
+        "vatMin": "DPH musí být ≥ 0",
+        "vatMax": "DPH musí být ≤ 100"
+      }
+    },
+    "actions": {
+      "create": "Vytvořit fakturu",
+      "createDraft": "Uložit jako koncept",
+      "edit": "Upravit",
+      "editAriaLabel": "Upravit fakturu {{number}}",
+      "moreAriaLabel": "Další akce pro fakturu {{number}}",
+      "detail": "Detail",
+      "recordPayment": "Zaznamenat platbu",
+      "downloadPdf": "Stáhnout PDF",
+      "cancel": "Zrušit",
+      "saveChanges": "Uložit změny",
+      "savingChanges": "Ukládám změny...",
+      "creating": "Vytvářím..."
+    },
+    "messages": {
+      "created": "Faktura byla úspěšně vytvořena",
+      "createFailed": "Vytvoření faktury selhalo",
+      "draftCreated": "Koncept faktury byl úspěšně vytvořen",
+      "draftCreateFailed": "Vytvoření konceptu faktury selhalo",
+      "updated": "Faktura byla úspěšně upravena",
+      "updateFailed": "Úprava faktury selhala"
+    },
+    "validation": {
+      "numberRequired": "Číslo faktury je povinné",
+      "contactRequired": "Odběratel je povinný",
+      "supplierRequired": "Dodavatel je povinný",
+      "vatModeRequired": "Režim DPH je povinný",
+      "createdDateRequired": "Datum vystavení je povinné",
+      "duzpDateRequired": "Datum zdanitelného plnění je povinné",
+      "dueDateRequired": "Datum splatnosti je povinné",
+      "bankRequired": "Bankovní účet je povinný"
+    },
+    "sections": {
+      "basicInfo": "Základní informace",
+      "items": "Položky faktury",
+      "bank": "Bankovní účet",
+      "bankSupplier": "Bankovní účet dodavatele",
+      "paymentSymbols": "Platební symboly",
+      "notes": "Poznámky",
+      "optionalDetails": "Platební symboly a poznámky"
+    }
+  },
+  "payments": {
+    "title": "Zaznamenat platbu",
+    "invoice": "Faktura {{number}}",
+    "fields": {
+      "date": "Datum platby",
+      "amount": "Částka",
+      "reference": "Variabilní symbol",
+      "method": "Forma úhrady"
+    },
+    "placeholders": {
+      "selectMethod": "Vyberte metodu platby"
+    },
+    "actions": {
+      "record": "Zaznamenat platbu",
+      "save": "Uložit platbu",
+      "saving": "Ukládám...",
+      "cancel": "Zrušit"
+    },
+    "messages": {
+      "success": "Platba byla úspěšně zaznamenána",
+      "error": "Zaznamenání platby se nezdařilo"
+    },
+    "validation": {
+      "amountRequired": "Částka je povinná",
+      "dateRequired": "Datum platby je povinné",
+      "referenceRequired": "Variabilní symbol je povinný"
+    }
+  },
+  "simpleInvoices": {
+    "title": "Zjednodušené doklady",
+    "description": "Přehled a evidence zjednodušených daňových dokladů z reálných dat",
+    "listTitle": "Seznam zjednodušených dokladů",
+    "empty": "Zatím nemáte evidovaný žádný zjednodušený doklad.",
+    "loading": "Načítám zjednodušené doklady…",
+    "error": "Nepodařilo se načíst zjednodušené doklady. Zkuste načtení zopakovat.",
+    "stats": {
+      "count": "Počet dokladů",
+      "totalVat": "Celkové DPH",
+      "totalWithVat": "Celkem s DPH"
+    },
+    "fields": {
+      "number": "Číslo dokladu",
+      "company": "Firma",
+      "base": "Základ",
+      "vat": "DPH",
+      "totalWithVat": "Celkem s DPH"
+    },
+    "placeholders": {
+      "contact": "Vyberte kontakt",
+      "description": "Doplňující informace k dokladu..."
+    },
+    "dialog": {
+      "title": "Vytvořit zjednodušený doklad",
+      "submit": "Vytvořit doklad"
+    },
+    "messages": {
+      "createSuccess": "Zjednodušený doklad byl vytvořen.",
+      "createError": "Vytvoření zjednodušeného dokladu se nepodařilo."
+    },
+    "list": {
+      "title": "Seznam zjednodušených dokladů",
+      "empty": "Zatím nemáte evidovaný žádný zjednodušený doklad.",
+      "loading": "Načítám zjednodušené doklady…",
+      "error": "Nepodařilo se načíst zjednodušené doklady. Zkuste načtení zopakovat."
+    },
+    "columns": {
+      "number": "Číslo dokladu",
+      "contact": "Firma",
+      "company": "Firma",
+      "createdDate": "Datum vystavení",
+      "duzpDate": "Datum plnění",
+      "base": "Základ",
+      "vat": "DPH",
+      "totalWithVat": "Celkem s DPH",
+      "note": "Poznámka"
+    },
+    "cards": {
+      "count": "Počet dokladů",
+      "totalVat": "Celkové DPH",
+      "totalWithVat": "Celkem s DPH"
+    },
+    "actions": {
+      "refresh": "Obnovit",
+      "create": "Nový doklad"
+    },
+    "create": {
+      "title": "Vytvořit zjednodušený doklad",
+      "fields": {
+        "number": "Číslo dokladu",
+        "contact": "Firma",
+        "createdDate": "Datum vystavení",
+        "duzpDate": "Datum zdanitelného plnění",
+        "base": "Základ",
+        "vat": "DPH",
+        "totalWithVat": "Celkem s DPH",
+        "note": "Poznámka"
+      },
+      "placeholders": {
+        "contact": "Vyberte kontakt",
+        "contactLoading": "Načítám kontakty...",
+        "note": "Doplňující informace k dokladu..."
+      },
+      "actions": {
+        "cancel": "Zrušit",
+        "submit": "Vytvořit doklad",
+        "submitting": "Ukládám"
+      },
+      "validation": {
+        "numberRequired": "Číslo dokladu je povinné",
+        "createdDateRequired": "Datum vystavení je povinné",
+        "duzpDateRequired": "Datum zdanitelného plnění je povinné",
+        "baseRequired": "Základ je povinný",
+        "baseMin": "Základ musí být kladné číslo nebo nula",
+        "vatRequired": "DPH je povinné",
+        "vatMin": "DPH musí být kladné číslo nebo nula",
+        "totalWithVatRequired": "Celkem s DPH je povinné",
+        "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula"
+      },
+      "messages": {
+        "created": "Zjednodušený doklad byl vytvořen.",
+        "createFailed": "Vytvoření zjednodušeného dokladu se nepodařilo."
+      }
+    }
+  },
+  "bankAccounts": {
+    "title": "Bankovní účty",
+    "description": "Sledujte své firemní účty",
+    "fields": {
+      "name": "Název účtu",
+      "number": "Číslo účtu",
+      "iban": "IBAN",
+      "swift": "SWIFT/BIC",
+      "currency": "Měna"
+    },
+    "placeholders": {
+      "name": "ČSOB CZK",
+      "number": "1234567890",
+      "iban": "CZ65 0800 0000 1234 5678 9012",
+      "swift": "CEKOCZPP",
+      "currency": "CZK"
+    },
+    "validation": {
+      "nameRequired": "Název účtu je povinný",
+      "numberOrIbanRequired": "Buď číslo účtu nebo IBAN musí být vyplněno",
+      "currencyRequired": "Měna je povinná"
+    },
+    "create": {
+      "title": "Přidat bankovní účet",
+      "trigger": "Přidat účet"
+    },
+    "edit": {
+      "title": "Upravit bankovní účet",
+      "description": "Aktualizujte název účtu, identifikátor a měnu."
+    },
+    "defaultAccount": "Výchozí účet",
+    "setAsDefault": "Nastavit jako výchozí",
+    "setNameAsDefault": "Nastavit {{name}} jako výchozí účet",
+    "actions": {
+      "cancel": "Zrušit",
+      "create": "Přidat účet",
+      "save": "Uložit změny"
+    },
+    "messages": {
+      "created": "{{name}} byl úspěšně přidán.",
+      "createFailed": "Přidání bankovního účtu se nepodařilo",
+      "updated": "{{name}} byl úspěšně aktualizován.",
+      "updateFailed": "Aktualizace bankovního účtu se nepodařila",
+      "setDefault": "{{name}} je nyní výchozí účet.",
+      "setDefaultFailed": "Nastavení výchozího účtu se nepodařilo"
+    }
+  },
+  "contacts": {
+    "title": "Kontakty",
+    "description": "Spravujte své klienty a dodavatele",
+    "allContacts": "Všechny kontakty",
+    "columns": {
+      "name": "Název",
+      "ico": "IČO",
+      "address": "Adresa",
+      "actions": "Akce"
+    },
+    "fields": {
+      "name": "Název",
+      "ico": "IČO",
+      "dic": "DIČ",
+      "country": "Stát",
+      "city": "Město",
+      "street": "Ulice",
+      "psc": "PSČ",
+      "email": "E-mail",
+      "description": "Popis"
+    },
+    "placeholders": {
+      "name": "Název firmy",
+      "ico": "1234567890",
+      "dic": "CZ1234567890",
+      "country": "Česká republika",
+      "city": "Praha",
+      "street": "123 Hlavní ul.",
+      "psc": "12345",
+      "email": "kontakt@firma.cz",
+      "description": "Krátká poznámka o firmě"
+    },
+    "detail": {
+      "description": "Kontaktní údaje a informace o registraci firmy.",
+      "ico": "IČO",
+      "dic": "DIČ",
+      "address": "Adresa",
+      "city": "Město",
+      "country": "Stát",
+      "email": "E-mail"
+    },
+    "validation": {
+      "nameRequired": "Název je povinný",
+      "countryRequired": "Stát je povinný"
+    },
+    "actions": {
+      "add": "Přidat kontakt",
+      "edit": "Upravit",
+      "cancel": "Zrušit",
+      "create": "Přidat kontakt",
+      "save": "Uložit změny"
+    },
+    "create": {
+      "title": "Přidat nový kontakt"
+    },
+    "edit": {
+      "title": "Upravit kontakt",
+      "description": "Aktualizujte údaje vybraného kontaktu."
+    },
+    "messages": {
+      "created": "Kontakt byl úspěšně vytvořen",
+      "createFailed": "Vytvoření kontaktu se nepodařilo",
+      "updated": "Kontakt byl úspěšně aktualizován",
+      "updateFailed": "Aktualizace kontaktu se nepodařila"
+    }
+  },
+  "taxReport": {
+    "title": "Přehled DPH",
+    "description": "Měsíční souhrn DPH z vydaných a přijatých dokladů včetně nákladových zjednodušených dokladů",
+    "actions": {
+      "refresh": "Obnovit",
+      "export": "Vygenerovat KH a DPH",
+      "exporting": "Generuji..."
+    },
+    "statCards": {
+      "inputVat": "DPH na vstupu",
+      "outputVat": "DPH na výstupu",
+      "simpleInvoices": "Zjednodušené doklady",
+      "result": "Výsledek období",
+      "inputVatTrend": "Přijaté faktury a zjednodušené doklady",
+      "outputVatTrend": "Pouze vydané faktury",
+      "simpleInvoicesTrend": "Nákladové doklady zahrnuté do vstupní DPH",
+      "vatDue": "DPH k úhradě",
+      "vatRefund": "Nárok na odpočet"
+    },
+    "breakdown": {
+      "title": "Rozpad DPH za vybrané období",
+      "description": "Data jsou načtena podle data zdanitelného plnění za měsíc {{month}} {{year}}.",
+      "loading": "Načítám přehled DPH…",
+      "error": "Nepodařilo se načíst podklady pro přehled DPH. Zkuste načtení zopakovat.",
+      "columns": {
+        "type": "Typ dokladu",
+        "base": "Základ",
+        "vat": "DPH",
+        "total": "Celkem"
+      },
+      "rows": {
+        "issued": "Vydané faktury",
+        "received": "Přijaté faktury",
+        "simple": "Zjednodušené doklady",
+        "inputTotal": "Součet na vstupu",
+        "outputTotal": "Součet na výstupu"
+      }
+    },
+    "explanation": {
+      "title": "Co z toho plyne",
+      "description": "Zjednodušené doklady jsou vedené jako přijaté nákladové doklady a vstupují do odpočtu DPH.",
+      "vatDueLabel": "DPH k úhradě / odpočtu",
+      "vatDue": "Za zvolené období vychází závazek vůči finančnímu úřadu.",
+      "vatRefund": "Za zvolené období vychází nárok na odpočet DPH.",
+      "inputVatDesc": "DPH na vstupu představuje odpočet z přijatých faktur a ze zjednodušených nákladových dokladů.",
+      "outputVatDesc": "DPH na výstupu obsahuje DPH pouze z vydaných faktur.",
+      "dataNote": "Přehled pracuje s měsíčními souhrny z backendových endpointů, takže odpovídá skutečným účetním datům a neobsahuje žádná smyšlená čísla.",
+      "updating": "Probíhá aktualizace dat…"
+    },
+    "months": {
+      "0": "leden",
+      "1": "únor",
+      "2": "březen",
+      "3": "duben",
+      "4": "květen",
+      "5": "červen",
+      "6": "červenec",
+      "7": "srpen",
+      "8": "září",
+      "9": "říjen",
+      "10": "listopad",
+      "11": "prosinec"
+    }
+  },
+  "settings": {
+    "menu": {
+      "personal": "Osobní údaje",
+      "billing": "Fakturační údaje",
+      "defaults": "Výchozí hodnoty",
+      "language": "Jazyk"
+    },
+    "personal": {
+      "dialogTitle": "Osobní údaje",
+      "dialogDescription": "Kontaktní údaje uložené ve vašem uživatelském profilu.",
+      "cardTitle": "Osobní údaje",
+      "cardDescription": "Základní kontaktní údaje uložené ve vašem uživatelském profilu.",
+      "fields": {
+        "firstName": "Jméno",
+        "lastName": "Příjmení",
+        "email": "Kontaktní e-mail",
+        "phone": "Telefon",
+        "dic": "DIČ"
+      },
+      "placeholders": {
+        "firstName": "Jan",
+        "lastName": "Novák",
+        "email": "jan@example.cz",
+        "phone": "+420 777 123 456",
+        "dic": "CZ12345678"
+      },
+      "validation": {
+        "firstNameRequired": "Jméno je povinné",
+        "lastNameRequired": "Příjmení je povinné",
+        "emailInvalid": "Zadejte platný e-mail"
+      },
+      "actions": {
+        "save": "Uložit změny",
+        "saving": "Ukládám...",
+        "create": "Vytvořit profil",
+        "creating": "Vytvářím..."
+      },
+      "messages": {
+        "updated": "Profil byl úspěšně upraven.",
+        "updateFailed": "Úprava profilu se nepodařila.",
+        "created": "Profil byl úspěšně vytvořen.",
+        "createFailed": "Vytvoření profilu se nepodařilo."
+      }
+    },
+    "billing": {
+      "dialogTitle": "Fakturační údaje",
+      "dialogDescription": "Údaje firmy a nastavení pro daňová podání.",
+      "cardTitle": "Fakturační údaje",
+      "cardDescription": "Údaje firmy používané na vystavených dokladech a dalších výstupech.",
+      "taxCardTitle": "Údaje pro daňová podání",
+      "taxCardDescription": "Pole finančního úřadu a pracoviště vycházejí z oficiálních číselníků MOJE daně.",
+      "loading": "Načítám fakturační údaje firmy...",
+      "errorTitle": "Fakturační údaje se nepodařilo načíst",
+      "errorDescription": "Nepodařilo se načíst firmu přiřazenou k účtu.",
+      "missingNew": "K účtu zatím není přiřazená fakturační firma. Po uložení se vytvoří nový záznam.",
+      "missingExisting": "Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.",
+      "fields": {
+        "name": "Název firmy",
+        "ico": "IČO",
+        "dic": "DIČ",
+        "country": "Stát",
+        "street": "Ulice a č.p.",
+        "city": "Město",
+        "psc": "PSČ",
+        "taxOffice": "Finanční úřad",
+        "workplace": "Územní pracoviště"
+      },
+      "placeholders": {
+        "name": "ACME s.r.o.",
+        "ico": "12345678",
+        "dic": "CZ12345678",
+        "country": "Česká republika",
+        "street": "Masarykova 12",
+        "city": "Brno",
+        "psc": "60200",
+        "taxOffice": "Vyberte finanční úřad",
+        "workplace": "Vyberte územní pracoviště"
+      },
+      "validation": {
+        "nameRequired": "Název firmy je povinný",
+        "countryRequired": "Stát je povinný"
+      },
+      "taxOfficeClear": "Nevybráno",
+      "workplaceClear": "Nevybráno",
+      "workplaceHintNoOffice": "Nejdřív vyberte finanční úřad.",
+      "workplaceHintSpecial": "U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.",
+      "workplaceHintNormal": "Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu.",
+      "actions": {
+        "save": "Uložit firmu",
+        "saving": "Ukládám firmu...",
+        "create": "Vytvořit firmu",
+        "creating": "Vytvářím firmu..."
+      },
+      "messages": {
+        "updated": "Fakturační údaje byly úspěšně upraveny.",
+        "updateFailed": "Úprava fakturačních údajů se nepodařila.",
+        "created": "Fakturační údaje byly úspěšně vytvořeny.",
+        "createFailed": "Vytvoření fakturačních údajů se nepodařilo."
+      }
+    },
+    "defaults": {
+      "dialogTitle": "Výchozí hodnoty",
+      "dialogDescription": "Hodnoty předvyplněné při vytváření nové faktury.",
+      "cardTitle": "Výchozí hodnoty faktur",
+      "cardDescription": "Hodnoty předvyplněné při vytváření nové faktury.",
+      "loading": "Načítám výchozí hodnoty...",
+      "notSet": "Výchozí hodnoty zatím nejsou nastaveny. Po uložení se vytvoří nový záznam.",
+      "fields": {
+        "currency": "Měna",
+        "prefix": "Prefix faktury",
+        "numberFormat": "Formát čísla faktury",
+        "nextNumber": "Další číslo faktury",
+        "dueDays": "Splatnost (dní)",
+        "vatRate": "Výchozí sazba DPH (%)",
+        "headerText": "Výchozí text záhlaví",
+        "footerText": "Výchozí text zápatí",
+        "logoUrl": "URL loga"
+      },
+      "actions": {
+        "save": "Uložit změny",
+        "saving": "Ukládám..."
+      },
+      "messages": {
+        "saved": "Výchozí hodnoty byly úspěšně uloženy.",
+        "saveFailed": "Uložení výchozích hodnot se nepodařilo."
+      }
+    }
+  },
+  "currencies": {
+    "USD": "USD - Americký dolar",
+    "EUR": "EUR - Euro",
+    "CZK": "CZK - Česká koruna"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Vítejte zpět! Přehled vašich financí.",
+    "cards": {
+      "income": "Celkové příjmy",
+      "expenses": "Celkové výdaje",
+      "balance": "Čistý zůstatek",
+      "fromLastMonth": "{{percent}}% oproti minulému měsíci",
+      "recentIncoming": "Nedávné přijaté faktury",
+      "recentOutgoing": "Nedávné vydané faktury",
+      "recentIncomingDesc": "Poslední přijaté faktury.",
+      "recentOutgoingDesc": "Poslední vydané faktury."
+    },
+    "status": {
+      "paid": "Uhrazena",
+      "pending": "Čeká"
+    },
+    "loading": "Načítám {{title}}...",
+    "loadError": "Nepodařilo se načíst {{title}}.",
+    "noData": "Zatím žádné záznamy."
+  },
+  "onboarding": {
+    "title": "Nastavení profilu",
+    "subtitle": "Vyplňte své údaje a informace o firmě pro dokončení registrace.",
+    "personal": {
+      "title": "Osobní údaje",
+      "description": "Základní kontaktní údaje pro váš profil.",
+      "fields": {
+        "firstName": "Jméno",
+        "lastName": "Příjmení",
+        "email": "Kontaktní e-mail",
+        "phone": "Telefon"
+      },
+      "placeholders": {
+        "firstName": "Jan",
+        "lastName": "Novák",
+        "email": "jan@example.cz",
+        "phone": "+420 777 123 456"
+      }
+    },
+    "company": {
+      "title": "Firma",
+      "description": "Údaje o vaší firmě. Zadejte IČO nebo název pro vyhledání v ARES.",
+      "fields": {
+        "name": "Název firmy",
+        "ico": "IČO",
+        "dic": "DIČ firmy",
+        "country": "Země",
+        "street": "Ulice",
+        "city": "Město",
+        "psc": "PSČ"
+      },
+      "placeholders": {
+        "name": "Firma s.r.o.",
+        "ico": "12345678",
+        "dic": "CZ12345678",
+        "country": "CZ",
+        "street": "Hlavní 1",
+        "city": "Praha",
+        "psc": "110 00"
+      }
+    },
+    "tax": {
+      "title": "Údaje pro daňová podání",
+      "description": "Pole finančního úřadu a pracoviště vycházejí z oficiálních číselníků MOJE daně.",
+      "fields": {
+        "dic": "DIČ",
+        "taxOffice": "Finanční úřad",
+        "workplace": "Územní pracoviště"
+      },
+      "placeholders": {
+        "dic": "CZ12345678",
+        "taxOffice": "Vyberte finanční úřad",
+        "workplace": "Vyberte územní pracoviště"
+      },
+      "hints": {
+        "noOffice": "Nejdřív vyberte finanční úřad.",
+        "special": "U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.",
+        "normal": "Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu."
+      }
+    },
+    "actions": {
+      "complete": "Dokončit registraci",
+      "saving": "Ukládám..."
+    },
+    "messages": {
+      "success": "Profil a firma byly úspěšně vytvořeny.",
+      "partial": "Firma vytvořena, ale profil se nepodařilo uložit. Můžete ho upravit v nastavení.",
+      "companyFailed": "Vytvoření firmy se nepodařilo."
+    },
+    "validation": {
+      "firstNameRequired": "Jméno je povinné",
+      "lastNameRequired": "Příjmení je povinné",
+      "companyNameRequired": "Název firmy je povinný"
+    },
+    "taxOfficeClear": "Nevybráno"
+  },
+  "autocomplete": {
+    "label": "Vyhledat v ARES",
+    "placeholder": "Zadejte název nebo celé IČO",
+    "loading": "Načítám návrhy...",
+    "empty": "Žádné výsledky."
+  },
+  "aiChat": {
+    "title": "AI Asistent",
+    "description": "Zeptejte se a pokračujte v konverzaci v této relaci.",
+    "placeholder": "Napište svou zprávu",
+    "hint": "Stiskněte Enter pro odeslání, Shift+Enter pro nový řádek.",
+    "emptyState": "Začněte krátkým dotazem ohledně faktur, kontaktů nebo účetnictví.",
+    "send": "Odeslat",
+    "typing": "AI píše...",
+    "processing": "Zpracovávám účtenku...",
+    "openLabel": "Otevřít AI chat",
+    "uploadReceipt": "Nahrát obrázek účtenky",
+    "uploading": "Nahrávám obrázek účtenky: {{name}}",
+    "metrics": {
+      "model": "Model",
+      "duration": "Trvání",
+      "promptTokens": "Vstupní tokeny",
+      "completionTokens": "Výstupní tokeny",
+      "totalTokens": "Celkem tokenů",
+      "cost": "Náklady"
+    },
+    "receiptResult": {
+      "title": "Výsledek parsování účtenky:",
+      "vendor": "Dodavatel",
+      "total": "Celkem",
+      "vat": "DPH",
+      "date": "Datum"
+    },
+    "messages": {
+      "chatFailed": "Požadavek AI chatu selhal",
+      "receiptSuccess": "Účtenka byla úspěšně zpracována",
+      "receiptFailed": "Parsování účtenky selhalo"
+    },
+    "receiptFailedMessage": "Parsování účtenky selhalo."
+  }
+}

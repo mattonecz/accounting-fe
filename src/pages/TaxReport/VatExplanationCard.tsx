@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardContent,
@@ -5,14 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
-    currency: 'CZK',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+import { formatMoney } from '@/lib/formatters';
 
 interface VatExplanationCardProps {
   vysledekDPH: number;
@@ -22,44 +16,45 @@ interface VatExplanationCardProps {
 export const VatExplanationCard = ({
   vysledekDPH,
   isFetching,
-}: VatExplanationCardProps) => (
-  <Card className="bg-muted/30">
-    <CardHeader>
-      <CardTitle>Co z toho plyne</CardTitle>
-      <CardDescription>
-        Zjednodušené doklady jsou vedené jako přijaté nákladové doklady a
-        vstupují do odpočtu DPH.
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4 text-sm text-muted-foreground">
-      <div className="rounded-lg border bg-background p-4">
-        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          DPH k úhradě / odpočtu
-        </div>
-        <div className="mt-2 text-2xl font-bold text-foreground">
-          {formatCurrency(Math.abs(vysledekDPH))}
-        </div>
-        <p className="mt-2">
-          {vysledekDPH >= 0
-            ? 'Za zvolené období vychází závazek vůči finančnímu úřadu.'
-            : 'Za zvolené období vychází nárok na odpočet DPH.'}
-        </p>
-      </div>
+}: VatExplanationCardProps) => {
+  const { t, i18n } = useTranslation();
 
-      <div className="space-y-2">
-        <p>
-          <strong>DPH na vstupu</strong> představuje odpočet z přijatých faktur
-          a ze zjednodušených nákladových dokladů.
-        </p>
-        <p>
-          <strong>DPH na výstupu</strong> obsahuje DPH pouze z vydaných faktur.
-        </p>
-        <p>
-          Přehled pracuje s měsíčními souhrny z backendových endpointů, takže
-          odpovídá skutečným účetním datům a neobsahuje žádná smyšlená čísla.
-        </p>
-        {isFetching ? <p>Probíhá aktualizace dat…</p> : null}
-      </div>
-    </CardContent>
-  </Card>
-);
+  return (
+    <Card className="bg-muted/30">
+      <CardHeader>
+        <CardTitle>{t('taxReport.explanation.title')}</CardTitle>
+        <CardDescription>
+          {t('taxReport.explanation.description')}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm text-muted-foreground">
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('taxReport.explanation.vatDueLabel')}
+          </div>
+          <div className="mt-2 text-2xl font-bold text-foreground">
+            {formatMoney(Math.abs(vysledekDPH), 'CZK', i18n.language)}
+          </div>
+          <p className="mt-2">
+            {vysledekDPH >= 0
+              ? t('taxReport.explanation.vatDue')
+              : t('taxReport.explanation.vatRefund')}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <p>
+            <strong>{t('taxReport.statCards.inputVat')}</strong>{' '}
+            {t('taxReport.explanation.inputVatDesc')}
+          </p>
+          <p>
+            <strong>{t('taxReport.statCards.outputVat')}</strong>{' '}
+            {t('taxReport.explanation.outputVatDesc')}
+          </p>
+          <p>{t('taxReport.explanation.dataNote')}</p>
+          {isFetching ? <p>{t('taxReport.explanation.updating')}</p> : null}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};

@@ -1,3 +1,4 @@
+// Print template is intentionally Czech-only — legal/tax-document wording.
 import type { RefObject } from 'react';
 import type { InvoiceResponseDto } from '@/api/model';
 import { formatDate, formatMoney, formatCompanyAddress } from './utils';

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { invoiceGetVatByMonth } from '@/api/invoices/invoices';
 import type { InvoiceGetVatByMonthDefault } from '@/api/model';
@@ -16,6 +17,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
+import { formatMoney } from '@/lib/formatters';
 import { MonthSelector } from './MonthSelector';
 import { VatBreakdownTable } from './VatBreakdownTable';
 import { VatExplanationCard } from './VatExplanationCard';
@@ -32,15 +34,8 @@ const normalizeTotals = (totals?: Partial<VatTotals>): VatTotals => ({
   total: Number(totals?.total ?? 0),
 });
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
-    currency: 'CZK',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-
 const TaxReport = () => {
+  const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const [selectedYear, setSelectedYear] = useState(currentYear);
@@ -76,6 +71,8 @@ const TaxReport = () => {
   const zakladNaVystupu = vydaneFaktury.base;
   const obratNaVstupu = prijateFaktury.total + zjednoduseneDoklady.total;
   const zakladNaVstupu = prijateFaktury.base + zjednoduseneDoklady.base;
+
+  const fmt = (n: number) => formatMoney(n, 'CZK', i18n.language);
 
   const handlePreviousMonth = () => {
     if (selectedMonth === 0) {
@@ -115,8 +112,8 @@ const TaxReport = () => {
     <PageLayout className="space-y-4">
       <div className="flex items-center justify-between">
         <PageHeader
-          title="Přehled DPH"
-          description="Měsíční souhrn DPH z vydaných a přijatých dokladů včetně nákladových zjednodušených dokladů"
+          title={t('taxReport.title')}
+          description={t('taxReport.description')}
         />
         <div className="flex flex-wrap items-center gap-4">
           <MonthSelector
@@ -135,43 +132,43 @@ const TaxReport = () => {
             disabled={isFetching}
           >
             <RefreshCcw className="mr-2 h-4 w-4" />
-            Obnovit
+            {t('taxReport.actions.refresh')}
           </Button>
 
           <Button onClick={() => void handleVatExport()} disabled={isExporting}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            {isExporting ? 'Generuji...' : 'Vygenerovat KH a DPH'}
+            {isExporting ? t('taxReport.actions.exporting') : t('taxReport.actions.export')}
           </Button>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="DPH na vstupu"
-          value={formatCurrency(vstupniDPH)}
+          title={t('taxReport.statCards.inputVat')}
+          value={fmt(vstupniDPH)}
           icon={TrendingDown}
-          trend="Přijaté faktury a zjednodušené doklady"
+          trend={t('taxReport.statCards.inputVatTrend')}
           variant="success"
         />
         <StatCard
-          title="DPH na výstupu"
-          value={formatCurrency(vystupniDPH)}
+          title={t('taxReport.statCards.outputVat')}
+          value={fmt(vystupniDPH)}
           icon={TrendingUp}
-          trend="Pouze vydané faktury"
+          trend={t('taxReport.statCards.outputVatTrend')}
           variant="default"
         />
         <StatCard
-          title="Zjednodušené doklady"
-          value={formatCurrency(zjednoduseneDoklady.vat)}
+          title={t('taxReport.statCards.simpleInvoices')}
+          value={fmt(zjednoduseneDoklady.vat)}
           icon={Receipt}
-          trend="Nákladové doklady zahrnuté do vstupní DPH"
+          trend={t('taxReport.statCards.simpleInvoicesTrend')}
           variant="warning"
         />
         <StatCard
-          title="Výsledek období"
-          value={formatCurrency(Math.abs(vysledekDPH))}
+          title={t('taxReport.statCards.result')}
+          value={fmt(Math.abs(vysledekDPH))}
           icon={Calculator}
-          trend={vysledekDPH >= 0 ? 'DPH k úhradě' : 'Nárok na odpočet'}
+          trend={vysledekDPH >= 0 ? t('taxReport.statCards.vatDue') : t('taxReport.statCards.vatRefund')}
           variant={vysledekDPH >= 0 ? 'destructive' : 'success'}
         />
       </div>

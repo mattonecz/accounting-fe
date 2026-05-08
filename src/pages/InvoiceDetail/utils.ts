@@ -1,10 +1,12 @@
+import i18n from '@/i18n';
 import type { InvoiceResponseDto } from '@/api/model';
+import { formatDate as libFormatDate, formatMoney as libFormatMoney } from '@/lib/formatters';
 
 export const formatDate = (date?: string) => {
   if (!date) return '-';
   const parsed = new Date(date);
   if (Number.isNaN(parsed.getTime())) return date;
-  return new Intl.DateTimeFormat('cs-CZ').format(parsed);
+  return libFormatDate(parsed);
 };
 
 export const formatMoney = (
@@ -12,12 +14,10 @@ export const formatMoney = (
   currency: string,
 ) => {
   const numericValue = typeof amount === 'string' ? Number(amount) : amount;
-  return new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
+  return libFormatMoney(
+    Number.isFinite(numericValue ?? NaN) ? (numericValue ?? 0) : 0,
     currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(numericValue ?? NaN) ? (numericValue ?? 0) : 0);
+  );
 };
 
 export const formatCompanyAddress = (company?: {
@@ -33,20 +33,8 @@ export const formatCompanyAddress = (company?: {
   return [firstLine, secondLine].filter(Boolean);
 };
 
-export const getPaymentMethodLabel = (paymentMethod?: string) => {
-  switch (paymentMethod) {
-    case 'BANK_TRANSFER':
-      return 'Bankovní převod';
-    case 'CASH':
-      return 'Hotovost';
-    case 'CARD':
-      return 'Kartou';
-    case 'OTHER':
-      return 'Jiná metoda';
-    default:
-      return paymentMethod || '-';
-  }
-};
+export const getPaymentMethodLabel = (paymentMethod?: string) =>
+  i18n.t(`invoices.paymentMethods.${paymentMethod}`, paymentMethod || '-');
 
 export const getPaidAmount = (invoice?: InvoiceResponseDto) =>
   (invoice?.payments ?? []).reduce(
@@ -54,24 +42,8 @@ export const getPaidAmount = (invoice?: InvoiceResponseDto) =>
     0,
   );
 
-export const getStatusHistoryLabel = (status?: string) => {
-  switch (status) {
-    case 'DRAFT':
-      return 'Koncept';
-    case 'ISSUED':
-      return 'Vystavena';
-    case 'OVERDUE':
-      return 'Po splatnosti';
-    case 'PAID':
-      return 'Uhrazena';
-    case 'CANCELLED':
-      return 'Zrušena';
-    case 'UPDATED':
-      return 'Upravena';
-    default:
-      return status || '-';
-  }
-};
+export const getStatusHistoryLabel = (status?: string) =>
+  i18n.t(`invoices.statuses.${status}`, status || '-');
 
 export const formatHistoryValue = (value: unknown) => {
   if (value === null || value === undefined || value === '') return '—';

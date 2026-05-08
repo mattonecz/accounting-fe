@@ -1,22 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import type { DashboardInvoiceItemDto } from '@/api/model';
-
-const formatCurrency = (amount: number, currency = 'USD') =>
-  new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return date.toLocaleDateString();
-};
-
-const getStatusLabel = (status: DashboardInvoiceItemDto['status']) =>
-  status === 'PAID' ? 'Paid' : 'Pending';
+import { formatDate, formatMoney } from '@/lib/formatters';
 
 interface RecentInvoicesCardProps {
   title: string;
@@ -37,8 +23,12 @@ export const RecentInvoicesCard = ({
   fallbackCurrency,
   variant,
 }: RecentInvoicesCardProps) => {
+  const { t, i18n } = useTranslation();
   const iconColor = variant === 'success' ? 'text-success' : 'text-warning';
   const amountColor = variant === 'success' ? 'text-success' : 'text-warning';
+
+  const getStatusLabel = (status: DashboardInvoiceItemDto['status']) =>
+    status === 'PAID' ? t('dashboard.status.paid') : t('dashboard.status.pending');
 
   return (
     <Card className="border-border/60 shadow-sm">
@@ -62,14 +52,15 @@ export const RecentInvoicesCard = ({
                     {invoice.companyName}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(invoice.date)}
+                    {formatDate(invoice.date, i18n.language)}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold ${amountColor}`}>
-                    {formatCurrency(
+                    {formatMoney(
                       invoice.amount,
                       invoice.currency || fallbackCurrency,
+                      i18n.language,
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -81,10 +72,10 @@ export const RecentInvoicesCard = ({
           ) : (
             <p className="text-sm text-muted-foreground">
               {isLoading
-                ? `Loading ${title.toLowerCase()}...`
+                ? t('dashboard.loading', { title: title.toLowerCase() })
                 : isError
-                  ? `Unable to load ${title.toLowerCase()}.`
-                  : `No ${title.toLowerCase()} yet.`}
+                  ? t('dashboard.loadError', { title: title.toLowerCase() })
+                  : t('dashboard.noData')}
             </p>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,6 +28,7 @@ import { useUserCreate } from '@/api/users/users';
 import { Input } from '@/components/ui/input';
 
 export default function Auth() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { mutate: signIn } = useSignIn();
@@ -35,30 +37,24 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginDto>({
-    defaultValues: {
-      username: '',
-      password: '',
-    },
+    defaultValues: { username: '', password: '' },
   });
 
   const registerForm = useForm<CreateUserDto>({
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   });
 
   const handleLogin = (data: LoginDto) => {
     signIn(
       { data },
       {
-        onSuccess: (data) => {
-          enqueueSnackbar('Successfully logged in!', { variant: 'success' });
-          login(data.data);
+        onSuccess: (res) => {
+          enqueueSnackbar(t('auth.messages.loginSuccess'), { variant: 'success' });
+          login(res.data);
           navigate('/');
         },
         onError: () => {
-          enqueueSnackbar('Invalid username or password', { variant: 'error' });
+          enqueueSnackbar(t('auth.messages.loginError'), { variant: 'error' });
         },
       },
     );
@@ -69,9 +65,7 @@ export default function Auth() {
       { data },
       {
         onSuccess: () => {
-          enqueueSnackbar('Account created successfully!', {
-            variant: 'success',
-          });
+          enqueueSnackbar(t('auth.messages.registerSuccess'), { variant: 'success' });
           signIn(
             { data: { username: data.email, password: data.password } },
             {
@@ -86,7 +80,7 @@ export default function Auth() {
           );
         },
         onError: () => {
-          enqueueSnackbar('Username already registered', { variant: 'error' });
+          enqueueSnackbar(t('auth.messages.registerError'), { variant: 'error' });
         },
       },
     );
@@ -101,37 +95,28 @@ export default function Auth() {
           </div>
           <div>
             <CardTitle className="text-2xl">FreelanceBooks</CardTitle>
-            <CardDescription>
-              Manage your freelance finances with ease
-            </CardDescription>
+            <CardDescription>{t('auth.tagline')}</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="login">{t('auth.tabs.login')}</TabsTrigger>
+              <TabsTrigger value="register">{t('auth.tabs.register')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <Form {...loginForm}>
-                <form
-                  onSubmit={loginForm.handleSubmit(handleLogin)}
-                  className="space-y-4"
-                >
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
                   <FormField
                     control={loginForm.control}
-                    rules={{ required: 'Username is required' }}
+                    rules={{ required: t('validation.required', { field: t('auth.fields.username') }) }}
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>{t('auth.fields.username')}</FormLabel>
                         <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="your@email.com"
-                            {...field}
-                          />
+                          <Input type="text" placeholder="vas@email.cz" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,23 +125,19 @@ export default function Auth() {
                   <FormField
                     control={loginForm.control}
                     name="password"
-                    rules={{ required: 'Password is required' }}
+                    rules={{ required: t('validation.required', { field: t('auth.fields.password') }) }}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>{t('auth.fields.password')}</FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...field}
-                          />
+                          <Input type="password" placeholder="••••••••" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <Button type="submit" className="w-full">
-                    Sign In
+                    {t('auth.actions.signIn')}
                   </Button>
                 </form>
               </Form>
@@ -164,19 +145,16 @@ export default function Auth() {
 
             <TabsContent value="register">
               <Form {...registerForm}>
-                <form
-                  onSubmit={registerForm.handleSubmit(handleRegister)}
-                  className="space-y-4"
-                >
+                <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
                   <FormField
                     control={registerForm.control}
                     name="email"
-                    rules={{ required: 'Email is required' }}
+                    rules={{ required: t('validation.required', { field: t('auth.fields.email') }) }}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('auth.fields.email')}</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="your@email.com" {...field} />
+                          <Input type="email" placeholder="vas@email.cz" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -185,10 +163,10 @@ export default function Auth() {
                   <FormField
                     control={registerForm.control}
                     name="password"
-                    rules={{ required: 'Password is required' }}
+                    rules={{ required: t('validation.required', { field: t('auth.fields.password') }) }}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>{t('auth.fields.password')}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
@@ -202,11 +180,7 @@ export default function Auth() {
                               onClick={() => setShowPassword((v) => !v)}
                               tabIndex={-1}
                             >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4" />
-                              ) : (
-                                <Eye className="h-4 w-4" />
-                              )}
+                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </FormControl>
@@ -215,7 +189,7 @@ export default function Auth() {
                     )}
                   />
                   <Button type="submit" className="w-full">
-                    Create Account
+                    {t('auth.actions.createAccount')}
                   </Button>
                 </form>
               </Form>

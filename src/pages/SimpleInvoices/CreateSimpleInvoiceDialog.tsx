@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,6 +27,7 @@ import {
   useSimpleInvoiceCreate,
 } from '@/api/simple-invoice/simple-invoice';
 import type { ContactResponseDto, CreateSimpleInvoiceDto } from '@/api/model';
+import i18n from '@/i18n';
 
 const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
   number: '',
@@ -47,6 +49,7 @@ export const CreateSimpleInvoiceDialog = ({
   open,
   onOpenChange,
 }: CreateSimpleInvoiceDialogProps) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const form = useForm<CreateSimpleInvoiceDto>({ defaultValues: getDefaultFormValues() });
 
@@ -58,15 +61,13 @@ export const CreateSimpleInvoiceDialog = ({
   const createMutation = useSimpleInvoiceCreate({
     mutation: {
       onSuccess: async () => {
-        enqueueSnackbar('Zjednodušený doklad byl vytvořen.', { variant: 'success' });
-        await queryClient.invalidateQueries({
-          queryKey: getSimpleInvoiceListByCompanyQueryKey(),
-        });
+        enqueueSnackbar(i18n.t('simpleInvoices.messages.createSuccess'), { variant: 'success' });
+        await queryClient.invalidateQueries({ queryKey: getSimpleInvoiceListByCompanyQueryKey() });
         onOpenChange(false);
         form.reset(getDefaultFormValues());
       },
       onError: () => {
-        enqueueSnackbar('Vytvoření zjednodušeného dokladu se nepodařilo.', { variant: 'error' });
+        enqueueSnackbar(i18n.t('simpleInvoices.messages.createError'), { variant: 'error' });
       },
     },
   });
@@ -91,12 +92,12 @@ export const CreateSimpleInvoiceDialog = ({
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Nový doklad
+          {t('simpleInvoices.actions.create')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Vytvořit zjednodušený doklad</DialogTitle>
+          <DialogTitle>{t('simpleInvoices.dialog.title')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -104,10 +105,10 @@ export const CreateSimpleInvoiceDialog = ({
               <FormField
                 control={form.control}
                 name="number"
-                rules={{ required: 'Číslo dokladu je povinné' }}
+                rules={{ required: t('validation.required', { field: t('simpleInvoices.fields.number') }) }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Číslo dokladu</FormLabel>
+                    <FormLabel>{t('simpleInvoices.fields.number')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="SI-2024-001" />
                     </FormControl>
@@ -120,7 +121,7 @@ export const CreateSimpleInvoiceDialog = ({
                 name="contactId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Firma</FormLabel>
+                    <FormLabel>{t('simpleInvoices.fields.company')}</FormLabel>
                     <FormControl>
                       <select
                         {...field}
@@ -128,7 +129,7 @@ export const CreateSimpleInvoiceDialog = ({
                         disabled={isContactsLoading}
                       >
                         <option value="">
-                          {isContactsLoading ? 'Načítám kontakty...' : 'Vyberte kontakt'}
+                          {isContactsLoading ? t('common.loading') : t('simpleInvoices.placeholders.contact')}
                         </option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.id}>
@@ -147,13 +148,11 @@ export const CreateSimpleInvoiceDialog = ({
               <FormField
                 control={form.control}
                 name="createdDate"
-                rules={{ required: 'Datum vystavení je povinné' }}
+                rules={{ required: t('validation.required', { field: t('invoices.fields.createdDate') }) }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Datum vystavení</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <FormLabel>{t('invoices.fields.createdDate')}</FormLabel>
+                    <FormControl><Input type="date" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -161,13 +160,11 @@ export const CreateSimpleInvoiceDialog = ({
               <FormField
                 control={form.control}
                 name="duzpDate"
-                rules={{ required: 'Datum zdanitelného plnění je povinné' }}
+                rules={{ required: t('validation.required', { field: t('invoices.fields.duzpDate') }) }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Datum zdanitelného plnění</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
+                    <FormLabel>{t('invoices.fields.duzpDate')}</FormLabel>
+                    <FormControl><Input type="date" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -179,23 +176,16 @@ export const CreateSimpleInvoiceDialog = ({
                 control={form.control}
                 name="total"
                 rules={{
-                  required: 'Základ je povinný',
-                  min: { value: 0, message: 'Základ musí být kladné číslo nebo nula' },
+                  required: t('validation.required', { field: t('simpleInvoices.fields.base') }),
+                  min: { value: 0, message: t('validation.minZero') },
                 }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Základ</FormLabel>
+                    <FormLabel>{t('simpleInvoices.fields.base')}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        value={field.value ?? 0}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
-                        }
-                        placeholder="0.00"
-                      />
+                      <Input type="number" step="0.01" {...field} value={field.value ?? 0}
+                        onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                        placeholder="0.00" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -205,23 +195,16 @@ export const CreateSimpleInvoiceDialog = ({
                 control={form.control}
                 name="totalTax"
                 rules={{
-                  required: 'DPH je povinné',
-                  min: { value: 0, message: 'DPH musí být kladné číslo nebo nula' },
+                  required: t('validation.required', { field: t('simpleInvoices.fields.vat') }),
+                  min: { value: 0, message: t('validation.minZero') },
                 }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>DPH</FormLabel>
+                    <FormLabel>{t('simpleInvoices.fields.vat')}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        value={field.value ?? 0}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
-                        }
-                        placeholder="0.00"
-                      />
+                      <Input type="number" step="0.01" {...field} value={field.value ?? 0}
+                        onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                        placeholder="0.00" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,23 +214,16 @@ export const CreateSimpleInvoiceDialog = ({
                 control={form.control}
                 name="totalWithTax"
                 rules={{
-                  required: 'Celkem s DPH je povinné',
-                  min: { value: 0, message: 'Celkem s DPH musí být kladné číslo nebo nula' },
+                  required: t('validation.required', { field: t('simpleInvoices.fields.totalWithVat') }),
+                  min: { value: 0, message: t('validation.minZero') },
                 }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Celkem s DPH</FormLabel>
+                    <FormLabel>{t('simpleInvoices.fields.totalWithVat')}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        value={field.value ?? 0}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
-                        }
-                        placeholder="0.00"
-                      />
+                      <Input type="number" step="0.01" {...field} value={field.value ?? 0}
+                        onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                        placeholder="0.00" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -260,9 +236,9 @@ export const CreateSimpleInvoiceDialog = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Poznámka</FormLabel>
+                  <FormLabel>{t('invoices.fields.note')}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Doplňující informace k dokladu..." />
+                    <Textarea {...field} placeholder={t('simpleInvoices.placeholders.description')} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -271,16 +247,16 @@ export const CreateSimpleInvoiceDialog = ({
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Zrušit
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={createMutation.isPending}>
                 {createMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Ukládám
+                    {t('common.saving')}
                   </>
                 ) : (
-                  'Vytvořit doklad'
+                  t('simpleInvoices.dialog.submit')
                 )}
               </Button>
             </div>

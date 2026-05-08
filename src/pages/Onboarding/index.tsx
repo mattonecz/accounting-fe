@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyCreate } from '@/api/companies/companies';
 import { useUserProfileCreate } from '@/api/user-profile/user-profile';
@@ -66,6 +67,7 @@ function findTaxOfficeCode(financniUrad: string): string {
 }
 
 export default function Onboarding() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { user, refreshActiveCompany } = useAuth();
@@ -137,7 +139,6 @@ export default function Onboarding() {
     setValue('street', company.street ?? '');
     setValue('city', company.city ?? '');
     setValue('psc', company.psc ?? '');
-    // Prefill DPH details from company lookup
     if (company.dic) {
       setValue('dic', company.dic);
     }
@@ -186,24 +187,21 @@ export default function Onboarding() {
             {
               onSuccess: async () => {
                 await refreshActiveCompany();
-                enqueueSnackbar('Profil a firma byly úspěšně vytvořeny.', {
+                enqueueSnackbar(t('onboarding.messages.success'), {
                   variant: 'success',
                 });
                 navigate('/');
               },
               onError: async () => {
                 await refreshActiveCompany();
-                enqueueSnackbar(
-                  'Firma vytvořena, ale profil se nepodařilo uložit. Můžete ho upravit v nastavení.',
-                  { variant: 'warning' },
-                );
+                enqueueSnackbar(t('onboarding.messages.partial'), { variant: 'warning' });
                 navigate('/');
               },
             },
           );
         },
         onError: () => {
-          enqueueSnackbar('Vytvoření firmy se nepodařilo.', {
+          enqueueSnackbar(t('onboarding.messages.companyFailed'), {
             variant: 'error',
           });
         },
@@ -218,31 +216,26 @@ export default function Onboarding() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary">
             <DollarSign className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Nastavení profilu</h1>
-          <p className="text-muted-foreground">
-            Vyplňte své údaje a informace o firmě pro dokončení registrace.
-          </p>
+          <h1 className="text-2xl font-bold">{t('onboarding.title')}</h1>
+          <p className="text-muted-foreground">{t('onboarding.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Personal info */}
           <Card>
             <CardHeader>
-              <CardTitle>Osobní údaje</CardTitle>
-              <CardDescription>
-                Základní kontaktní údaje pro váš profil.
-              </CardDescription>
+              <CardTitle>{t('onboarding.personal.title')}</CardTitle>
+              <CardDescription>{t('onboarding.personal.description')}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Jméno</Label>
+                <Label htmlFor="firstName">{t('onboarding.personal.fields.firstName')}</Label>
                 <Input
                   id="firstName"
                   {...register('firstName', {
-                    required: 'Jméno je povinné',
-                    validate: (v) => v.trim().length > 0 || 'Jméno je povinné',
+                    required: t('onboarding.validation.firstNameRequired'),
+                    validate: (v) => v.trim().length > 0 || t('onboarding.validation.firstNameRequired'),
                   })}
-                  placeholder="Jan"
+                  placeholder={t('onboarding.personal.placeholders.firstName')}
                 />
                 {errors.firstName && (
                   <p className="text-sm text-destructive">
@@ -251,15 +244,15 @@ export default function Onboarding() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Příjmení</Label>
+                <Label htmlFor="lastName">{t('onboarding.personal.fields.lastName')}</Label>
                 <Input
                   id="lastName"
                   {...register('lastName', {
-                    required: 'Příjmení je povinné',
+                    required: t('onboarding.validation.lastNameRequired'),
                     validate: (v) =>
-                      v.trim().length > 0 || 'Příjmení je povinné',
+                      v.trim().length > 0 || t('onboarding.validation.lastNameRequired'),
                   })}
-                  placeholder="Novák"
+                  placeholder={t('onboarding.personal.placeholders.lastName')}
                 />
                 {errors.lastName && (
                   <p className="text-sm text-destructive">
@@ -268,31 +261,28 @@ export default function Onboarding() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Kontaktní e-mail</Label>
+                <Label htmlFor="email">{t('onboarding.personal.fields.email')}</Label>
                 <Input
                   id="email"
                   {...register('email')}
-                  placeholder="jan@example.cz"
+                  placeholder={t('onboarding.personal.placeholders.email')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon</Label>
+                <Label htmlFor="phone">{t('onboarding.personal.fields.phone')}</Label>
                 <Input
                   id="phone"
                   {...register('phone')}
-                  placeholder="+420 777 123 456"
+                  placeholder={t('onboarding.personal.placeholders.phone')}
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* Company info */}
           <Card>
             <CardHeader>
-              <CardTitle>Firma</CardTitle>
-              <CardDescription>
-                Údaje o vaší firmě. Zadejte IČO nebo název pro vyhledání v ARES.
-              </CardDescription>
+              <CardTitle>{t('onboarding.company.title')}</CardTitle>
+              <CardDescription>{t('onboarding.company.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Autocomplete
@@ -301,13 +291,13 @@ export default function Onboarding() {
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">Název firmy</Label>
+                  <Label htmlFor="companyName">{t('onboarding.company.fields.name')}</Label>
                   <Input
                     id="companyName"
                     {...register('companyName', {
-                      required: 'Název firmy je povinný',
+                      required: t('onboarding.validation.companyNameRequired'),
                     })}
-                    placeholder="Firma s.r.o."
+                    placeholder={t('onboarding.company.placeholders.name')}
                   />
                   {errors.companyName && (
                     <p className="text-sm text-destructive">
@@ -316,69 +306,65 @@ export default function Onboarding() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="ico">IČO</Label>
-                  <Input id="ico" {...register('ico')} placeholder="12345678" />
+                  <Label htmlFor="ico">{t('onboarding.company.fields.ico')}</Label>
+                  <Input id="ico" {...register('ico')} placeholder={t('onboarding.company.placeholders.ico')} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="companyDic">DIČ firmy</Label>
+                  <Label htmlFor="companyDic">{t('onboarding.company.fields.dic')}</Label>
                   <Input
                     id="companyDic"
                     {...register('companyDic')}
-                    placeholder="CZ12345678"
+                    placeholder={t('onboarding.company.placeholders.dic')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="country">Země</Label>
+                  <Label htmlFor="country">{t('onboarding.company.fields.country')}</Label>
                   <Input
                     id="country"
                     {...register('country')}
-                    placeholder="CZ"
+                    placeholder={t('onboarding.company.placeholders.country')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="street">Ulice</Label>
+                  <Label htmlFor="street">{t('onboarding.company.fields.street')}</Label>
                   <Input
                     id="street"
                     {...register('street')}
-                    placeholder="Hlavní 1"
+                    placeholder={t('onboarding.company.placeholders.street')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">Město</Label>
+                  <Label htmlFor="city">{t('onboarding.company.fields.city')}</Label>
                   <Input
                     id="city"
                     {...register('city')}
-                    placeholder="Praha"
+                    placeholder={t('onboarding.company.placeholders.city')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="psc">PSČ</Label>
+                  <Label htmlFor="psc">{t('onboarding.company.fields.psc')}</Label>
                   <Input
                     id="psc"
                     {...register('psc')}
-                    placeholder="110 00"
+                    placeholder={t('onboarding.company.placeholders.psc')}
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* DPH details */}
           <Card>
             <CardHeader>
-              <CardTitle>Údaje pro daňová podání</CardTitle>
-              <CardDescription>
-                Pole finančního úřadu a pracoviště vycházejí z oficiálních
-                číselníků MOJE daně.
-              </CardDescription>
+              <CardTitle>{t('onboarding.tax.title')}</CardTitle>
+              <CardDescription>{t('onboarding.tax.description')}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="dic">DIČ</Label>
+                <Label htmlFor="dic">{t('onboarding.tax.fields.dic')}</Label>
                 <Input
                   id="dic"
                   {...register('dic')}
-                  placeholder="CZ12345678"
+                  placeholder={t('onboarding.tax.placeholders.dic')}
                 />
               </div>
 
@@ -387,7 +373,7 @@ export default function Onboarding() {
                 name="c_ufo"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <Label htmlFor="c_ufo">Finanční úřad</Label>
+                    <Label htmlFor="c_ufo">{t('onboarding.tax.fields.taxOffice')}</Label>
                     <Select
                       onValueChange={(value) =>
                         field.onChange(
@@ -397,11 +383,11 @@ export default function Onboarding() {
                       value={field.value || CLEAR_SELECT_VALUE}
                     >
                       <SelectTrigger id="c_ufo">
-                        <SelectValue placeholder="Vyberte finanční úřad" />
+                        <SelectValue placeholder={t('onboarding.tax.placeholders.taxOffice')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={CLEAR_SELECT_VALUE}>
-                          Nevybráno
+                          {t('onboarding.taxOfficeClear')}
                         </SelectItem>
                         {TAX_OFFICE_OPTIONS.map((option) => (
                           <SelectItem key={option.code} value={option.code}>
@@ -419,7 +405,7 @@ export default function Onboarding() {
                 name="c_pracufo"
                 render={({ field }) => (
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="c_pracufo">Územní pracoviště</Label>
+                    <Label htmlFor="c_pracufo">{t('onboarding.tax.fields.workplace')}</Label>
                     <Select
                       disabled={
                         !selectedTaxOfficeCode ||
@@ -433,12 +419,12 @@ export default function Onboarding() {
                       value={field.value || CLEAR_SELECT_VALUE}
                     >
                       <SelectTrigger id="c_pracufo">
-                        <SelectValue placeholder="Vyberte územní pracoviště" />
+                        <SelectValue placeholder={t('onboarding.tax.placeholders.workplace')} />
                       </SelectTrigger>
                       <SelectContent>
                         {selectedTaxOfficeCode !== SPECIAL_TAX_OFFICE_CODE && (
                           <SelectItem value={CLEAR_SELECT_VALUE}>
-                            Nevybráno
+                            {t('onboarding.taxOfficeClear')}
                           </SelectItem>
                         )}
                         {workplaceOptions.map((option) => (
@@ -450,10 +436,10 @@ export default function Onboarding() {
                     </Select>
                     <p className="text-sm text-muted-foreground">
                       {!selectedTaxOfficeCode
-                        ? 'Nejdřív vyberte finanční úřad.'
+                        ? t('onboarding.tax.hints.noOffice')
                         : selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
-                          ? 'U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.'
-                          : 'Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu.'}
+                          ? t('onboarding.tax.hints.special')
+                          : t('onboarding.tax.hints.normal')}
                     </p>
                   </div>
                 )}
@@ -463,7 +449,7 @@ export default function Onboarding() {
 
           <div className="flex justify-end">
             <Button type="submit" size="lg" disabled={isSaving}>
-              {isSaving ? 'Ukládám...' : 'Dokončit registraci'}
+              {isSaving ? t('onboarding.actions.saving') : t('onboarding.actions.complete')}
             </Button>
           </div>
         </form>

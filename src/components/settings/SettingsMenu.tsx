@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import * as axios from 'axios';
 import { Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,6 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,10 +23,12 @@ import { useUserProfileGet } from '@/api/user-profile/user-profile';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { BillingInfoForm } from './BillingInfoForm';
 import { InvoiceDefaultsForm } from './InvoiceDefaultsForm';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 type ActiveDialog = 'personal' | 'billing' | 'defaults' | null;
 
 export const SettingsMenu = () => {
+  const { t } = useTranslation();
   const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
   const { user, activeCompanyId } = useAuth();
 
@@ -55,14 +59,16 @@ export const SettingsMenu = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top">
+          <LanguageSelector />
+          <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => open('personal')}>
-            Osobní údaje
+            {t('settings.menu.personal')}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => open('billing')}>
-            Fakturační údaje
+            {t('settings.menu.billing')}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => open('defaults')}>
-            Výchozí hodnoty
+            {t('settings.menu.defaults')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -72,9 +78,9 @@ export const SettingsMenu = () => {
           <ScrollArea className="max-h-[85vh]">
             <div className="p-6">
               <DialogHeader className="mb-6">
-                <DialogTitle>Osobní údaje</DialogTitle>
+                <DialogTitle>{t('settings.personal.title')}</DialogTitle>
                 <DialogDescription>
-                  Kontaktní údaje uložené ve vašem uživatelském profilu.
+                  {t('settings.personal.description')}
                 </DialogDescription>
               </DialogHeader>
               <PersonalInfoForm
@@ -94,9 +100,9 @@ export const SettingsMenu = () => {
           <ScrollArea className="max-h-[85vh]">
             <div className="p-6">
               <DialogHeader className="mb-6">
-                <DialogTitle>Fakturační údaje</DialogTitle>
+                <DialogTitle>{t('settings.billing.title')}</DialogTitle>
                 <DialogDescription>
-                  Údaje firmy a nastavení pro daňová podání.
+                  {t('settings.billing.description')}
                 </DialogDescription>
               </DialogHeader>
               <BillingInfoForm companyId={activeCompanyId ?? ''} />
@@ -110,9 +116,9 @@ export const SettingsMenu = () => {
           <ScrollArea className="max-h-[85vh]">
             <div className="p-6">
               <DialogHeader className="mb-6">
-                <DialogTitle>Výchozí hodnoty</DialogTitle>
+                <DialogTitle>{t('settings.defaults.title')}</DialogTitle>
                 <DialogDescription>
-                  Hodnoty předvyplněné při vytváření nové faktury.
+                  {t('settings.defaults.description')}
                 </DialogDescription>
               </DialogHeader>
               <InvoiceDefaultsForm />

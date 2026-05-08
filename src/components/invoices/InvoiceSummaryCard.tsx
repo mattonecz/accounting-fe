@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { UseFormReturn } from 'react-hook-form';
 import { CreateInvoiceDto } from '@/api/model';
 import { FormCard } from '@/components/FormCard';
@@ -13,6 +14,7 @@ export const InvoiceSummaryCard = ({
   formatMoney,
   isVatPayer,
 }: InvoiceSummaryCardProps) => {
+  const { t } = useTranslation();
   const items = form.watch('items') ?? [];
 
   const total = items.reduce(
@@ -28,26 +30,22 @@ export const InvoiceSummaryCard = ({
   const totalWithTax = total + totalTax;
 
   return (
-    <FormCard title="Souhrn faktury">
-      <div
-        className={`grid grid-cols-1 gap-4 ${
-          isVatPayer ? 'md:grid-cols-3' : 'md:grid-cols-1'
-        }`}
-      >
+    <FormCard title={t('invoices.summary.title')}>
+      <div className={`grid grid-cols-1 gap-4 ${isVatPayer ? 'md:grid-cols-3' : 'md:grid-cols-1'}`}>
         <div>
           <p className="text-sm text-muted-foreground">
-            {isVatPayer ? 'Mezisoučet' : 'Částka celkem'}
+            {isVatPayer ? t('invoices.summary.subtotal') : t('invoices.summary.total')}
           </p>
           <p className="text-2xl font-bold">{formatMoney(total)}</p>
         </div>
         {isVatPayer && (
           <>
             <div>
-              <p className="text-sm text-muted-foreground">DPH celkem</p>
+              <p className="text-sm text-muted-foreground">{t('invoices.summary.totalTax')}</p>
               <p className="text-2xl font-bold">{formatMoney(totalTax)}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Částka celkem</p>
+              <p className="text-sm text-muted-foreground">{t('invoices.summary.total')}</p>
               <p className="text-2xl font-bold">{formatMoney(totalWithTax)}</p>
             </div>
           </>

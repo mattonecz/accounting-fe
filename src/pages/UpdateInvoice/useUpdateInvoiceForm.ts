@@ -3,6 +3,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import i18n from '@/i18n';
 import {
   getInvoiceGetQueryKey,
   getInvoiceListByCompanyQueryKey,
@@ -272,21 +273,15 @@ export function useUpdateInvoiceForm(id: string) {
       { data: payload },
       {
         onSuccess: async (response) => {
-          enqueueSnackbar('Faktura byla úspěšně upravena', {
-            variant: 'success',
-          });
+          enqueueSnackbar(i18n.t('invoices.messages.updated'), { variant: 'success' });
           await Promise.all([
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceListByCompanyQueryKey(),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceGetQueryKey(id || data.id),
-            }),
+            queryClient.invalidateQueries({ queryKey: getInvoiceListByCompanyQueryKey() }),
+            queryClient.invalidateQueries({ queryKey: getInvoiceGetQueryKey(id || data.id) }),
           ]);
           navigate(`/invoices/${response.data.id}`);
         },
         onError: () => {
-          enqueueSnackbar('Úprava faktury selhala', { variant: 'error' });
+          enqueueSnackbar(i18n.t('invoices.messages.updateFailed'), { variant: 'error' });
         },
       },
     );

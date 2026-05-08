@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Landmark } from 'lucide-react';
@@ -44,25 +45,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-const paymentMethodOptions = [
-  {
-    value: CreatePaymentDtoPaymentMethod.BANK_TRANSFER,
-    label: 'Bankovni prevod',
-  },
-  {
-    value: CreatePaymentDtoPaymentMethod.CASH,
-    label: 'Hotovost',
-  },
-  {
-    value: CreatePaymentDtoPaymentMethod.CARD,
-    label: 'Kartou',
-  },
-  {
-    value: CreatePaymentDtoPaymentMethod.OTHER,
-    label: 'Jine',
-  },
-] as const;
-
 const paymentMethodSchema = z.enum([
   CreatePaymentDtoPaymentMethod.BANK_TRANSFER,
   CreatePaymentDtoPaymentMethod.CASH,
@@ -70,14 +52,12 @@ const paymentMethodSchema = z.enum([
   CreatePaymentDtoPaymentMethod.OTHER,
 ]);
 
-const paymentSchema = z.object({
-  amount: z.string().min(1, 'Castka je povinna'),
-  paymentDate: z.string().min(1, 'Datum platby je povinne'),
-  paymentMethod: paymentMethodSchema,
-  reference: z.string().min(1, 'Variabilni symbol je povinny'),
-});
-
-type PaymentFormValues = z.infer<typeof paymentSchema>;
+type PaymentFormValues = {
+  amount: string;
+  paymentDate: string;
+  paymentMethod: typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod];
+  reference: string;
+};
 
 type InvoicePaymentSource = InvoiceResponseDto & {
   paymentMethod?:
@@ -105,20 +85,17 @@ const getDefaultAmount = (invoice: InvoiceResponseDto) => {
     typeof rawAmount === 'number'
       ? rawAmount
       : Number.parseFloat(String(rawAmount));
-
   return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
 };
 
-const getDefaultPaymentMethod = (invoice: InvoicePaymentSource) => {
-  const paymentMethod = invoice.paymentMethod;
-
-  if (
-    paymentMethod &&
-    paymentMethodOptions.some((option) => option.value === paymentMethod)
-  ) {
-    return paymentMethod;
+const getDefaultPaymentMethod = (
+  invoice: InvoicePaymentSource,
+): typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod] => {
+  const pm = invoice.paymentMethod;
+  const values = Object.values(CreatePaymentDtoPaymentMethod) as string[];
+  if (pm && values.includes(pm as string)) {
+    return pm as typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod];
   }
-
   return CreatePaymentDtoPaymentMethod.BANK_TRANSFER;
 };
 
@@ -132,6 +109,7 @@ export function RecordPaymentDialog({
   onOpenChange: controlledOnOpenChange,
   hideTrigger = false,
 }: RecordPaymentDialogProps) {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -145,6 +123,13 @@ export function RecordPaymentDialog({
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { mutate: createPayment, isPending } = usePaymentCreate();
+
+  const paymentSchema = z.object({
+    amount: z.string().min(1, t('payments.validation.amountRequired')),
+    paymentDate: z.string().min(1, t('payments.validation.dateRequired')),
+    paymentMethod: paymentMethodSchema,
+    reference: z.string().min(1, t('payments.validation.referenceRequired')),
+  });
 
   const defaultValues = useMemo<PaymentFormValues>(
     () => ({
@@ -167,6 +152,13 @@ export function RecordPaymentDialog({
     }
   }, [defaultValues, form, open]);
 
+  const paymentMethodOptions = [
+    { value: CreatePaymentDtoPaymentMethod.BANK_TRANSFER, label: t('invoices.paymentMethods.BANK_TRANSFER') },
+    { value: CreatePaymentDtoPaymentMethod.CASH, label: t('invoices.paymentMethods.CASH') },
+    { value: CreatePaymentDtoPaymentMethod.CARD, label: t('invoices.paymentMethods.CARD') },
+    { value: CreatePaymentDtoPaymentMethod.OTHER, label: t('invoices.paymentMethods.OTHER') },
+  ];
+
   const handleSubmit = (values: PaymentFormValues) => {
     createPayment(
       {
@@ -180,20 +172,12 @@ export function RecordPaymentDialog({
       },
       {
         onSuccess: async () => {
-          enqueueSnackbar('Platba byla uspesne zaznamenana', {
-            variant: 'success',
-          });
+          enqueueSnackbar(t('payments.messages.recordSuccess'), { variant: 'success' });
 
           await Promise.all([
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceListByCompanyQueryKey(),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceGetQueryKey(invoice.id),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: getPaymentListByInvoiceQueryKey(invoice.id),
-            }),
+            queryClient.invalidateQueries({ queryKey: getInvoiceListByCompanyQueryKey() }),
+            queryClient.invalidateQueries({ queryKey: getInvoiceGetQueryKey(invoice.id) }),
+            queryClient.invalidateQueries({ queryKey: getPaymentListByInvoiceQueryKey(invoice.id) }),
           ]);
 
           onSuccess?.();
@@ -201,9 +185,7 @@ export function RecordPaymentDialog({
           form.reset(defaultValues);
         },
         onError: () => {
-          enqueueSnackbar('Zaznamenani platby se nezdarilo', {
-            variant: 'error',
-          });
+          enqueueSnackbar(t('payments.messages.recordError'), { variant: 'error' });
         },
       },
     );
@@ -219,33 +201,28 @@ export function RecordPaymentDialog({
             size={triggerSize}
             className={triggerClassName}
             onClick={(event) => {
-              if (stopPropagation) {
-                event.stopPropagation();
-              }
+              if (stopPropagation) event.stopPropagation();
             }}
           >
             <Landmark className="h-4 w-4" />
-            Zaznamenat platbu
+            {t('payments.actions.record')}
           </Button>
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Zaznamenat platbu</DialogTitle>
-          <DialogDescription>Faktura {invoice.number}</DialogDescription>
+          <DialogTitle>{t('payments.actions.record')}</DialogTitle>
+          <DialogDescription>{t('invoices.fields.number')} {invoice.number}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="paymentDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Datum platby</FormLabel>
+                  <FormLabel>{t('payments.fields.date')}</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -259,14 +236,9 @@ export function RecordPaymentDialog({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Castka</FormLabel>
+                  <FormLabel>{t('payments.fields.amount')}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      inputMode="decimal"
-                      {...field}
-                    />
+                    <Input type="number" step="0.01" inputMode="decimal" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -278,7 +250,7 @@ export function RecordPaymentDialog({
               name="reference"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Variabilni symbol</FormLabel>
+                  <FormLabel>{t('payments.fields.reference')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -292,11 +264,11 @@ export function RecordPaymentDialog({
               name="paymentMethod"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Forma uhrady</FormLabel>
+                  <FormLabel>{t('payments.fields.method')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Vyberte metodu platby" />
+                        <SelectValue placeholder={t('payments.placeholders.method')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -313,16 +285,11 @@ export function RecordPaymentDialog({
             />
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Zrusit
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? 'Ukladam...' : 'Ulozit platbu'}
+                {isPending ? t('common.saving') : t('payments.actions.save')}
               </Button>
             </div>
           </form>

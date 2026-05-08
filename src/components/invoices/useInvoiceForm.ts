@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import i18n from '@/i18n';
 import {
   CreateInvoiceDto,
   CreateInvoiceDtoStatus,
@@ -217,8 +218,8 @@ export const useInvoiceForm = () => {
         onSuccess: () => {
           enqueueSnackbar(
             mode === 'draft'
-              ? 'Koncept faktury byl úspěšně vytvořen'
-              : 'Faktura byla úspěšně vytvořena',
+              ? i18n.t('invoices.messages.draftCreated')
+              : i18n.t('invoices.messages.created'),
             { variant: 'success' },
           );
           navigate(isReceived ? '/incoming-invoices' : '/outgoing-invoices');
@@ -226,8 +227,8 @@ export const useInvoiceForm = () => {
         onError: () => {
           enqueueSnackbar(
             mode === 'draft'
-              ? 'Vytvoření konceptu faktury selhalo'
-              : 'Vytvoření faktury selhalo',
+              ? i18n.t('invoices.messages.draftCreateFailed')
+              : i18n.t('invoices.messages.createFailed'),
             { variant: 'error' },
           );
         },

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import {
   getUserProfileGetQueryKey,
   useUserProfileCreate,
@@ -46,13 +47,6 @@ const toOptionalField = (value: string) => {
   return trimmedValue.length > 0 ? trimmedValue : undefined;
 };
 
-const validateOptionalEmail = (value: string) => {
-  if (!value.trim()) return true;
-  return (
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) || 'Zadejte platný e-mail'
-  );
-};
-
 const toProfilePayload = (data: CreateUserProfileDto): CreateUserProfileDto => ({
   firstName: data.firstName.trim(),
   lastName: data.lastName.trim(),
@@ -76,6 +70,7 @@ export const PersonalInfoForm = ({
   isLoading,
   hasExistingProfile,
 }: PersonalInfoFormProps) => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { mutate: createProfile, isPending: isCreatingProfile } = useUserProfileCreate();
@@ -109,13 +104,17 @@ export const PersonalInfoForm = ({
       queryClient.setQueryData(getUserProfileGetQueryKey(), response);
       resetFormValues(mapProfileToForm(response.data, user));
       enqueueSnackbar(
-        hasExistingProfile ? 'Profil byl úspěšně upraven.' : 'Profil byl úspěšně vytvořen.',
+        hasExistingProfile
+          ? t('settings.personal.messages.updateSuccess')
+          : t('settings.personal.messages.createSuccess'),
         { variant: 'success' },
       );
     };
     const handleError = () => {
       enqueueSnackbar(
-        hasExistingProfile ? 'Úprava profilu se nepodařila.' : 'Vytvoření profilu se nepodařilo.',
+        hasExistingProfile
+          ? t('settings.personal.messages.updateError')
+          : t('settings.personal.messages.createError'),
         { variant: 'error' },
       );
     };
@@ -131,53 +130,63 @@ export const PersonalInfoForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Osobní údaje</CardTitle>
-            <CardDescription>
-              Základní kontaktní údaje uložené ve vašem uživatelském profilu.
-            </CardDescription>
+            <CardTitle>{t('settings.personal.card.title')}</CardTitle>
+            <CardDescription>{t('settings.personal.card.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <InputController
               control={form.control}
               name="firstName"
-              label="Jméno"
+              label={t('settings.personal.fields.firstName')}
               placeholder="Jan"
               variant="vertical"
               rules={{
-                required: 'Jméno je povinné',
-                validate: (value) => (value?.trim().length ?? 0) > 0 || 'Jméno je povinné',
+                required: t('validation.required', { field: t('settings.personal.fields.firstName') }),
+                validate: (value) =>
+                  (value?.trim().length ?? 0) > 0 ||
+                  t('validation.required', { field: t('settings.personal.fields.firstName') }),
               }}
             />
             <InputController
               control={form.control}
               name="lastName"
-              label="Příjmení"
+              label={t('settings.personal.fields.lastName')}
               placeholder="Novák"
               variant="vertical"
               rules={{
-                required: 'Příjmení je povinné',
-                validate: (value) => (value?.trim().length ?? 0) > 0 || 'Příjmení je povinné',
+                required: t('validation.required', { field: t('settings.personal.fields.lastName') }),
+                validate: (value) =>
+                  (value?.trim().length ?? 0) > 0 ||
+                  t('validation.required', { field: t('settings.personal.fields.lastName') }),
               }}
             />
             <InputController
               control={form.control}
               name="email"
-              label="Kontaktní e-mail"
+              label={t('settings.personal.fields.email')}
               placeholder="jan@example.cz"
               variant="vertical"
-              rules={{ validate: (value) => validateOptionalEmail(value ?? '') }}
+              rules={{
+                validate: (value) => {
+                  if (!value?.trim()) return true;
+                  return (
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ||
+                    t('validation.email')
+                  );
+                },
+              }}
             />
             <InputController
               control={form.control}
               name="phone"
-              label="Telefon"
+              label={t('settings.personal.fields.phone')}
               placeholder="+420 777 123 456"
               variant="vertical"
             />
             <InputController
               control={form.control}
               name="dic"
-              label="DIČ"
+              label={t('invoices.fields.dic')}
               placeholder="CZ12345678"
               variant="vertical"
             />
@@ -187,8 +196,10 @@ export const PersonalInfoForm = ({
         <div className="flex justify-end">
           <Button type="submit" size="lg" disabled={isSaving}>
             {isSaving
-              ? hasExistingProfile ? 'Ukládám...' : 'Vytvářím...'
-              : hasExistingProfile ? 'Uložit změny' : 'Vytvořit profil'}
+              ? t('common.saving')
+              : hasExistingProfile
+                ? t('common.saveChanges')
+                : t('settings.personal.actions.create')}
           </Button>
         </div>
       </form>

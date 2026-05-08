@@ -1,59 +1,57 @@
+import { useTranslation } from 'react-i18next';
 import { StatCard } from '@/components/StatCard';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { useInvoiceGetStats } from '@/api/invoices/invoices';
 import { ArrowUpRight, ArrowDownRight, Scale } from 'lucide-react';
+import { formatMoney } from '@/lib/formatters';
 import { RecentInvoicesCard } from './RecentInvoicesCard';
 
-const formatSummaryCurrency = (amount: number, currency = 'USD') =>
-  new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-    notation: 'compact',
-    maximumFractionDigits: 0,
-  }).format(amount);
-
-const formatPercentChange = (value: number) => {
-  const sign = value > 0 ? '+' : '';
-  return `${sign}${Math.round(value)}% from last month`;
-};
-
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
   const { data, isLoading, isError } = useInvoiceGetStats();
   const stats = data?.data;
 
   const summaryCurrency =
     stats?.recentIncomingInvoices?.[0]?.currency ??
     stats?.recentOutgoingInvoices?.[0]?.currency ??
-    'USD';
+    'CZK';
 
   const summary = stats?.summary;
+
+  const formatSummary = (amount: number) =>
+    formatMoney(amount, summaryCurrency, i18n.language);
+
+  const formatPercentChange = (value: number) => {
+    const sign = value > 0 ? '+' : '';
+    return t('dashboard.cards.fromLastMonth', { percent: `${sign}${Math.round(value)}` });
+  };
 
   return (
     <PageLayout>
       <PageHeader
-        title="Dashboard"
-        description="Welcome back! Here's your financial overview."
+        title={t('dashboard.title')}
+        description={t('dashboard.description')}
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
-          title="Total Income"
-          value={formatSummaryCurrency(summary?.totalIncome ?? 0, summaryCurrency)}
+          title={t('dashboard.cards.income')}
+          value={formatSummary(summary?.totalIncome ?? 0)}
           icon={ArrowUpRight}
           trend={summary ? formatPercentChange(summary.incomeChangePct) : undefined}
           variant="success"
         />
         <StatCard
-          title="Total Expenses"
-          value={formatSummaryCurrency(summary?.totalExpenses ?? 0, summaryCurrency)}
+          title={t('dashboard.cards.expenses')}
+          value={formatSummary(summary?.totalExpenses ?? 0)}
           icon={ArrowDownRight}
           trend={summary ? formatPercentChange(summary.expenseChangePct) : undefined}
           variant="warning"
         />
         <StatCard
-          title="Net Balance"
-          value={formatSummaryCurrency(summary?.netBalance ?? 0, summaryCurrency)}
+          title={t('dashboard.cards.balance')}
+          value={formatSummary(summary?.netBalance ?? 0)}
           icon={Scale}
           trend={summary ? formatPercentChange(summary.netChangePct) : undefined}
           variant="default"
@@ -62,8 +60,8 @@ export default function Dashboard() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <RecentInvoicesCard
-          title="Recent Incoming Invoices"
-          description="Latest invoices you received."
+          title={t('dashboard.cards.recentIncoming')}
+          description={t('dashboard.cards.recentIncomingDesc')}
           invoices={stats?.recentIncomingInvoices}
           isLoading={isLoading}
           isError={isError}
@@ -71,8 +69,8 @@ export default function Dashboard() {
           variant="success"
         />
         <RecentInvoicesCard
-          title="Recent Outgoing Invoices"
-          description="Latest invoices you issued."
+          title={t('dashboard.cards.recentOutgoing')}
+          description={t('dashboard.cards.recentOutgoingDesc')}
           invoices={stats?.recentOutgoingInvoices}
           isLoading={isLoading}
           isError={isError}

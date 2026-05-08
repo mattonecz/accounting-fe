@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -9,14 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Plus,
-  Pencil,
-  MoreHorizontal,
-  Eye,
-  Download,
-  Landmark,
-} from 'lucide-react';
+import { Plus, Pencil, MoreHorizontal, Eye, Download, Landmark } from 'lucide-react';
 import { useInvoiceListByCompany } from '@/api/invoices/invoices';
 import { RecordPaymentDialog } from '@/components/RecordPaymentDialog';
 import { InvoicePdfRenderer } from '@/components/InvoicePdfRenderer';
@@ -26,67 +20,57 @@ import { InvoiceListByCompanyType } from '@/api/model/invoiceListByCompanyType';
 import { InvoiceResponseDto } from '@/api/model/invoiceResponseDto';
 
 export default function IncomingInvoices() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const invoices = useInvoiceListByCompany({
-    type: InvoiceListByCompanyType.RECEIVED,
-  });
-  const [paymentInvoice, setPaymentInvoice] =
-    useState<InvoiceResponseDto | null>(null);
+  const invoices = useInvoiceListByCompany({ type: InvoiceListByCompanyType.RECEIVED });
+  const [paymentInvoice, setPaymentInvoice] = useState<InvoiceResponseDto | null>(null);
   const [pdfInvoiceId, setPdfInvoiceId] = useState<string | null>(null);
 
   const columns = [
     {
-      header: 'Číslo faktury',
+      header: t('invoices.list.columns.number'),
       cell: (invoice: InvoiceResponseDto) => (
-        <span className="text-primary underline-offset-4 hover:underline">
-          {invoice.number}
-        </span>
+        <span className="text-primary underline-offset-4 hover:underline">{invoice.number}</span>
       ),
       cellClassName: 'font-mono font-medium',
     },
     {
-      header: 'Dodavatel',
+      header: t('invoices.list.columns.supplier'),
       headerClassName: 'w-[32%]',
-      cell: (invoice: InvoiceResponseDto) =>
-        invoice.contactSnapshot?.name || '-',
+      cell: (invoice: InvoiceResponseDto) => invoice.contactSnapshot?.name || '-',
       cellClassName: 'min-w-[220px]',
     },
     {
-      header: 'Částka',
+      header: t('invoices.list.columns.amount'),
       cell: (invoice: InvoiceResponseDto) => invoice.total,
       cellClassName: 'font-semibold text-success',
     },
     {
-      header: 'Stav',
-      cell: (invoice: InvoiceResponseDto) => (
-        <InvoiceStatusBadge status={invoice.status} />
-      ),
+      header: t('invoices.list.columns.status'),
+      cell: (invoice: InvoiceResponseDto) => <InvoiceStatusBadge status={invoice.status} />,
     },
     {
-      header: 'Datum vystavení',
+      header: t('invoices.list.columns.createdDate'),
       cell: (invoice: InvoiceResponseDto) => invoice.createdDate,
       cellClassName: 'text-muted-foreground',
     },
     {
-      header: 'Datum splatnosti',
+      header: t('invoices.list.columns.dueDate'),
       cell: (invoice: InvoiceResponseDto) => invoice.dueDate,
       cellClassName: 'text-muted-foreground',
     },
     {
-      header: 'Akce',
+      header: t('invoices.list.columns.actions'),
       headerClassName: 'text-right',
       cellClassName: 'text-right',
       cell: (invoice: InvoiceResponseDto) => (
-        <div
-          className="flex justify-end gap-2"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
           <Button
             variant="outline"
             size="icon"
             onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
-            aria-label={`Upravit fakturu ${invoice.number}`}
-            title="Upravit"
+            aria-label={t('invoices.actions.editAriaLabel', { number: invoice.number })}
+            title={t('invoices.actions.edit')}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -95,7 +79,7 @@ export default function IncomingInvoices() {
               <Button
                 variant="outline"
                 size="icon"
-                aria-label={`Další akce pro fakturu ${invoice.number}`}
+                aria-label={t('invoices.actions.moreAriaLabel', { number: invoice.number })}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -103,17 +87,15 @@ export default function IncomingInvoices() {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => setPaymentInvoice(invoice)}>
                 <Landmark className="mr-2 h-4 w-4" />
-                Zaznamenat platbu
+                {t('payments.actions.record')}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigate(`/invoices/${invoice.id}`)}
-              >
+              <DropdownMenuItem onClick={() => navigate(`/invoices/${invoice.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
-                Detail
+                {t('invoices.actions.detail')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPdfInvoiceId(invoice.id)}>
                 <Download className="mr-2 h-4 w-4" />
-                Stáhnout PDF
+                {t('invoices.actions.downloadPdf')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -125,28 +107,25 @@ export default function IncomingInvoices() {
   return (
     <PageLayout>
       <PageHeader
-        title="Faktury přijaté"
-        description="Sledujte faktury přijaté"
+        title={t('nav.invoicesReceived')}
+        description={t('invoices.list.descriptionReceived')}
         actions={
-          <Button
-            className="gap-2"
-            onClick={() => navigate('/invoices/create?type=received')}
-          >
+          <Button className="gap-2" onClick={() => navigate('/invoices/create?type=received')}>
             <Plus className="h-4 w-4" />
-            Vytvořit fakturu
+            {t('invoices.actions.create')}
           </Button>
         }
       />
 
       <DataTableCard
-        title="Všechny faktury"
+        title={t('invoices.list.allInvoices')}
         columns={columns}
         data={invoices.data?.data?.data}
         isLoading={invoices.isLoading}
         isError={invoices.isError}
-        emptyMessage="Žádné přijaté faktury nenalezeny."
-        loadingMessage="Načítám faktury..."
-        errorMessage="Nepodařilo se načíst faktury."
+        emptyMessage={t('invoices.list.emptyReceived')}
+        loadingMessage={t('invoices.list.loading')}
+        errorMessage={t('invoices.list.error')}
         onRowClick={(invoice) => navigate(`/invoices/${invoice.id}`)}
       />
 
@@ -154,18 +133,13 @@ export default function IncomingInvoices() {
         <RecordPaymentDialog
           invoice={paymentInvoice}
           open
-          onOpenChange={(open) => {
-            if (!open) setPaymentInvoice(null);
-          }}
+          onOpenChange={(open) => { if (!open) setPaymentInvoice(null); }}
           hideTrigger
         />
       )}
 
       {pdfInvoiceId && (
-        <InvoicePdfRenderer
-          invoiceId={pdfInvoiceId}
-          onDone={() => setPdfInvoiceId(null)}
-        />
+        <InvoicePdfRenderer invoiceId={pdfInvoiceId} onDone={() => setPdfInvoiceId(null)} />
       )}
     </PageLayout>
   );
