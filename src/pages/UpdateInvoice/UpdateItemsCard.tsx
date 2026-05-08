@@ -20,6 +20,7 @@ interface UpdateItemsCardProps {
   calculateInvoiceTotals: () => void;
   addItem: () => void;
   removeItem: (index: number) => void;
+  isVatPayer: boolean;
 }
 
 export const UpdateItemsCard = ({
@@ -29,6 +30,7 @@ export const UpdateItemsCard = ({
   calculateInvoiceTotals,
   addItem,
   removeItem,
+  isVatPayer,
 }: UpdateItemsCardProps) => (
   <FormCard
     title="Položky faktury"
@@ -51,9 +53,11 @@ export const UpdateItemsCard = ({
         <span className="w-32 text-sm font-medium text-muted-foreground">
           Cena
         </span>
-        <span className="w-24 text-sm font-medium text-muted-foreground">
-          DPH %
-        </span>
+        {isVatPayer && (
+          <span className="w-24 text-sm font-medium text-muted-foreground">
+            DPH %
+          </span>
+        )}
         <span className="w-32 text-sm font-medium text-muted-foreground">
           Celkem
         </span>
@@ -129,38 +133,43 @@ export const UpdateItemsCard = ({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name={`items.${index}.vatRate`}
-            rules={{
-              min: { value: 0, message: 'DPH musí být ≥ 0' },
-              max: { value: 100, message: 'DPH musí být ≤ 100' },
-            }}
-            render={({ field }) => (
-              <FormItem className="w-24">
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="1"
-                    {...field}
-                    value={field.value ?? 0}
-                    onChange={(e) => {
-                      field.onChange(toNumber(e.target.value));
-                      calculateInvoiceTotals();
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {isVatPayer && (
+            <FormField
+              control={form.control}
+              name={`items.${index}.vatRate`}
+              rules={{
+                min: { value: 0, message: 'DPH musí být ≥ 0' },
+                max: { value: 100, message: 'DPH musí být ≤ 100' },
+              }}
+              render={({ field }) => (
+                <FormItem className="w-24">
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="1"
+                      {...field}
+                      value={field.value ?? 0}
+                      onChange={(e) => {
+                        field.onChange(toNumber(e.target.value));
+                        calculateInvoiceTotals();
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="w-32">
             <p className="font-medium">
               {formatMoney(
                 toNumber(form.watch(`items.${index}.quantity`)) *
                   toNumber(form.watch(`items.${index}.unitPrice`)) *
-                  (1 + toNumber(form.watch(`items.${index}.vatRate`)) / 100),
+                  (1 +
+                    (isVatPayer
+                      ? toNumber(form.watch(`items.${index}.vatRate`)) / 100
+                      : 0)),
               )}
             </p>
           </div>

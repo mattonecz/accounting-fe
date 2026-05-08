@@ -41,7 +41,7 @@ export const InvoicePrintDocument = ({
                 </p>
                 <p>
                   <span className="text-muted-foreground">DUZP:</span>{' '}
-                  {formatDate(invoice.taxDate)}
+                  {formatDate(invoice.duzpDate)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">

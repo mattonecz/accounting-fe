@@ -30,7 +30,7 @@ import type { ContactResponseDto, CreateSimpleInvoiceDto } from '@/api/model';
 const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
-  taxDate: new Date().toISOString().split('T')[0],
+  duzpDate: new Date().toISOString().split('T')[0],
   total: 0,
   totalTax: 0,
   totalWithTax: 0,
@@ -77,7 +77,7 @@ export const CreateSimpleInvoiceDialog = ({
         contactId: data.contactId || undefined,
         number: data.number,
         createdDate: data.createdDate,
-        taxDate: data.taxDate,
+        duzpDate: data.duzpDate,
         total: data.total,
         totalTax: data.totalTax,
         totalWithTax: data.totalWithTax,
@@ -160,7 +160,7 @@ export const CreateSimpleInvoiceDialog = ({
               />
               <FormField
                 control={form.control}
-                name="taxDate"
+                name="duzpDate"
                 rules={{ required: 'Datum zdanitelného plnění je povinné' }}
                 render={({ field }) => (
                   <FormItem>

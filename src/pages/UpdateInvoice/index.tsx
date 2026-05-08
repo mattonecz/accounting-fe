@@ -19,6 +19,7 @@ export default function UpdateInvoice() {
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
+    isVatPayer,
     sortedContacts,
     sortedBanks,
     formatMoney,
@@ -58,10 +59,12 @@ export default function UpdateInvoice() {
     (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
     0,
   );
-  const totalTax = items.reduce((sum, item) => {
-    const base = toNumber(item.quantity) * toNumber(item.unitPrice);
-    return sum + base * (toNumber(item.vatRate) / 100);
-  }, 0);
+  const totalTax = isVatPayer
+    ? items.reduce((sum, item) => {
+        const base = toNumber(item.quantity) * toNumber(item.unitPrice);
+        return sum + base * (toNumber(item.vatRate) / 100);
+      }, 0)
+    : 0;
 
   return (
     <PageLayout className="space-y-4">
@@ -78,6 +81,7 @@ export default function UpdateInvoice() {
             sortedContacts={sortedContacts}
             sortedBanks={sortedBanks}
             isCzkCurrency={isCzkCurrency}
+            isVatPayer={isVatPayer}
           />
 
           <UpdateItemsCard
@@ -87,22 +91,33 @@ export default function UpdateInvoice() {
             calculateInvoiceTotals={calculateInvoiceTotals}
             addItem={addItem}
             removeItem={removeItem}
+            isVatPayer={isVatPayer}
           />
 
           <FormCard title="Souhrn faktury">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div
+              className={`grid grid-cols-1 gap-4 ${
+                isVatPayer ? 'md:grid-cols-3' : 'md:grid-cols-1'
+              }`}
+            >
               <div>
-                <p className="text-sm text-muted-foreground">Mezisoučet</p>
+                <p className="text-sm text-muted-foreground">
+                  {isVatPayer ? 'Mezisoučet' : 'Částka celkem'}
+                </p>
                 <p className="text-2xl font-bold">{formatMoney(total)}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">DPH celkem</p>
-                <p className="text-2xl font-bold">{formatMoney(totalTax)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Částka celkem</p>
-                <p className="text-2xl font-bold">{formatMoney(total + totalTax)}</p>
-              </div>
+              {isVatPayer && (
+                <>
+                  <div>
+                    <p className="text-sm text-muted-foreground">DPH celkem</p>
+                    <p className="text-2xl font-bold">{formatMoney(totalTax)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Částka celkem</p>
+                    <p className="text-2xl font-bold">{formatMoney(total + totalTax)}</p>
+                  </div>
+                </>
+              )}
             </div>
           </FormCard>
 

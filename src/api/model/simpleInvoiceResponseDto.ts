@@ -13,7 +13,7 @@ export interface SimpleInvoiceResponseDto {
   contactId?: string;
   number: string;
   createdDate: string;
-  taxDate: string;
+  duzpDate: string;
   total: number;
   totalTax: number;
   totalWithTax: number;

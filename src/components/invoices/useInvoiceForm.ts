@@ -6,10 +6,13 @@ import {
   CreateInvoiceDto,
   CreateInvoiceDtoStatus,
   CreateInvoiceDtoType,
+  CreateInvoiceDtoVatMode,
+  InvoiceBankAccountSnapshotDto,
 } from '@/api/model';
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
+import { useUserProfileGet } from '@/api/user-profile/user-profile';
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
   CZK: 'Kč',
@@ -18,6 +21,26 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
 };
 
 export type InvoiceSubmitMode = 'draft' | 'issued';
+
+const trimOrUndefined = (value: string | undefined) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
+const buildBankSnapshot = (
+  snapshot: InvoiceBankAccountSnapshotDto | undefined,
+): InvoiceBankAccountSnapshotDto | undefined => {
+  if (!snapshot) return undefined;
+  const cleaned: InvoiceBankAccountSnapshotDto = {
+    name: trimOrUndefined(snapshot.name),
+    number: trimOrUndefined(snapshot.number),
+    iban: trimOrUndefined(snapshot.iban),
+    swift: trimOrUndefined(snapshot.swift),
+    currency: trimOrUndefined(snapshot.currency),
+  };
+  const hasAny = Object.values(cleaned).some((v) => v != null);
+  return hasAny ? cleaned : undefined;
+};
 
 export const useInvoiceForm = () => {
   const navigate = useNavigate();
@@ -31,24 +54,53 @@ export const useInvoiceForm = () => {
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
   const { data: invoiceNumber } = useInvoiceGetCount();
+  const { data: userProfileResponse } = useUserProfileGet();
   const { mutate: createInvoice, isPending: isCreatingInvoice } =
     useInvoiceCreate();
   const [submitMode, setSubmitMode] = useState<InvoiceSubmitMode>('issued');
+
+  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
+  const initialVatMode: CreateInvoiceDtoVatMode = isVatPayer
+    ? CreateInvoiceDtoVatMode.STANDARD
+    : CreateInvoiceDtoVatMode.NON_VAT_PAYER;
 
   const form = useForm<CreateInvoiceDto>({
     defaultValues: {
       type: invoiceType,
       currency: 'CZK',
+      vatMode: initialVatMode,
       createdDate: new Date().toISOString().split('T')[0],
-      taxDate: new Date().toISOString().split('T')[0],
+      duzpDate: new Date().toISOString().split('T')[0],
       dueDate: (() => {
         const date = new Date();
         date.setDate(date.getDate() + 14);
         return date.toISOString().split('T')[0];
       })(),
-      items: [{ name: '', quantity: 1, unitPrice: 0, total: 0, vatRate: 21 }],
+      items: [
+        {
+          name: '',
+          quantity: 1,
+          unitPrice: 0,
+          total: 0,
+          vatRate: isVatPayer ? 21 : undefined,
+        },
+      ],
     },
   });
+
+  // Once we know whether the user is a VAT payer, sync the form's vatMode
+  // default — react-hook-form has already initialised with whatever value was
+  // present on first render (likely the non-VAT-payer fallback while the
+  // profile request was still pending).
+  useEffect(() => {
+    const current = form.getValues('vatMode');
+    if (isVatPayer && current === CreateInvoiceDtoVatMode.NON_VAT_PAYER) {
+      form.setValue('vatMode', CreateInvoiceDtoVatMode.STANDARD);
+    }
+    if (!isVatPayer && current !== CreateInvoiceDtoVatMode.NON_VAT_PAYER) {
+      form.setValue('vatMode', CreateInvoiceDtoVatMode.NON_VAT_PAYER);
+    }
+  }, [isVatPayer, form]);
 
   const selectedCurrency = form.watch('currency') || 'CZK';
   const currencyLabel = CURRENCY_SYMBOLS[selectedCurrency] || selectedCurrency;
@@ -89,6 +141,7 @@ export const useInvoiceForm = () => {
   }, [invoiceNumber, form, isReceived]);
 
   useEffect(() => {
+    if (isReceived) return;
     const selectedBankId = form.getValues('bankId');
     if (selectedBankId) return;
 
@@ -97,7 +150,7 @@ export const useInvoiceForm = () => {
     if (defaultBank) {
       form.setValue('bankId', defaultBank.id);
     }
-  }, [sortedBanks, form]);
+  }, [sortedBanks, form, isReceived]);
 
   useEffect(() => {
     if (selectedCurrency === 'CZK') {
@@ -121,7 +174,38 @@ export const useInvoiceForm = () => {
   const submitInvoice = (data: CreateInvoiceDto, mode: InvoiceSubmitMode) => {
     setSubmitMode(mode);
 
-    const { status: _status, ...invoicePayload } = data;
+    const { status: _status, bankId, bankSnapshot, ...rest } = data;
+
+    const cleanedSnapshot = isReceived
+      ? buildBankSnapshot(bankSnapshot)
+      : undefined;
+    const finalBankId = !isReceived ? bankId : undefined;
+
+    const finalVatMode = isVatPayer
+      ? rest.vatMode
+      : CreateInvoiceDtoVatMode.NON_VAT_PAYER;
+
+    const finalItems = rest.items.map((item) => ({
+      ...item,
+      vatRate: isVatPayer ? item.vatRate : undefined,
+    }));
+
+    const invoicePayload: CreateInvoiceDto = {
+      ...rest,
+      vatMode: finalVatMode,
+      items: finalItems,
+      bankId: finalBankId,
+      bankSnapshot: cleanedSnapshot,
+      variableSymbol: trimOrUndefined(rest.variableSymbol),
+      specificSymbol: trimOrUndefined(rest.specificSymbol),
+      konstantSymbol: trimOrUndefined(rest.konstantSymbol),
+      note: trimOrUndefined(rest.note),
+      internalNote: trimOrUndefined(rest.internalNote),
+      originalNumber: isReceived
+        ? trimOrUndefined(rest.originalNumber)
+        : undefined,
+    };
+
     const payload =
       mode === 'draft'
         ? { ...invoicePayload, status: CreateInvoiceDtoStatus.DRAFT }
@@ -157,6 +241,7 @@ export const useInvoiceForm = () => {
     submitMode,
     isCreatingInvoice,
     isReceived,
+    isVatPayer,
     selectedCurrency,
     currencyLabel,
     isCzkCurrency,

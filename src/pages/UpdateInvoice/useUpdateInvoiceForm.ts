@@ -11,11 +11,14 @@ import {
 } from '@/api/invoices/invoices';
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
+import { useUserProfileGet } from '@/api/user-profile/user-profile';
 import {
+  InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
   UpdateInvoiceDto,
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
+  UpdateInvoiceDtoVatMode,
 } from '@/api/model';
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -37,13 +40,34 @@ export const toNumber = (value: unknown) => {
   return Number.isFinite(numericValue) ? Number(numericValue) : 0;
 };
 
+const trimOrUndefined = (value: string | undefined) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
+const buildBankSnapshot = (
+  snapshot: InvoiceBankAccountSnapshotDto | undefined,
+): InvoiceBankAccountSnapshotDto | undefined => {
+  if (!snapshot) return undefined;
+  const cleaned: InvoiceBankAccountSnapshotDto = {
+    name: trimOrUndefined(snapshot.name),
+    number: trimOrUndefined(snapshot.number),
+    iban: trimOrUndefined(snapshot.iban),
+    swift: trimOrUndefined(snapshot.swift),
+    currency: trimOrUndefined(snapshot.currency),
+  };
+  const hasAny = Object.values(cleaned).some((v) => v != null);
+  return hasAny ? cleaned : undefined;
+};
+
 const getDefaultValues = (): UpdateInvoiceDto => ({
   id: '',
   type: UpdateInvoiceDtoType.ISSUED,
   status: UpdateInvoiceDtoStatus.ISSUED,
+  vatMode: UpdateInvoiceDtoVatMode.STANDARD,
   currency: 'CZK',
   createdDate: new Date().toISOString().split('T')[0],
-  taxDate: new Date().toISOString().split('T')[0],
+  duzpDate: new Date().toISOString().split('T')[0],
   dueDate: new Date().toISOString().split('T')[0],
   items: [DEFAULT_ITEM],
 });
@@ -99,8 +123,11 @@ export function useUpdateInvoiceForm(id: string) {
   const { data: invoiceResponse, isLoading, isError } = useInvoiceGet(id || '');
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
+  const { data: userProfileResponse } = useUserProfileGet();
   const { mutate: updateInvoice, isPending: isUpdatingInvoice } =
     useInvoiceUpdate();
+
+  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
 
   const form = useForm<UpdateInvoiceDto>({
     defaultValues: getDefaultValues(),
@@ -135,21 +162,44 @@ export function useUpdateInvoiceForm(id: string) {
     const invoice = invoiceResponse?.data;
     if (!invoice) return;
 
+    const invoiceType =
+      (invoice.type as UpdateInvoiceDtoType) || UpdateInvoiceDtoType.ISSUED;
+    const isReceived = invoiceType === UpdateInvoiceDtoType.RECEIVED;
+
     form.reset({
       id: invoice.id,
       contactId: findMatchingContactId(invoice, sortedContacts),
-      bankId: findMatchingBankId(invoice, sortedBanks),
+      bankId: isReceived
+        ? undefined
+        : findMatchingBankId(invoice, sortedBanks) || undefined,
+      bankSnapshot: isReceived
+        ? {
+            name: invoice.bankAccount?.name ?? '',
+            number: invoice.bankAccount?.number ?? '',
+            iban: invoice.bankAccount?.iban ?? '',
+            swift: invoice.bankAccount?.swift ?? '',
+            currency: invoice.bankAccount?.currency ?? '',
+          }
+        : undefined,
       number: invoice.number,
       currency: invoice.currency,
-      type:
-        (invoice.type as UpdateInvoiceDtoType) || UpdateInvoiceDtoType.ISSUED,
+      type: invoiceType,
+      vatMode:
+        (invoice.vatMode as UpdateInvoiceDtoVatMode) ||
+        UpdateInvoiceDtoVatMode.STANDARD,
       status:
         (invoice.status as UpdateInvoiceDtoStatus) ||
         UpdateInvoiceDtoStatus.ISSUED,
       exchangeRate: invoice.exchangeRate,
       createdDate: invoice.createdDate,
-      taxDate: invoice.taxDate,
+      duzpDate: invoice.duzpDate,
       dueDate: invoice.dueDate,
+      variableSymbol: invoice.variableSymbol ?? '',
+      specificSymbol: invoice.specificSymbol ?? '',
+      konstantSymbol: invoice.konstantSymbol ?? '',
+      note: invoice.note ?? '',
+      internalNote: invoice.internalNote ?? '',
+      originalNumber: invoice.originalNumber ?? '',
       items: invoice.items?.length
         ? invoice.items.map((item) => ({
             name: item.name,
@@ -185,8 +235,41 @@ export function useUpdateInvoiceForm(id: string) {
   };
 
   const handleSubmit = (data: UpdateInvoiceDto) => {
+    const isReceived = data.type === UpdateInvoiceDtoType.RECEIVED;
+
+    const cleanedSnapshot = isReceived
+      ? buildBankSnapshot(data.bankSnapshot)
+      : undefined;
+    const finalBankId = !isReceived ? data.bankId || undefined : undefined;
+
+    const finalVatMode = isVatPayer
+      ? data.vatMode
+      : UpdateInvoiceDtoVatMode.NON_VAT_PAYER;
+
+    const finalItems = data.items?.map((item) => ({
+      ...item,
+      vatRate: isVatPayer ? item.vatRate : undefined,
+    }));
+
+    const payload: UpdateInvoiceDto = {
+      ...data,
+      id: id || data.id,
+      vatMode: finalVatMode,
+      items: finalItems,
+      bankId: finalBankId,
+      bankSnapshot: cleanedSnapshot,
+      variableSymbol: trimOrUndefined(data.variableSymbol),
+      specificSymbol: trimOrUndefined(data.specificSymbol),
+      konstantSymbol: trimOrUndefined(data.konstantSymbol),
+      note: trimOrUndefined(data.note),
+      internalNote: trimOrUndefined(data.internalNote),
+      originalNumber: isReceived
+        ? trimOrUndefined(data.originalNumber)
+        : undefined,
+    };
+
     updateInvoice(
-      { data: { ...data, id: id || data.id } },
+      { data: payload },
       {
         onSuccess: async (response) => {
           enqueueSnackbar('Faktura byla úspěšně upravena', {
@@ -218,6 +301,7 @@ export function useUpdateInvoiceForm(id: string) {
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
+    isVatPayer,
     sortedContacts,
     sortedBanks,
     formatMoney,

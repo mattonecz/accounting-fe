@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
@@ -75,22 +75,69 @@ interface BillingInfoFormProps {
 }
 
 export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
-  const { enqueueSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
   const [companyFallback, setCompanyFallback] = useState<CompanyResponseDto | null>(null);
-  const isResettingRef = useRef(false);
 
   const {
     data: companyResponse,
     isError: isCompanyError,
     isLoading: isCompanyLoading,
-  } = useCompanyGet(companyId, { query: { retry: false } });
+  } = useCompanyGet(companyId, { query: { retry: false, enabled: !!companyId } });
+
+  const companyFromApi = companyResponse?.data;
+  const company = companyFromApi ?? companyFallback;
+
+  if (companyId && isCompanyLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-sm text-muted-foreground">
+          Načítám fakturační údaje firmy...
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isCompanyError && !company) {
+    return (
+      <Card className="border-destructive/30">
+        <CardHeader>
+          <CardTitle>Fakturační údaje se nepodařilo načíst</CardTitle>
+          <CardDescription>Nepodařilo se načíst firmu přiřazenou k účtu.</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  // Mount the form only after company data has settled, so `defaultValues` on
+  // the first render already has the loaded values (Radix Select latches its
+  // internal "no match" state on the first render, so loading values via a
+  // post-mount reset/`values` sync doesn't update the displayed label).
+  return (
+    <BillingInfoFormContent
+      key={company?.id ?? 'new'}
+      companyId={companyId}
+      company={company}
+      onCompanyCreated={setCompanyFallback}
+    />
+  );
+};
+
+interface BillingInfoFormContentProps {
+  companyId: string;
+  company: CompanyResponseDto | null;
+  onCompanyCreated: (company: CompanyResponseDto | null) => void;
+}
+
+const BillingInfoFormContent = ({
+  companyId,
+  company,
+  onCompanyCreated,
+}: BillingInfoFormContentProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const { mutate: createCompany, isPending: isCreatingCompany } = useCompanyCreate();
   const { mutate: updateCompany, isPending: isUpdatingCompany } = useCompanyUpdate();
 
-  const companyFromApi = companyResponse?.data;
-  const company = companyFromApi ?? companyFallback;
   const hasExistingCompany = Boolean(company?.id);
   const isSaving = isCreatingCompany || isUpdatingCompany;
 
@@ -98,7 +145,9 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     ? 'Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.'
     : 'K účtu zatím není přiřazená fakturační firma. Po uložení se vytvoří nový záznam.';
 
-  const form = useForm<CompanyFormValues>({ defaultValues: mapCompanyToForm() });
+  const form = useForm<CompanyFormValues>({
+    defaultValues: mapCompanyToForm(company),
+  });
   const { reset, watch, setValue } = form;
 
   const selectedTaxOfficeCode = watch('c_ufo');
@@ -113,22 +162,9 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     );
   }, [selectedTaxOfficeCode]);
 
+  // Sanitize c_pracufo when the user changes c_ufo to a different office.
+  // Skipped on the initial render because defaultValues already match.
   useEffect(() => {
-    if (company) {
-      isResettingRef.current = true;
-      reset(mapCompanyToForm(company));
-      return;
-    }
-    if (!isCompanyLoading) {
-      reset(mapCompanyToForm());
-    }
-  }, [company, isCompanyLoading, reset]);
-
-  useEffect(() => {
-    if (isResettingRef.current) {
-      isResettingRef.current = false;
-      return;
-    }
     if (!selectedTaxOfficeCode) {
       if (selectedWorkplaceCode) setValue('c_pracufo', '');
       return;
@@ -138,8 +174,11 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
         setValue('c_pracufo', SPECIAL_TAX_OFFICE_WORKPLACE_CODE);
       return;
     }
-    const hasMatchingWorkplace = workplaceOptions.some((w) => w.code === selectedWorkplaceCode);
-    if (selectedWorkplaceCode && !hasMatchingWorkplace) setValue('c_pracufo', '');
+    const hasMatchingWorkplace = workplaceOptions.some(
+      (w) => w.code === selectedWorkplaceCode,
+    );
+    if (selectedWorkplaceCode && !hasMatchingWorkplace)
+      setValue('c_pracufo', '');
   }, [selectedTaxOfficeCode, selectedWorkplaceCode, setValue, workplaceOptions]);
 
   const onSubmit = (data: CompanyFormValues) => {
@@ -147,11 +186,10 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     const handleSuccess = (response: { data: CompanyResponseDto }) => {
       queryClient.setQueryData(getCompanyGetQueryKey(response.data.id), response);
       if (!companyId || response.data.id !== companyId) {
-        setCompanyFallback(response.data);
+        onCompanyCreated(response.data);
       } else {
-        setCompanyFallback(null);
+        onCompanyCreated(null);
       }
-      isResettingRef.current = true;
       reset(mapCompanyToForm(response.data));
       enqueueSnackbar(
         hasExistingCompany
@@ -185,27 +223,6 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
     : selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
       ? 'U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.'
       : 'Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu.';
-
-  if (isCompanyLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-sm text-muted-foreground">
-          Načítám fakturační údaje firmy...
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isCompanyError && !company) {
-    return (
-      <Card className="border-destructive/30">
-        <CardHeader>
-          <CardTitle>Fakturační údaje se nepodařilo načíst</CardTitle>
-          <CardDescription>Nepodařilo se načíst firmu přiřazenou k účtu.</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
 
   return (
     <Form {...form}>

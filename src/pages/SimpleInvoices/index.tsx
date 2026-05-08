@@ -32,7 +32,7 @@ const columns = [
   },
   { header: 'Firma', cell: (i: SimpleInvoiceResponseDto) => i.contact?.name || '-' },
   { header: 'Datum vystavení', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.createdDate) },
-  { header: 'Datum plnění', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.taxDate) },
+  { header: 'Datum plnění', cell: (i: SimpleInvoiceResponseDto) => formatDate(i.duzpDate) },
   {
     header: 'Základ',
     headerClassName: 'text-right',

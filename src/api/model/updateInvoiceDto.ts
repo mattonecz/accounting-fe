@@ -5,7 +5,9 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { UpdateInvoiceDtoType } from './updateInvoiceDtoType';
+import type { UpdateInvoiceDtoVatMode } from './updateInvoiceDtoVatMode';
 import type { UpdateInvoiceDtoStatus } from './updateInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
 
@@ -13,16 +15,25 @@ export interface UpdateInvoiceDto {
   /** UUID of the invoice */
   id: string;
   bankId?: string;
+  /** Direct bank-account snapshot (mutually exclusive with `bankId`). Setting this clears `bankId`. */
+  bankSnapshot?: InvoiceBankAccountSnapshotDto;
   /** UUID of the external party (Contact) */
   contactId?: string;
   number?: string;
   currency?: string;
   type?: UpdateInvoiceDtoType;
+  vatMode?: UpdateInvoiceDtoVatMode;
   status?: UpdateInvoiceDtoStatus;
   exchangeRate?: number;
   createdDate?: string;
-  taxDate?: string;
+  duzpDate?: string;
   dueDate?: string;
   /** Array of invoice items. Totals are recomputed server-side when provided. */
   items?: InvoiceItemDto[];
+  variableSymbol?: string;
+  specificSymbol?: string;
+  konstantSymbol?: string;
+  note?: string;
+  internalNote?: string;
+  originalNumber?: string;
 }

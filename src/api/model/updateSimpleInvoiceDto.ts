@@ -11,7 +11,7 @@ export interface UpdateSimpleInvoiceDto {
   contactId?: string;
   number?: string;
   createdDate?: string;
-  taxDate?: string;
+  duzpDate?: string;
   total?: number;
   totalTax?: number;
   totalWithTax?: number;

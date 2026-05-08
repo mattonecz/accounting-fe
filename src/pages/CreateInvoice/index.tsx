@@ -14,6 +14,7 @@ const CreateInvoice = () => {
     isCreatingInvoice,
     isCzkCurrency,
     isReceived,
+    isVatPayer,
     sortedBanks,
     sortedContacts,
     formatMoney,
@@ -41,6 +42,7 @@ const CreateInvoice = () => {
             sortedBanks={sortedBanks}
             isCzkCurrency={isCzkCurrency}
             isReceived={isReceived}
+            isVatPayer={isVatPayer}
             getBankAccountLabel={getBankAccountLabel}
           />
 
@@ -49,9 +51,14 @@ const CreateInvoice = () => {
             fieldArray={fieldArray}
             formatMoney={formatMoney}
             onRecalculate={calculateTotals}
+            isVatPayer={isVatPayer}
           />
 
-          <InvoiceSummaryCard form={form} formatMoney={formatMoney} />
+          <InvoiceSummaryCard
+            form={form}
+            formatMoney={formatMoney}
+            isVatPayer={isVatPayer}
+          />
 
           <InvoiceFormActions isCreatingInvoice={isCreatingInvoice} />
         </form>

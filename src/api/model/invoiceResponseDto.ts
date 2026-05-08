@@ -5,6 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceResponseDtoVatMode } from './invoiceResponseDtoVatMode';
 import type { InvoiceResponseDtoStatus } from './invoiceResponseDtoStatus';
 import type { InvoiceItemResponseDto } from './invoiceItemResponseDto';
 import type { ContactSnapshotDto } from './contactSnapshotDto';
@@ -16,19 +17,26 @@ export interface InvoiceResponseDto {
   id: string;
   number: string;
   createdDate: string;
-  taxDate: string;
+  duzpDate: string;
   dueDate: string;
   total: number;
   totalTax: number;
   exchangeRate?: number;
   currency: string;
   type: string;
+  vatMode: InvoiceResponseDtoVatMode;
   status: InvoiceResponseDtoStatus;
   totalWithTax: number;
   items: InvoiceItemResponseDto[];
   companyId: string;
-  bankId: string;
+  bankId?: string;
   contactId: string;
+  variableSymbol?: string;
+  specificSymbol?: string;
+  konstantSymbol?: string;
+  note?: string;
+  internalNote?: string;
+  originalNumber?: string;
   contactSnapshot?: ContactSnapshotDto;
   bankAccount?: InvoiceBankAccountSnapshotDto;
   payments?: PaymentResponseDto[];

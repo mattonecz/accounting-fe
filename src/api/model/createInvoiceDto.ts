@@ -5,24 +5,40 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
+import type { CreateInvoiceDtoVatMode } from './createInvoiceDtoVatMode';
 import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
 
 export interface CreateInvoiceDto {
-  bankId: string;
+  /** UUID of a managed Bank row. Provide this OR `bankSnapshot`, not both. Required for ISSUED invoices. */
+  bankId?: string;
+  /** Direct bank-account snapshot, e.g. for RECEIVED invoices where the supplier account is captured ad-hoc instead of as a managed Bank row. Mutually exclusive with `bankId`. */
+  bankSnapshot?: InvoiceBankAccountSnapshotDto;
   /** UUID of the external party (Contact). */
   contactId: string;
   number: string;
   currency: string;
   /** Direction of invoice - RECEIVED or ISSUED */
   type: CreateInvoiceDtoType;
+  /** VAT regime under which the invoice was issued/received. */
+  vatMode: CreateInvoiceDtoVatMode;
   /** Invoice status. Defaults to ISSUED when omitted. */
   status?: CreateInvoiceDtoStatus;
   exchangeRate?: number;
   createdDate: string;
-  taxDate: string;
+  duzpDate: string;
   dueDate: string;
   /** Array of invoice items. Totals are computed server-side. */
   items: InvoiceItemDto[];
+  variableSymbol?: string;
+  specificSymbol?: string;
+  konstantSymbol?: string;
+  /** Public note shown on the invoice. */
+  note?: string;
+  /** Internal note, not shown to the counterparty. */
+  internalNote?: string;
+  /** Supplier-provided invoice number (typically used on RECEIVED invoices to keep the supplier's original reference). */
+  originalNumber?: string;
 }
