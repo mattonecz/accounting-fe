@@ -1,6 +1,7 @@
 {
   "common": {
     "save": "Uložit",
+    "saveChanges": "Uložit změny",
     "cancel": "Zrušit",
     "delete": "Smazat",
     "edit": "Upravit",
@@ -11,7 +12,8 @@
     "optional": "Volitelně",
     "errorLoad": "Nepodařilo se načíst",
     "refresh": "Obnovit",
-    "detail": "Detail"
+    "detail": "Detail",
+    "notSelected": "Nevybráno"
   },
   "validation": {
     "required": "{{field}} je povinné",
@@ -20,22 +22,35 @@
     "email": "Zadejte platný e-mail"
   },
   "nav": {
-    "dashboard": "Dashboard",
+    "dashboard": "Nástěnka",
     "contacts": "Kontakty",
     "bankAccounts": "Bankovní účty",
     "invoicesIssued": "Faktury vydané",
     "invoicesReceived": "Faktury přijaté",
     "simpleInvoices": "Zjednodušené doklady",
-    "taxReport": "Přehled DPH",
-    "logout": "Odhlásit"
+    "taxReport": "Přiznání DPH",
+    "logout": "Odhlásit",
+    "sectionOverview": "Přehled",
+    "sectionBilling": "Fakturace",
+    "sectionData": "Data",
+    "sectionReports": "Přehledy"
   },
   "auth": {
     "title": "FreelanceBooks",
+    "tagline": "Spravujte své freelance finance snadno",
     "description": "Spravujte své freelance finance snadno",
     "login": "Přihlásit se",
     "register": "Registrovat se",
     "signIn": "Přihlásit se",
     "createAccount": "Vytvořit účet",
+    "tabs": {
+      "login": "Přihlášení",
+      "register": "Registrace"
+    },
+    "actions": {
+      "signIn": "Přihlásit se",
+      "createAccount": "Vytvořit účet"
+    },
     "fields": {
       "username": "Uživatelské jméno",
       "email": "E-mail",
@@ -165,6 +180,8 @@
       "originalNumber": "Číslo dodavatele",
       "currency": "Měna",
       "vatMode": "Režim DPH",
+      "ico": "IČO",
+      "dic": "DIČ",
       "exchangeRate": "Kurz",
       "createdDate": "Datum vystavení",
       "duzpDate": "Datum zdanitelného plnění",
@@ -295,6 +312,40 @@
       "paymentSymbols": "Platební symboly",
       "notes": "Poznámky",
       "optionalDetails": "Platební symboly a poznámky"
+    },
+    "vatClaim": {
+      "title": "DPH / Kontrolní hlášení",
+      "shouldClaim": "Uplatnit odpočet DPH",
+      "claimType": {
+        "label": "Typ odpočtu",
+        "options": {
+          "FULL": "Plný odpočet (100 %)",
+          "PARTIAL": "Částečný odpočet"
+        }
+      },
+      "claimRatio": {
+        "label": "Poměr odpočtu",
+        "placeholder": "0.5",
+        "hint": "Hodnota mezi 0 a 1 (např. 0.5 = 50 %)"
+      },
+      "claimMonth": {
+        "label": "Měsíc uplatnění"
+      },
+      "note": {
+        "label": "Poznámka",
+        "placeholder": "Volitelná interní poznámka"
+      },
+      "validation": {
+        "ratioRequired": "Poměr odpočtu je povinný při částečném odpočtu",
+        "ratioRange": "Poměr musí být v intervalu (0, 1)"
+      },
+      "statusLabel": "Stav odpočtu DPH",
+      "claimedAt": "Uplatněno dne",
+      "status": {
+        "PENDING": "Čeká na uplatnění",
+        "CLAIMED": "Uplatněno",
+        "SKIPPED": "Přeskočeno"
+      }
     }
   },
   "payments": {
@@ -606,10 +657,12 @@
       "language": "Jazyk"
     },
     "personal": {
-      "dialogTitle": "Osobní údaje",
-      "dialogDescription": "Kontaktní údaje uložené ve vašem uživatelském profilu.",
-      "cardTitle": "Osobní údaje",
-      "cardDescription": "Základní kontaktní údaje uložené ve vašem uživatelském profilu.",
+      "title": "Osobní údaje",
+      "description": "Kontaktní údaje uložené ve vašem uživatelském profilu.",
+      "card": {
+        "title": "Osobní údaje",
+        "description": "Základní kontaktní údaje uložené ve vašem uživatelském profilu."
+      },
       "fields": {
         "firstName": "Jméno",
         "lastName": "Příjmení",
@@ -636,24 +689,28 @@
         "creating": "Vytvářím..."
       },
       "messages": {
-        "updated": "Profil byl úspěšně upraven.",
-        "updateFailed": "Úprava profilu se nepodařila.",
-        "created": "Profil byl úspěšně vytvořen.",
-        "createFailed": "Vytvoření profilu se nepodařilo."
+        "updateSuccess": "Profil byl úspěšně upraven.",
+        "updateError": "Úprava profilu se nepodařila.",
+        "createSuccess": "Profil byl úspěšně vytvořen.",
+        "createError": "Vytvoření profilu se nepodařilo."
       }
     },
     "billing": {
-      "dialogTitle": "Fakturační údaje",
-      "dialogDescription": "Údaje firmy a nastavení pro daňová podání.",
-      "cardTitle": "Fakturační údaje",
-      "cardDescription": "Údaje firmy používané na vystavených dokladech a dalších výstupech.",
-      "taxCardTitle": "Údaje pro daňová podání",
-      "taxCardDescription": "Pole finančního úřadu a pracoviště vycházejí z oficiálních číselníků MOJE daně.",
+      "title": "Fakturační údaje",
+      "description": "Údaje firmy a nastavení pro daňová podání.",
+      "card": {
+        "title": "Fakturační údaje",
+        "description": "Údaje firmy používané na vystavených dokladech a dalších výstupech."
+      },
+      "taxCard": {
+        "title": "Údaje pro daňová podání",
+        "description": "Pole finančního úřadu a pracoviště vycházejí z oficiálních číselníků MOJE daně."
+      },
       "loading": "Načítám fakturační údaje firmy...",
       "errorTitle": "Fakturační údaje se nepodařilo načíst",
       "errorDescription": "Nepodařilo se načíst firmu přiřazenou k účtu.",
-      "missingNew": "K účtu zatím není přiřazená fakturační firma. Po uložení se vytvoří nový záznam.",
-      "missingExisting": "Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.",
+      "missingCompanyNew": "K účtu zatím není přiřazená fakturační firma. Po uložení se vytvoří nový záznam.",
+      "missingCompanyExisting": "Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.",
       "fields": {
         "name": "Název firmy",
         "ico": "IČO",
@@ -663,7 +720,7 @@
         "city": "Město",
         "psc": "PSČ",
         "taxOffice": "Finanční úřad",
-        "workplace": "Územní pracoviště"
+        "taxWorkplace": "Územní pracoviště"
       },
       "placeholders": {
         "name": "ACME s.r.o.",
@@ -674,17 +731,17 @@
         "city": "Brno",
         "psc": "60200",
         "taxOffice": "Vyberte finanční úřad",
-        "workplace": "Vyberte územní pracoviště"
+        "taxWorkplace": "Vyberte územní pracoviště"
       },
       "validation": {
         "nameRequired": "Název firmy je povinný",
         "countryRequired": "Stát je povinný"
       },
-      "taxOfficeClear": "Nevybráno",
-      "workplaceClear": "Nevybráno",
-      "workplaceHintNoOffice": "Nejdřív vyberte finanční úřad.",
-      "workplaceHintSpecial": "U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.",
-      "workplaceHintNormal": "Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu.",
+      "taxOfficeHint": {
+        "selectFirst": "Nejdřív vyberte finanční úřad.",
+        "special": "U specializovaného finančního úřadu se pracoviště nastaví automaticky na kód 4000.",
+        "normal": "Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu."
+      },
       "actions": {
         "save": "Uložit firmu",
         "saving": "Ukládám firmu...",
@@ -692,28 +749,30 @@
         "creating": "Vytvářím firmu..."
       },
       "messages": {
-        "updated": "Fakturační údaje byly úspěšně upraveny.",
-        "updateFailed": "Úprava fakturačních údajů se nepodařila.",
-        "created": "Fakturační údaje byly úspěšně vytvořeny.",
-        "createFailed": "Vytvoření fakturačních údajů se nepodařilo."
+        "updateSuccess": "Fakturační údaje byly úspěšně upraveny.",
+        "updateError": "Úprava fakturačních údajů se nepodařila.",
+        "createSuccess": "Fakturační údaje byly úspěšně vytvořeny.",
+        "createError": "Vytvoření fakturačních údajů se nepodařilo."
       }
     },
     "defaults": {
-      "dialogTitle": "Výchozí hodnoty",
-      "dialogDescription": "Hodnoty předvyplněné při vytváření nové faktury.",
-      "cardTitle": "Výchozí hodnoty faktur",
-      "cardDescription": "Hodnoty předvyplněné při vytváření nové faktury.",
+      "title": "Výchozí hodnoty",
+      "description": "Hodnoty předvyplněné při vytváření nové faktury.",
+      "card": {
+        "title": "Výchozí hodnoty faktur",
+        "description": "Hodnoty předvyplněné při vytváření nové faktury."
+      },
       "loading": "Načítám výchozí hodnoty...",
-      "notSet": "Výchozí hodnoty zatím nejsou nastaveny. Po uložení se vytvoří nový záznam.",
+      "notSetHint": "Výchozí hodnoty zatím nejsou nastaveny. Po uložení se vytvoří nový záznam.",
       "fields": {
         "currency": "Měna",
-        "prefix": "Prefix faktury",
-        "numberFormat": "Formát čísla faktury",
-        "nextNumber": "Další číslo faktury",
-        "dueDays": "Splatnost (dní)",
-        "vatRate": "Výchozí sazba DPH (%)",
-        "headerText": "Výchozí text záhlaví",
-        "footerText": "Výchozí text zápatí",
+        "invoicePrefix": "Prefix faktury",
+        "invoiceNumberFormat": "Formát čísla faktury",
+        "nextInvoiceNumber": "Další číslo faktury",
+        "dueDaysDefault": "Splatnost (dní)",
+        "defaultVatRate": "Výchozí sazba DPH (%)",
+        "defaultHeaderText": "Výchozí text záhlaví",
+        "defaultFooterText": "Výchozí text zápatí",
         "logoUrl": "URL loga"
       },
       "actions": {
@@ -721,8 +780,8 @@
         "saving": "Ukládám..."
       },
       "messages": {
-        "saved": "Výchozí hodnoty byly úspěšně uloženy.",
-        "saveFailed": "Uložení výchozích hodnot se nepodařilo."
+        "saveSuccess": "Výchozí hodnoty byly úspěšně uloženy.",
+        "saveError": "Uložení výchozích hodnot se nepodařilo."
       }
     }
   },

@@ -51,7 +51,7 @@ const InvoiceDetail = () => {
   if (isError || !invoice) {
     return (
       <PageLayout>
-        <p className="text-destructive">{t('invoices.detail.loadError')}</p>
+        <p className="text-destructive">{t('invoices.detail.error')}</p>
       </PageLayout>
     );
   }
@@ -75,10 +75,10 @@ const InvoiceDetail = () => {
         </Button>
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            {t('invoices.detail.title')}
+            {t('invoices.detail.backLabel')}
           </p>
           <p className="text-sm text-muted-foreground">
-            {t('invoices.detail.subtitle', { number: invoice.number })}
+            {t('invoices.detail.backNumber', { number: invoice.number })}
           </p>
         </div>
       </div>

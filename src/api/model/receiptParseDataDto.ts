@@ -5,14 +5,23 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { VatBreakdownItemDto } from './vatBreakdownItemDto';
 
 export interface ReceiptParseDataDto {
   /** @nullable */
   vendor: string | null;
   /** @nullable */
   total: number | null;
-  /** @nullable */
+  /**
+   * Total VAT amount (sum of all rates)
+   * @nullable
+   */
   vat: number | null;
+  /**
+   * Per-rate VAT breakdown; null when no rate breakdown is present on the document
+   * @nullable
+   */
+  vatBreakdown: VatBreakdownItemDto[] | null;
   /** @nullable */
   currency: string | null;
   /** @nullable */

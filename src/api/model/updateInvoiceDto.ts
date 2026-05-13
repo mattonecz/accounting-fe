@@ -10,6 +10,7 @@ import type { UpdateInvoiceDtoType } from './updateInvoiceDtoType';
 import type { UpdateInvoiceDtoVatMode } from './updateInvoiceDtoVatMode';
 import type { UpdateInvoiceDtoStatus } from './updateInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
+import type { InvoiceVatClaimDto } from './invoiceVatClaimDto';
 
 export interface UpdateInvoiceDto {
   /** UUID of the invoice */
@@ -36,4 +37,13 @@ export interface UpdateInvoiceDto {
   note?: string;
   internalNote?: string;
   originalNumber?: string;
+  description?: string;
+  /** Pre-computed base total (kind=SIMPLE only). */
+  total?: number;
+  /** Pre-computed VAT amount (kind=SIMPLE only). */
+  totalTax?: number;
+  /** Pre-computed total with VAT (kind=SIMPLE only). */
+  totalWithTax?: number;
+  /** Optional VAT claim metadata. When omitted, claim is left untouched. When provided, an existing claim is updated; if none exists, one is created. */
+  vatClaim?: InvoiceVatClaimDto;
 }

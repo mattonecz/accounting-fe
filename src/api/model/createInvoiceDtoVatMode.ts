@@ -7,7 +7,7 @@
  */
 
 /**
- * VAT regime under which the invoice was issued/received.
+ * Required for kind=INVOICE.
  */
 export type CreateInvoiceDtoVatMode = typeof CreateInvoiceDtoVatMode[keyof typeof CreateInvoiceDtoVatMode];
 

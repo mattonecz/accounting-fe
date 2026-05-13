@@ -24,14 +24,30 @@ export const Sidebar = () => {
   const { logout, user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
-  const navigation = [
-    { name: t('nav.dashboard'), href: '/', icon: Home },
-    { name: t('nav.contacts'), href: '/contacts', icon: Users },
-    { name: t('nav.bankAccounts'), href: '/bank-accounts', icon: Building2 },
-    { name: t('nav.invoicesIssued'), href: '/outgoing-invoices', icon: FileInput },
-    { name: t('nav.invoicesReceived'), href: '/incoming-invoices', icon: FileText },
-    { name: t('nav.simpleInvoices'), href: '/invoices/simple', icon: Receipt },
-    { name: t('nav.taxReport'), href: '/tax-report', icon: Calculator },
+  const navigationGroups = [
+    {
+      label: t('nav.sectionOverview'),
+      items: [{ name: t('nav.dashboard'), href: '/', icon: Home }],
+    },
+    {
+      label: t('nav.sectionBilling'),
+      items: [
+        { name: t('nav.invoicesIssued'), href: '/outgoing-invoices', icon: FileInput },
+        { name: t('nav.invoicesReceived'), href: '/incoming-invoices', icon: FileText },
+        { name: t('nav.simpleInvoices'), href: '/invoices/simple', icon: Receipt },
+      ],
+    },
+    {
+      label: t('nav.sectionData'),
+      items: [
+        { name: t('nav.contacts'), href: '/contacts', icon: Users },
+        { name: t('nav.bankAccounts'), href: '/bank-accounts', icon: Building2 },
+      ],
+    },
+    {
+      label: t('nav.sectionReports'),
+      items: [{ name: t('nav.taxReport'), href: '/tax-report', icon: Calculator }],
+    },
   ];
 
   const handleLogout = () => {
@@ -46,25 +62,32 @@ export const Sidebar = () => {
         <Wallet className="mr-3 h-6 w-6 text-primary" />
         <h1 className="text-xl font-bold text-foreground">FreelanceBooks</h1>
       </div>
-      <nav className="flex-1 space-y-1 p-4">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.name}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-4 overflow-y-auto p-4">
+        {navigationGroups.map((group) => (
+          <div key={group.label}>
+            <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {group.label}
+            </p>
+            {group.items.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
       <div className="border-t border-border p-4">
         <div className="mb-3 flex items-center justify-between">

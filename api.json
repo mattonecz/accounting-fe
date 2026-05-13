@@ -796,6 +796,19 @@
         "operationId": "invoiceListByCompany",
         "parameters": [
           {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "description": "Filter by invoice kind",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INVOICE",
+                "SIMPLE"
+              ]
+            }
+          },
+          {
             "name": "type",
             "required": false,
             "in": "query",
@@ -922,6 +935,28 @@
           }
         },
         "summary": "Get invoice by id",
+        "tags": [
+          "Invoices"
+        ]
+      },
+      "delete": {
+        "operationId": "invoiceDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete invoice by id",
         "tags": [
           "Invoices"
         ]
@@ -1054,6 +1089,145 @@
           }
         },
         "summary": "Get invoice by number",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/{id}/vat-claim/mark-claimed": {
+      "post": {
+        "operationId": "invoiceVatClaimMarkClaimed",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkVatClaimedDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Mark VAT claim as CLAIMED for an invoice",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/{id}/vat-claim/mark-skipped": {
+      "post": {
+        "operationId": "invoiceVatClaimMarkSkipped",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Mark VAT claim as SKIPPED for an invoice",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/vat-claims/byMonth": {
+      "post": {
+        "operationId": "invoiceVatClaimList",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListVatClaimsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List VAT claims by month and optional status",
+        "tags": [
+          "Invoices"
+        ]
+      }
+    },
+    "/invoices/simple/byMonth/vat": {
+      "post": {
+        "operationId": "simpleInvoiceGetVatByMonth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetByMonthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleInvoiceVatTotalsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get simple invoice VAT totals by month",
         "tags": [
           "Invoices"
         ]
@@ -1257,181 +1431,6 @@
         "summary": "Update user profile",
         "tags": [
           "UserProfile"
-        ]
-      }
-    },
-    "/simple-invoices": {
-      "post": {
-        "operationId": "simpleInvoiceCreate",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "description": "Simple invoice creation data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateSimpleInvoiceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create simple invoice",
-        "tags": [
-          "SimpleInvoice"
-        ]
-      },
-      "patch": {
-        "operationId": "simpleInvoiceUpdate",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSimpleInvoiceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Update simple invoice",
-        "tags": [
-          "SimpleInvoice"
-        ]
-      }
-    },
-    "/simple-invoices/list": {
-      "get": {
-        "operationId": "simpleInvoiceListByCompany",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "List simple invoices by company",
-        "tags": [
-          "SimpleInvoice"
-        ]
-      }
-    },
-    "/simple-invoices/byMonth/vat": {
-      "post": {
-        "operationId": "simpleInvoiceGetVatByMonth",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetSimpleInvoiceVatByMonthDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleInvoiceVatTotalsDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get simple invoice VAT summary by month and year using tax date",
-        "tags": [
-          "SimpleInvoice"
-        ]
-      }
-    },
-    "/simple-invoices/{id}": {
-      "get": {
-        "operationId": "simpleInvoiceGet",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID of the simple invoice",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleInvoiceResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get simple invoice by id",
-        "tags": [
-          "SimpleInvoice"
-        ]
-      },
-      "delete": {
-        "operationId": "simpleInvoiceDelete",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID of the simple invoice",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Delete simple invoice",
-        "tags": [
-          "SimpleInvoice"
         ]
       }
     },
@@ -2511,9 +2510,49 @@
           "total"
         ]
       },
+      "InvoiceVatClaimDto": {
+        "type": "object",
+        "properties": {
+          "shouldClaimVat": {
+            "type": "boolean",
+            "description": "Whether the company intends to claim VAT deduction for this invoice. When false, status is set to SKIPPED automatically."
+          },
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ],
+            "description": "FULL = 100% deduction, PARTIAL = ratio in (0,1). Required when shouldClaimVat=true."
+          },
+          "claimRatio": {
+            "type": "number",
+            "example": 0.8,
+            "description": "Required when claimType=PARTIAL. Must be in (0,1). Ignored for FULL."
+          },
+          "claimMonth": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-01",
+            "description": "First day of the month in which VAT is claimed (YYYY-MM-01)."
+          },
+          "note": {
+            "type": "string",
+            "description": "Internal note about the VAT claim."
+          }
+        }
+      },
       "CreateInvoiceDto": {
         "type": "object",
         "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "INVOICE",
+              "SIMPLE"
+            ],
+            "default": "INVOICE"
+          },
           "bankId": {
             "type": "string",
             "description": "UUID of a managed Bank row. Provide this OR `bankSnapshot`, not both. Required for ISSUED invoices."
@@ -2536,7 +2575,8 @@
           },
           "currency": {
             "type": "string",
-            "example": "CZK"
+            "example": "CZK",
+            "description": "Required for kind=INVOICE."
           },
           "type": {
             "type": "string",
@@ -2545,7 +2585,7 @@
               "ISSUED"
             ],
             "example": "RECEIVED",
-            "description": "Direction of invoice - RECEIVED or ISSUED"
+            "description": "Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE."
           },
           "vatMode": {
             "type": "string",
@@ -2555,7 +2595,7 @@
               "REVERSE_CHARGE"
             ],
             "example": "STANDARD",
-            "description": "VAT regime under which the invoice was issued/received."
+            "description": "Required for kind=INVOICE."
           },
           "status": {
             "type": "string",
@@ -2585,14 +2625,30 @@
           "dueDate": {
             "format": "date",
             "type": "string",
-            "example": "2025-07-20"
+            "example": "2025-07-20",
+            "description": "Required for kind=INVOICE."
           },
           "items": {
-            "description": "Array of invoice items. Totals are computed server-side.",
+            "description": "Required for kind=INVOICE. Totals are computed server-side.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InvoiceItemDto"
             }
+          },
+          "total": {
+            "type": "number",
+            "example": 1000,
+            "description": "Required for kind=SIMPLE. Pre-computed base total."
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 200,
+            "description": "Required for kind=SIMPLE. Pre-computed VAT amount."
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1200,
+            "description": "Required for kind=SIMPLE. Pre-computed total with VAT."
           },
           "variableSymbol": {
             "type": "string",
@@ -2617,18 +2673,23 @@
           "originalNumber": {
             "type": "string",
             "description": "Supplier-provided invoice number (typically used on RECEIVED invoices to keep the supplier's original reference)."
+          },
+          "description": {
+            "type": "string"
+          },
+          "vatClaim": {
+            "description": "Optional VAT claim metadata. When omitted, no claim row is created.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceVatClaimDto"
+              }
+            ]
           }
         },
         "required": [
-          "contactId",
           "number",
-          "currency",
-          "type",
-          "vatMode",
           "createdDate",
-          "duzpDate",
-          "dueDate",
-          "items"
+          "duzpDate"
         ]
       },
       "InvoiceItemResponseDto": {
@@ -2798,6 +2859,74 @@
           "datetime"
         ]
       },
+      "InvoiceVatClaimResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "invoiceId": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "shouldClaimVat": {
+            "type": "boolean"
+          },
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ],
+            "nullable": true
+          },
+          "claimRatio": {
+            "type": "object",
+            "nullable": true
+          },
+          "claimMonth": {
+            "format": "date",
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CLAIMED",
+              "SKIPPED"
+            ]
+          },
+          "claimedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "invoiceId",
+          "companyId",
+          "shouldClaimVat",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "InvoiceResponseDto": {
         "type": "object",
         "properties": {
@@ -2850,6 +2979,16 @@
               "PAID",
               "CANCELLED"
             ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "INVOICE",
+              "SIMPLE"
+            ]
+          },
+          "description": {
+            "type": "string"
           },
           "totalWithTax": {
             "type": "number"
@@ -2904,6 +3043,9 @@
             "items": {
               "$ref": "#/components/schemas/InvoiceStatusHistoryItemDto"
             }
+          },
+          "vatClaim": {
+            "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
           }
         },
         "required": [
@@ -2911,17 +3053,14 @@
           "number",
           "createdDate",
           "duzpDate",
-          "dueDate",
           "total",
           "totalTax",
-          "currency",
           "type",
-          "vatMode",
           "status",
+          "kind",
           "totalWithTax",
           "items",
-          "companyId",
-          "contactId"
+          "companyId"
         ]
       },
       "PaginatedInvoiceResponseDto": {
@@ -3166,6 +3305,32 @@
           },
           "originalNumber": {
             "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number",
+            "example": 1000,
+            "description": "Pre-computed base total (kind=SIMPLE only)."
+          },
+          "totalTax": {
+            "type": "number",
+            "example": 200,
+            "description": "Pre-computed VAT amount (kind=SIMPLE only)."
+          },
+          "totalWithTax": {
+            "type": "number",
+            "example": 1200,
+            "description": "Pre-computed total with VAT (kind=SIMPLE only)."
+          },
+          "vatClaim": {
+            "description": "Optional VAT claim metadata. When omitted, claim is left untouched. When provided, an existing claim is updated; if none exists, one is created.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceVatClaimDto"
+              }
+            ]
           }
         },
         "required": [
@@ -3211,6 +3376,87 @@
         "required": [
           "year",
           "month"
+        ]
+      },
+      "MarkVatClaimedDto": {
+        "type": "object",
+        "properties": {
+          "claimMonth": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-01",
+            "description": "Month in which the VAT was claimed (first day of the month)."
+          },
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ]
+          },
+          "claimRatio": {
+            "type": "number",
+            "example": 0.8
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claimMonth"
+        ]
+      },
+      "ListVatClaimsDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2025,
+            "description": "Year (YYYY)",
+            "minimum": 1900,
+            "maximum": 2100
+          },
+          "month": {
+            "type": "number",
+            "example": 6,
+            "description": "Month (1-12)",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CLAIMED",
+              "SKIPPED"
+            ]
+          }
+        },
+        "required": [
+          "year",
+          "month"
+        ]
+      },
+      "SimpleInvoiceVatTotalsDto": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "number",
+            "example": 1000
+          },
+          "vat": {
+            "type": "number",
+            "example": 200
+          },
+          "total": {
+            "type": "number",
+            "example": 1200
+          }
+        },
+        "required": [
+          "base",
+          "vat",
+          "total"
         ]
       },
       "CreateBankDto": {
@@ -3396,190 +3642,6 @@
           }
         }
       },
-      "CreateSimpleInvoiceDto": {
-        "type": "object",
-        "properties": {
-          "contactId": {
-            "type": "string",
-            "description": "UUID of the external contact"
-          },
-          "number": {
-            "type": "string",
-            "example": "20250001"
-          },
-          "createdDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-20"
-          },
-          "duzpDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-07-20"
-          },
-          "total": {
-            "type": "number",
-            "example": 1000
-          },
-          "totalTax": {
-            "type": "number",
-            "example": 150
-          },
-          "totalWithTax": {
-            "type": "number",
-            "example": 1150
-          },
-          "description": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "number",
-          "createdDate",
-          "duzpDate",
-          "total",
-          "totalTax",
-          "totalWithTax"
-        ]
-      },
-      "SimpleInvoiceResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "companyId": {
-            "type": "string"
-          },
-          "contactId": {
-            "type": "string"
-          },
-          "number": {
-            "type": "string"
-          },
-          "createdDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "duzpDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "total": {
-            "type": "number"
-          },
-          "totalTax": {
-            "type": "number"
-          },
-          "totalWithTax": {
-            "type": "number"
-          },
-          "description": {
-            "type": "string"
-          },
-          "contact": {
-            "$ref": "#/components/schemas/ContactResponseDto"
-          }
-        },
-        "required": [
-          "id",
-          "companyId",
-          "number",
-          "createdDate",
-          "duzpDate",
-          "total",
-          "totalTax",
-          "totalWithTax"
-        ]
-      },
-      "GetSimpleInvoiceVatByMonthDto": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "type": "number",
-            "example": 2025,
-            "description": "Year (YYYY)",
-            "minimum": 1900,
-            "maximum": 2100
-          },
-          "month": {
-            "type": "number",
-            "example": 6,
-            "description": "Month (1-12)",
-            "minimum": 1,
-            "maximum": 12
-          }
-        },
-        "required": [
-          "year",
-          "month"
-        ]
-      },
-      "SimpleInvoiceVatTotalsDto": {
-        "type": "object",
-        "properties": {
-          "base": {
-            "type": "number",
-            "example": 1000
-          },
-          "vat": {
-            "type": "number",
-            "example": 200
-          },
-          "total": {
-            "type": "number",
-            "example": 1200
-          }
-        },
-        "required": [
-          "base",
-          "vat",
-          "total"
-        ]
-      },
-      "UpdateSimpleInvoiceDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "contactId": {
-            "type": "string"
-          },
-          "number": {
-            "type": "string",
-            "example": "20250001"
-          },
-          "createdDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-20"
-          },
-          "duzpDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-07-20"
-          },
-          "total": {
-            "type": "number",
-            "example": 1000
-          },
-          "totalTax": {
-            "type": "number",
-            "example": 150
-          },
-          "totalWithTax": {
-            "type": "number",
-            "example": 1150
-          },
-          "description": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
       "CreatePaymentDto": {
         "type": "object",
         "properties": {
@@ -3675,6 +3737,30 @@
           "id"
         ]
       },
+      "VatBreakdownItemDto": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "number",
+            "description": "VAT rate percentage (e.g. 21)"
+          },
+          "base": {
+            "type": "number",
+            "nullable": true,
+            "description": "Taxable base amount at this rate"
+          },
+          "amount": {
+            "type": "number",
+            "nullable": true,
+            "description": "VAT amount at this rate"
+          }
+        },
+        "required": [
+          "rate",
+          "base",
+          "amount"
+        ]
+      },
       "ReceiptParseDataDto": {
         "type": "object",
         "properties": {
@@ -3688,7 +3774,16 @@
           },
           "vat": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "Total VAT amount (sum of all rates)"
+          },
+          "vatBreakdown": {
+            "nullable": true,
+            "description": "Per-rate VAT breakdown; null when no rate breakdown is present on the document",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VatBreakdownItemDto"
+            }
           },
           "currency": {
             "type": "string",
@@ -3703,6 +3798,7 @@
           "vendor",
           "total",
           "vat",
+          "vatBreakdown",
           "currency",
           "date"
         ]

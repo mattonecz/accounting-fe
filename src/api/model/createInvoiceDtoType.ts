@@ -7,7 +7,7 @@
  */
 
 /**
- * Direction of invoice - RECEIVED or ISSUED
+ * Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE.
  */
 export type CreateInvoiceDtoType = typeof CreateInvoiceDtoType[keyof typeof CreateInvoiceDtoType];
 

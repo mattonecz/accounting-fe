@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { enqueueSnackbar } from 'notistack';
@@ -23,13 +24,17 @@ import {
 import { Loader2, Plus } from 'lucide-react';
 import { useListContacts } from '@/api/contacts/contacts';
 import {
-  getSimpleInvoiceListByCompanyQueryKey,
-  useSimpleInvoiceCreate,
-} from '@/api/simple-invoice/simple-invoice';
-import type { ContactResponseDto, CreateSimpleInvoiceDto } from '@/api/model';
+  getInvoiceListByCompanyQueryKey,
+  useInvoiceCreate,
+} from '@/api/invoices/invoices';
+import { useUserProfileGet } from '@/api/user-profile/user-profile';
+import type { ContactResponseDto, CreateInvoiceDto } from '@/api/model';
+import { CreateInvoiceDtoKind, InvoiceListByCompanyKind, InvoiceVatClaimDtoClaimType } from '@/api/model';
+import { InvoiceVatClaimCard } from '@/components/invoices/InvoiceVatClaimCard';
 import i18n from '@/i18n';
 
-const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
+const getDefaultFormValues = (): CreateInvoiceDto => ({
+  kind: CreateInvoiceDtoKind.SIMPLE,
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
   duzpDate: new Date().toISOString().split('T')[0],
@@ -38,6 +43,13 @@ const getDefaultFormValues = (): CreateSimpleInvoiceDto => ({
   totalWithTax: 0,
   description: '',
   contactId: '',
+  vatClaim: {
+    shouldClaimVat: true,
+    claimType: InvoiceVatClaimDtoClaimType.FULL,
+    claimRatio: undefined,
+    claimMonth: new Date().toISOString().slice(0, 7),
+    note: '',
+  },
 });
 
 interface CreateSimpleInvoiceDialogProps {
@@ -51,18 +63,29 @@ export const CreateSimpleInvoiceDialog = ({
 }: CreateSimpleInvoiceDialogProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const form = useForm<CreateSimpleInvoiceDto>({ defaultValues: getDefaultFormValues() });
+  const form = useForm<CreateInvoiceDto>({ defaultValues: getDefaultFormValues() });
+
+  const { data: userProfileResponse } = useUserProfileGet();
+  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
 
   const { data: contacts = [], isLoading: isContactsLoading } =
     useListContacts<ContactResponseDto[]>({
       query: { select: (response) => response.data },
     });
 
-  const createMutation = useSimpleInvoiceCreate({
+  const duzpDate = form.watch('duzpDate');
+  useEffect(() => {
+    if (!duzpDate) return;
+    const claimMonthDirty = form.formState.dirtyFields.vatClaim?.claimMonth ?? false;
+    if (claimMonthDirty) return;
+    form.setValue('vatClaim.claimMonth', duzpDate.slice(0, 7));
+  }, [duzpDate, form]);
+
+  const createMutation = useInvoiceCreate({
     mutation: {
       onSuccess: async () => {
         enqueueSnackbar(i18n.t('simpleInvoices.messages.createSuccess'), { variant: 'success' });
-        await queryClient.invalidateQueries({ queryKey: getSimpleInvoiceListByCompanyQueryKey() });
+        await queryClient.invalidateQueries({ queryKey: getInvoiceListByCompanyQueryKey({ kind: InvoiceListByCompanyKind.SIMPLE }) });
         onOpenChange(false);
         form.reset(getDefaultFormValues());
       },
@@ -72,9 +95,27 @@ export const CreateSimpleInvoiceDialog = ({
     },
   });
 
-  const onSubmit = (data: CreateSimpleInvoiceDto) => {
+  const onSubmit = (data: CreateInvoiceDto) => {
+    const vatClaimPayload =
+      isVatPayer && data.vatClaim?.shouldClaimVat
+        ? {
+            shouldClaimVat: true as const,
+            claimType: data.vatClaim.claimType,
+            claimRatio:
+              data.vatClaim.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
+              data.vatClaim.claimRatio != null
+                ? Number(data.vatClaim.claimRatio)
+                : undefined,
+            claimMonth: data.vatClaim.claimMonth
+              ? `${data.vatClaim.claimMonth.slice(0, 7)}-01`
+              : undefined,
+            note: data.vatClaim.note?.trim() || undefined,
+          }
+        : undefined;
+
     createMutation.mutate({
       data: {
+        kind: CreateInvoiceDtoKind.SIMPLE,
         contactId: data.contactId || undefined,
         number: data.number,
         createdDate: data.createdDate,
@@ -83,6 +124,7 @@ export const CreateSimpleInvoiceDialog = ({
         totalTax: data.totalTax,
         totalWithTax: data.totalWithTax,
         description: data.description?.trim() || undefined,
+        vatClaim: vatClaimPayload,
       },
     });
   };
@@ -244,6 +286,8 @@ export const CreateSimpleInvoiceDialog = ({
                 </FormItem>
               )}
             />
+
+            {isVatPayer && <InvoiceVatClaimCard form={form} />}
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

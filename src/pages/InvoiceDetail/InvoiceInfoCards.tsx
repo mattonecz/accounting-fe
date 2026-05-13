@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { InvoiceResponseDto } from '@/api/model';
+import { InvoiceVatClaimResponseDtoStatus, InvoiceResponseDtoKind } from '@/api/model';
 import { Lock } from 'lucide-react';
 import { formatDate, formatCompanyAddress } from './utils';
 
@@ -71,7 +72,7 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
               <div>
                 <div className="text-base text-muted-foreground">{t('invoices.fields.vatMode')}</div>
                 <div className="mt-1 text-xl font-semibold text-slate-900">
-                  {t(`invoices.vatModes.${invoice.vatMode}`, invoice.vatMode)}
+                  {invoice.vatMode ? t(`invoices.vatModes.${invoice.vatMode}`) : '-'}
                 </div>
               </div>
             </div>
@@ -218,6 +219,78 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
           </CardContent>
         </Card>
       )}
+
+      {invoice.vatClaim &&
+        (invoice.type === 'RECEIVED' || invoice.kind === InvoiceResponseDtoKind.SIMPLE) && (
+          <Card className="border-slate-200/80 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl tracking-tight text-slate-900">
+                {t('invoices.vatClaim.title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-base text-muted-foreground">
+                  {t('invoices.vatClaim.statusLabel')}
+                </span>
+                <span
+                  className={
+                    invoice.vatClaim.status === InvoiceVatClaimResponseDtoStatus.CLAIMED
+                      ? 'rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800'
+                      : invoice.vatClaim.status === InvoiceVatClaimResponseDtoStatus.SKIPPED
+                        ? 'rounded-full bg-slate-100 px-3 py-0.5 text-sm font-medium text-slate-600'
+                        : 'rounded-full bg-amber-100 px-3 py-0.5 text-sm font-medium text-amber-800'
+                  }
+                >
+                  {t(`invoices.vatClaim.status.${invoice.vatClaim.status}`)}
+                </span>
+              </div>
+              {invoice.vatClaim.claimType && (
+                <div>
+                  <span className="text-base text-muted-foreground">
+                    {t('invoices.vatClaim.claimType.label')}:{' '}
+                  </span>
+                  <span className="text-slate-900">
+                    {t(`invoices.vatClaim.claimType.options.${invoice.vatClaim.claimType}`)}
+                    {invoice.vatClaim.claimRatio != null &&
+                      ` (${String(invoice.vatClaim.claimRatio)})`}
+                  </span>
+                </div>
+              )}
+              {invoice.vatClaim.claimMonth && (
+                <div>
+                  <span className="text-base text-muted-foreground">
+                    {t('invoices.vatClaim.claimMonth.label')}:{' '}
+                  </span>
+                  <span className="text-slate-900">
+                    {invoice.vatClaim.claimMonth.slice(0, 7)}
+                  </span>
+                </div>
+              )}
+              {invoice.vatClaim.status === InvoiceVatClaimResponseDtoStatus.CLAIMED &&
+                invoice.vatClaim.claimedAt && (
+                  <div>
+                    <span className="text-base text-muted-foreground">
+                      {t('invoices.vatClaim.claimedAt')}:{' '}
+                    </span>
+                    <span className="text-slate-900">
+                      {formatDate(invoice.vatClaim.claimedAt)}
+                    </span>
+                  </div>
+                )}
+              {invoice.vatClaim.note != null && (
+                <div>
+                  <span className="text-base text-muted-foreground">
+                    {t('invoices.vatClaim.note.label')}:{' '}
+                  </span>
+                  <span className="text-slate-900">
+                    {String(invoice.vatClaim.note)}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
     </div>
   );
 };

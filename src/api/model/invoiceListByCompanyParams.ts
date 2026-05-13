@@ -5,9 +5,14 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceListByCompanyKind } from './invoiceListByCompanyKind';
 import type { InvoiceListByCompanyType } from './invoiceListByCompanyType';
 
 export type InvoiceListByCompanyParams = {
+/**
+ * Filter by invoice kind
+ */
+kind?: InvoiceListByCompanyKind;
 /**
  * Filter by invoice type - RECEIVED or ISSUED
  */

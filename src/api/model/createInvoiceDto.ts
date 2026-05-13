@@ -5,33 +5,44 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { CreateInvoiceDtoKind } from './createInvoiceDtoKind';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
 import type { CreateInvoiceDtoVatMode } from './createInvoiceDtoVatMode';
 import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
+import type { InvoiceVatClaimDto } from './invoiceVatClaimDto';
 
 export interface CreateInvoiceDto {
+  kind?: CreateInvoiceDtoKind;
   /** UUID of a managed Bank row. Provide this OR `bankSnapshot`, not both. Required for ISSUED invoices. */
   bankId?: string;
   /** Direct bank-account snapshot, e.g. for RECEIVED invoices where the supplier account is captured ad-hoc instead of as a managed Bank row. Mutually exclusive with `bankId`. */
   bankSnapshot?: InvoiceBankAccountSnapshotDto;
   /** UUID of the external party (Contact). */
-  contactId: string;
+  contactId?: string;
   number: string;
-  currency: string;
-  /** Direction of invoice - RECEIVED or ISSUED */
-  type: CreateInvoiceDtoType;
-  /** VAT regime under which the invoice was issued/received. */
-  vatMode: CreateInvoiceDtoVatMode;
+  /** Required for kind=INVOICE. */
+  currency?: string;
+  /** Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE. */
+  type?: CreateInvoiceDtoType;
+  /** Required for kind=INVOICE. */
+  vatMode?: CreateInvoiceDtoVatMode;
   /** Invoice status. Defaults to ISSUED when omitted. */
   status?: CreateInvoiceDtoStatus;
   exchangeRate?: number;
   createdDate: string;
   duzpDate: string;
-  dueDate: string;
-  /** Array of invoice items. Totals are computed server-side. */
-  items: InvoiceItemDto[];
+  /** Required for kind=INVOICE. */
+  dueDate?: string;
+  /** Required for kind=INVOICE. Totals are computed server-side. */
+  items?: InvoiceItemDto[];
+  /** Required for kind=SIMPLE. Pre-computed base total. */
+  total?: number;
+  /** Required for kind=SIMPLE. Pre-computed VAT amount. */
+  totalTax?: number;
+  /** Required for kind=SIMPLE. Pre-computed total with VAT. */
+  totalWithTax?: number;
   variableSymbol?: string;
   specificSymbol?: string;
   konstantSymbol?: string;
@@ -41,4 +52,7 @@ export interface CreateInvoiceDto {
   internalNote?: string;
   /** Supplier-provided invoice number (typically used on RECEIVED invoices to keep the supplier's original reference). */
   originalNumber?: string;
+  description?: string;
+  /** Optional VAT claim metadata. When omitted, no claim row is created. */
+  vatClaim?: InvoiceVatClaimDto;
 }

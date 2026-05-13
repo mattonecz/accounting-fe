@@ -7,30 +7,34 @@
  */
 import type { InvoiceResponseDtoVatMode } from './invoiceResponseDtoVatMode';
 import type { InvoiceResponseDtoStatus } from './invoiceResponseDtoStatus';
+import type { InvoiceResponseDtoKind } from './invoiceResponseDtoKind';
 import type { InvoiceItemResponseDto } from './invoiceItemResponseDto';
 import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { PaymentResponseDto } from './paymentResponseDto';
 import type { InvoiceStatusHistoryItemDto } from './invoiceStatusHistoryItemDto';
+import type { InvoiceVatClaimResponseDto } from './invoiceVatClaimResponseDto';
 
 export interface InvoiceResponseDto {
   id: string;
   number: string;
   createdDate: string;
   duzpDate: string;
-  dueDate: string;
+  dueDate?: string;
   total: number;
   totalTax: number;
   exchangeRate?: number;
-  currency: string;
+  currency?: string;
   type: string;
-  vatMode: InvoiceResponseDtoVatMode;
+  vatMode?: InvoiceResponseDtoVatMode;
   status: InvoiceResponseDtoStatus;
+  kind: InvoiceResponseDtoKind;
+  description?: string;
   totalWithTax: number;
   items: InvoiceItemResponseDto[];
   companyId: string;
   bankId?: string;
-  contactId: string;
+  contactId?: string;
   variableSymbol?: string;
   specificSymbol?: string;
   konstantSymbol?: string;
@@ -41,4 +45,5 @@ export interface InvoiceResponseDto {
   bankAccount?: InvoiceBankAccountSnapshotDto;
   payments?: PaymentResponseDto[];
   statusHistory?: InvoiceStatusHistoryItemDto[];
+  vatClaim?: InvoiceVatClaimResponseDto;
 }

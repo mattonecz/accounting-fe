@@ -37,7 +37,11 @@ import type {
   GetByMonthDto,
   InvoiceListByCompanyParams,
   InvoiceResponseDto,
+  InvoiceVatClaimResponseDto,
+  ListVatClaimsDto,
+  MarkVatClaimedDto,
   PaginatedInvoiceResponseDto,
+  SimpleInvoiceVatTotalsDto,
   UpdateInvoiceDto,
   UpdateInvoiceStatusDto
 } from '.././model';
@@ -527,6 +531,66 @@ export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TE
 
 
 /**
+ * @summary Delete invoice by id
+ */
+export const invoiceDelete = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<void>> => {
+    
+    
+    return axios.default.delete(
+      `/invoices/${id}`,options
+    );
+  }
+
+
+
+export const getInvoiceDeleteMutationOptions = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['invoiceDelete'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceDelete>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  invoiceDelete(id,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceDelete>>>
+    
+    export type InvoiceDeleteMutationError = AxiosError<unknown>
+
+    /**
+ * @summary Delete invoice by id
+ */
+export const useInvoiceDelete = <TError = AxiosError<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceDelete>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceDeleteMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
  * @summary Update invoice status
  */
 export const invoiceUpdateStatus = (
@@ -799,3 +863,248 @@ export function useInvoiceGetByNumber<TData = Awaited<ReturnType<typeof invoiceG
 
 
 
+/**
+ * @summary Mark VAT claim as CLAIMED for an invoice
+ */
+export const invoiceVatClaimMarkClaimed = (
+    id: string,
+    markVatClaimedDto: MarkVatClaimedDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceVatClaimResponseDto>> => {
+    
+    
+    return axios.default.post(
+      `/invoices/${id}/vat-claim/mark-claimed`,
+      markVatClaimedDto,options
+    );
+  }
+
+
+
+export const getInvoiceVatClaimMarkClaimedMutationOptions = <TError = AxiosError<InvoiceVatClaimResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>, TError,{id: string;data: MarkVatClaimedDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>, TError,{id: string;data: MarkVatClaimedDto}, TContext> => {
+
+const mutationKey = ['invoiceVatClaimMarkClaimed'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>, {id: string;data: MarkVatClaimedDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  invoiceVatClaimMarkClaimed(id,data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceVatClaimMarkClaimedMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>>
+    export type InvoiceVatClaimMarkClaimedMutationBody = MarkVatClaimedDto
+    export type InvoiceVatClaimMarkClaimedMutationError = AxiosError<InvoiceVatClaimResponseDto>
+
+    /**
+ * @summary Mark VAT claim as CLAIMED for an invoice
+ */
+export const useInvoiceVatClaimMarkClaimed = <TError = AxiosError<InvoiceVatClaimResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>, TError,{id: string;data: MarkVatClaimedDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceVatClaimMarkClaimed>>,
+        TError,
+        {id: string;data: MarkVatClaimedDto},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceVatClaimMarkClaimedMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Mark VAT claim as SKIPPED for an invoice
+ */
+export const invoiceVatClaimMarkSkipped = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceVatClaimResponseDto>> => {
+    
+    
+    return axios.default.post(
+      `/invoices/${id}/vat-claim/mark-skipped`,undefined,options
+    );
+  }
+
+
+
+export const getInvoiceVatClaimMarkSkippedMutationOptions = <TError = AxiosError<InvoiceVatClaimResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['invoiceVatClaimMarkSkipped'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  invoiceVatClaimMarkSkipped(id,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceVatClaimMarkSkippedMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>>
+    
+    export type InvoiceVatClaimMarkSkippedMutationError = AxiosError<InvoiceVatClaimResponseDto>
+
+    /**
+ * @summary Mark VAT claim as SKIPPED for an invoice
+ */
+export const useInvoiceVatClaimMarkSkipped = <TError = AxiosError<InvoiceVatClaimResponseDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceVatClaimMarkSkipped>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceVatClaimMarkSkippedMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary List VAT claims by month and optional status
+ */
+export const invoiceVatClaimList = (
+    listVatClaimsDto: ListVatClaimsDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<InvoiceVatClaimResponseDto[]>> => {
+    
+    
+    return axios.default.post(
+      `/invoices/vat-claims/byMonth`,
+      listVatClaimsDto,options
+    );
+  }
+
+
+
+export const getInvoiceVatClaimListMutationOptions = <TError = AxiosError<InvoiceVatClaimResponseDto[]>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimList>>, TError,{data: ListVatClaimsDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimList>>, TError,{data: ListVatClaimsDto}, TContext> => {
+
+const mutationKey = ['invoiceVatClaimList'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceVatClaimList>>, {data: ListVatClaimsDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  invoiceVatClaimList(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InvoiceVatClaimListMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceVatClaimList>>>
+    export type InvoiceVatClaimListMutationBody = ListVatClaimsDto
+    export type InvoiceVatClaimListMutationError = AxiosError<InvoiceVatClaimResponseDto[]>
+
+    /**
+ * @summary List VAT claims by month and optional status
+ */
+export const useInvoiceVatClaimList = <TError = AxiosError<InvoiceVatClaimResponseDto[]>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceVatClaimList>>, TError,{data: ListVatClaimsDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof invoiceVatClaimList>>,
+        TError,
+        {data: ListVatClaimsDto},
+        TContext
+      > => {
+
+      const mutationOptions = getInvoiceVatClaimListMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Get simple invoice VAT totals by month
+ */
+export const simpleInvoiceGetVatByMonth = (
+    getByMonthDto: GetByMonthDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<SimpleInvoiceVatTotalsDto>> => {
+    
+    
+    return axios.default.post(
+      `/invoices/simple/byMonth/vat`,
+      getByMonthDto,options
+    );
+  }
+
+
+
+export const getSimpleInvoiceGetVatByMonthMutationOptions = <TError = AxiosError<SimpleInvoiceVatTotalsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext> => {
+
+const mutationKey = ['simpleInvoiceGetVatByMonth'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, {data: GetByMonthDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  simpleInvoiceGetVatByMonth(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SimpleInvoiceGetVatByMonthMutationResult = NonNullable<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>>
+    export type SimpleInvoiceGetVatByMonthMutationBody = GetByMonthDto
+    export type SimpleInvoiceGetVatByMonthMutationError = AxiosError<SimpleInvoiceVatTotalsDto>
+
+    /**
+ * @summary Get simple invoice VAT totals by month
+ */
+export const useSimpleInvoiceGetVatByMonth = <TError = AxiosError<SimpleInvoiceVatTotalsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>, TError,{data: GetByMonthDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof simpleInvoiceGetVatByMonth>>,
+        TError,
+        {data: GetByMonthDto},
+        TContext
+      > => {
+
+      const mutationOptions = getSimpleInvoiceGetVatByMonthMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    

@@ -1,6 +1,7 @@
 {
   "common": {
     "save": "Save",
+    "saveChanges": "Save Changes",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -11,7 +12,8 @@
     "optional": "Optional",
     "errorLoad": "Failed to load",
     "refresh": "Refresh",
-    "detail": "Detail"
+    "detail": "Detail",
+    "notSelected": "Not selected"
   },
   "validation": {
     "required": "{{field}} is required",
@@ -26,16 +28,29 @@
     "invoicesIssued": "Issued Invoices",
     "invoicesReceived": "Received Invoices",
     "simpleInvoices": "Simple Invoices",
-    "taxReport": "VAT Report",
-    "logout": "Log out"
+    "taxReport": "VAT Return",
+    "logout": "Log out",
+    "sectionOverview": "Overview",
+    "sectionBilling": "Billing",
+    "sectionData": "Data",
+    "sectionReports": "Reports"
   },
   "auth": {
     "title": "FreelanceBooks",
+    "tagline": "Manage your freelance finances with ease",
     "description": "Manage your freelance finances with ease",
     "login": "Login",
     "register": "Register",
     "signIn": "Sign In",
     "createAccount": "Create Account",
+    "tabs": {
+      "login": "Login",
+      "register": "Register"
+    },
+    "actions": {
+      "signIn": "Sign In",
+      "createAccount": "Create Account"
+    },
     "fields": {
       "username": "Username",
       "email": "Email",
@@ -164,6 +179,8 @@
       "originalNumber": "Supplier Number",
       "currency": "Currency",
       "vatMode": "VAT Mode",
+      "ico": "ICO",
+      "dic": "Tax ID",
       "exchangeRate": "Exchange Rate",
       "createdDate": "Issue Date",
       "duzpDate": "Tax Date",
@@ -294,6 +311,40 @@
       "paymentSymbols": "Payment Symbols",
       "notes": "Notes",
       "optionalDetails": "Payment symbols & notes"
+    },
+    "vatClaim": {
+      "title": "VAT deduction",
+      "shouldClaim": "Claim VAT deduction",
+      "claimType": {
+        "label": "Deduction type",
+        "options": {
+          "FULL": "Full deduction (100%)",
+          "PARTIAL": "Partial deduction"
+        }
+      },
+      "claimRatio": {
+        "label": "Deduction ratio",
+        "placeholder": "0.5",
+        "hint": "Value between 0 and 1 (e.g. 0.5 = 50%)"
+      },
+      "claimMonth": {
+        "label": "Claim month"
+      },
+      "note": {
+        "label": "Note",
+        "placeholder": "Optional internal note"
+      },
+      "validation": {
+        "ratioRequired": "Deduction ratio is required for partial deduction",
+        "ratioRange": "Ratio must be in the interval (0, 1)"
+      },
+      "statusLabel": "VAT claim status",
+      "claimedAt": "Claimed on",
+      "status": {
+        "PENDING": "Pending",
+        "CLAIMED": "Claimed",
+        "SKIPPED": "Skipped"
+      }
     }
   },
   "payments": {
@@ -605,10 +656,12 @@
       "language": "Language"
     },
     "personal": {
-      "dialogTitle": "Personal Info",
-      "dialogDescription": "Contact details stored in your user profile.",
-      "cardTitle": "Personal Info",
-      "cardDescription": "Basic contact details stored in your user profile.",
+      "title": "Personal Info",
+      "description": "Contact details stored in your user profile.",
+      "card": {
+        "title": "Personal Info",
+        "description": "Basic contact details stored in your user profile."
+      },
       "fields": {
         "firstName": "First Name",
         "lastName": "Last Name",
@@ -635,24 +688,28 @@
         "creating": "Creating..."
       },
       "messages": {
-        "updated": "Profile updated successfully.",
-        "updateFailed": "Failed to update profile.",
-        "created": "Profile created successfully.",
-        "createFailed": "Failed to create profile."
+        "updateSuccess": "Profile updated successfully.",
+        "updateError": "Failed to update profile.",
+        "createSuccess": "Profile created successfully.",
+        "createError": "Failed to create profile."
       }
     },
     "billing": {
-      "dialogTitle": "Billing Info",
-      "dialogDescription": "Company details and tax filing settings.",
-      "cardTitle": "Billing Info",
-      "cardDescription": "Company details used on issued documents and other outputs.",
-      "taxCardTitle": "Tax Filing Details",
-      "taxCardDescription": "Tax office and workplace fields come from official MOJE daně codebooks.",
+      "title": "Billing Info",
+      "description": "Company details and tax filing settings.",
+      "card": {
+        "title": "Billing Info",
+        "description": "Company details used on issued documents and other outputs."
+      },
+      "taxCard": {
+        "title": "Tax Filing Details",
+        "description": "Tax office and workplace fields come from official MOJE daně codebooks."
+      },
       "loading": "Loading billing info...",
       "errorTitle": "Failed to load billing info",
       "errorDescription": "Could not load the company assigned to this account.",
-      "missingNew": "No billing company is assigned to this account yet. A new record will be created on save.",
-      "missingExisting": "The company assigned to this account was not found. A new record will be created on save.",
+      "missingCompanyNew": "No billing company is assigned to this account yet. A new record will be created on save.",
+      "missingCompanyExisting": "The company assigned to this account was not found. A new record will be created on save.",
       "fields": {
         "name": "Company Name",
         "ico": "ICO",
@@ -662,7 +719,7 @@
         "city": "City",
         "psc": "ZIP Code",
         "taxOffice": "Tax Office",
-        "workplace": "Tax Office Branch"
+        "taxWorkplace": "Tax Office Branch"
       },
       "placeholders": {
         "name": "ACME Ltd.",
@@ -673,17 +730,17 @@
         "city": "Brno",
         "psc": "60200",
         "taxOffice": "Select tax office",
-        "workplace": "Select tax office branch"
+        "taxWorkplace": "Select tax office branch"
       },
       "validation": {
         "nameRequired": "Company name is required",
         "countryRequired": "Country is required"
       },
-      "taxOfficeClear": "Not selected",
-      "workplaceClear": "Not selected",
-      "workplaceHintNoOffice": "Select a tax office first.",
-      "workplaceHintSpecial": "For the specialized tax office, the branch is automatically set to code 4000.",
-      "workplaceHintNormal": "Only branches belonging to the selected tax office are shown.",
+      "taxOfficeHint": {
+        "selectFirst": "Select a tax office first.",
+        "special": "For the specialized tax office, the branch is automatically set to code 4000.",
+        "normal": "Only branches belonging to the selected tax office are shown."
+      },
       "actions": {
         "save": "Save Company",
         "saving": "Saving company...",
@@ -691,28 +748,30 @@
         "creating": "Creating company..."
       },
       "messages": {
-        "updated": "Billing info updated successfully.",
-        "updateFailed": "Failed to update billing info.",
-        "created": "Billing info created successfully.",
-        "createFailed": "Failed to create billing info."
+        "updateSuccess": "Billing info updated successfully.",
+        "updateError": "Failed to update billing info.",
+        "createSuccess": "Billing info created successfully.",
+        "createError": "Failed to create billing info."
       }
     },
     "defaults": {
-      "dialogTitle": "Invoice Defaults",
-      "dialogDescription": "Values pre-filled when creating a new invoice.",
-      "cardTitle": "Invoice Default Values",
-      "cardDescription": "Values pre-filled when creating a new invoice.",
+      "title": "Invoice Defaults",
+      "description": "Values pre-filled when creating a new invoice.",
+      "card": {
+        "title": "Invoice Default Values",
+        "description": "Values pre-filled when creating a new invoice."
+      },
       "loading": "Loading invoice defaults...",
-      "notSet": "Invoice defaults are not set yet. A new record will be created on save.",
+      "notSetHint": "Invoice defaults are not set yet. A new record will be created on save.",
       "fields": {
         "currency": "Currency",
-        "prefix": "Invoice Prefix",
-        "numberFormat": "Invoice Number Format",
-        "nextNumber": "Next Invoice Number",
-        "dueDays": "Due Days",
-        "vatRate": "Default VAT Rate (%)",
-        "headerText": "Default Header Text",
-        "footerText": "Default Footer Text",
+        "invoicePrefix": "Invoice Prefix",
+        "invoiceNumberFormat": "Invoice Number Format",
+        "nextInvoiceNumber": "Next Invoice Number",
+        "dueDaysDefault": "Due Days",
+        "defaultVatRate": "Default VAT Rate (%)",
+        "defaultHeaderText": "Default Header Text",
+        "defaultFooterText": "Default Footer Text",
         "logoUrl": "Logo URL"
       },
       "actions": {
@@ -720,8 +779,8 @@
         "saving": "Saving..."
       },
       "messages": {
-        "saved": "Invoice defaults saved successfully.",
-        "saveFailed": "Failed to save invoice defaults."
+        "saveSuccess": "Invoice defaults saved successfully.",
+        "saveError": "Failed to save invoice defaults."
       }
     }
   },

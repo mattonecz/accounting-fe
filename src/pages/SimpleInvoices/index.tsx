@@ -8,8 +8,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { RefreshCcw } from 'lucide-react';
-import { useSimpleInvoiceListByCompany } from '@/api/simple-invoice/simple-invoice';
-import type { SimpleInvoiceResponseDto } from '@/api/model';
+import { useInvoiceListByCompany } from '@/api/invoices/invoices';
+import type { InvoiceResponseDto } from '@/api/model';
+import { InvoiceListByCompanyKind } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
@@ -26,9 +27,10 @@ const SimpleInvoices = () => {
     isFetching,
     isError,
     refetch,
-  } = useSimpleInvoiceListByCompany<SimpleInvoiceResponseDto[]>({
-    query: { select: (response) => response.data },
-  });
+  } = useInvoiceListByCompany<InvoiceResponseDto[]>(
+    { kind: InvoiceListByCompanyKind.SIMPLE },
+    { query: { select: (r) => r.data.data } },
+  );
 
   const soucty = useMemo(
     () =>
@@ -48,30 +50,30 @@ const SimpleInvoices = () => {
   const columns = [
     {
       header: t('simpleInvoices.columns.number'),
-      cell: (i: SimpleInvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
+      cell: (i: InvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
     },
-    { header: t('simpleInvoices.columns.company'), cell: (i: SimpleInvoiceResponseDto) => i.contact?.name || '-' },
-    { header: t('invoices.fields.createdDate'), cell: (i: SimpleInvoiceResponseDto) => formatDate(i.createdDate, lang) },
-    { header: t('invoices.fields.duzpDate'), cell: (i: SimpleInvoiceResponseDto) => formatDate(i.duzpDate, lang) },
+    { header: t('simpleInvoices.columns.company'), cell: (i: InvoiceResponseDto) => i.contactSnapshot?.name || '-' },
+    { header: t('invoices.fields.createdDate'), cell: (i: InvoiceResponseDto) => formatDate(i.createdDate, lang) },
+    { header: t('invoices.fields.duzpDate'), cell: (i: InvoiceResponseDto) => formatDate(i.duzpDate, lang) },
     {
       header: t('simpleInvoices.columns.base'),
       headerClassName: 'text-right',
       cellClassName: 'text-right',
-      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.total, 'CZK', lang),
+      cell: (i: InvoiceResponseDto) => formatMoney(i.total, 'CZK', lang),
     },
     {
       header: t('simpleInvoices.columns.vat'),
       headerClassName: 'text-right',
       cellClassName: 'text-right',
-      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.totalTax, 'CZK', lang),
+      cell: (i: InvoiceResponseDto) => formatMoney(i.totalTax, 'CZK', lang),
     },
     {
       header: t('simpleInvoices.columns.totalWithVat'),
       headerClassName: 'text-right',
       cellClassName: 'text-right',
-      cell: (i: SimpleInvoiceResponseDto) => formatMoney(i.totalWithTax, 'CZK', lang),
+      cell: (i: InvoiceResponseDto) => formatMoney(i.totalWithTax, 'CZK', lang),
     },
-    { header: t('invoices.fields.note'), cell: (i: SimpleInvoiceResponseDto) => i.description || '-' },
+    { header: t('invoices.fields.note'), cell: (i: InvoiceResponseDto) => i.description || '-' },
   ];
 
   return (

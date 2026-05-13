@@ -5,8 +5,10 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { InvoiceVatClaimDto } from './invoiceVatClaimDto';
 
 export interface UpdateSimpleInvoiceDto {
+  /** UUID of the invoice */
   id: string;
   contactId?: string;
   number?: string;
@@ -16,4 +18,6 @@ export interface UpdateSimpleInvoiceDto {
   totalTax?: number;
   totalWithTax?: number;
   description?: string;
+  /** Optional VAT claim metadata. When omitted, claim is left untouched. */
+  vatClaim?: InvoiceVatClaimDto;
 }

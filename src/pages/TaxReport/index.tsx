@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { invoiceGetVatByMonth } from '@/api/invoices/invoices';
 import type { InvoiceGetVatByMonthDefault } from '@/api/model';
-import { simpleInvoiceGetVatByMonth } from '@/api/simple-invoice/simple-invoice';
+import { simpleInvoiceGetVatByMonth } from '@/api/invoices/invoices';
 import { vatExport } from '@/api/vat/vat';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/PageLayout';

@@ -16,6 +16,8 @@ import { useUserProfileGet } from '@/api/user-profile/user-profile';
 import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
+  InvoiceVatClaimDto,
+  InvoiceVatClaimDtoClaimType,
   UpdateInvoiceDto,
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
@@ -210,6 +212,27 @@ export function useUpdateInvoiceForm(id: string) {
             total: toNumber(item.total),
           }))
         : [DEFAULT_ITEM],
+      vatClaim: invoice.vatClaim
+        ? {
+            shouldClaimVat: invoice.vatClaim.shouldClaimVat,
+            claimType:
+              invoice.vatClaim.claimType ?? InvoiceVatClaimDtoClaimType.FULL,
+            claimRatio:
+              invoice.vatClaim.claimRatio != null
+                ? toNumber(invoice.vatClaim.claimRatio)
+                : undefined,
+            claimMonth: invoice.vatClaim.claimMonth
+              ? invoice.vatClaim.claimMonth.slice(0, 7)
+              : (invoice.duzpDate?.slice(0, 7) ?? ''),
+            note: (invoice.vatClaim.note as unknown as string | null) ?? '',
+          }
+        : {
+            shouldClaimVat: true,
+            claimType: InvoiceVatClaimDtoClaimType.FULL,
+            claimRatio: undefined,
+            claimMonth: invoice.duzpDate?.slice(0, 7) ?? '',
+            note: '',
+          },
     });
   }, [form, invoiceResponse?.data, sortedBanks, sortedContacts]);
 
@@ -252,6 +275,27 @@ export function useUpdateInvoiceForm(id: string) {
       vatRate: isVatPayer ? item.vatRate : undefined,
     }));
 
+    const sendVatClaim =
+      isReceived &&
+      finalVatMode === UpdateInvoiceDtoVatMode.STANDARD &&
+      data.vatClaim?.shouldClaimVat === true;
+
+    const vatClaimPayload: InvoiceVatClaimDto | undefined = sendVatClaim
+      ? {
+          shouldClaimVat: true,
+          claimType: data.vatClaim?.claimType,
+          claimRatio:
+            data.vatClaim?.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
+            data.vatClaim?.claimRatio != null
+              ? Number(data.vatClaim.claimRatio)
+              : undefined,
+          claimMonth: data.vatClaim?.claimMonth
+            ? `${data.vatClaim.claimMonth.slice(0, 7)}-01`
+            : undefined,
+          note: trimOrUndefined(data.vatClaim?.note),
+        }
+      : undefined;
+
     const payload: UpdateInvoiceDto = {
       ...data,
       id: id || data.id,
@@ -267,6 +311,7 @@ export function useUpdateInvoiceForm(id: string) {
       originalNumber: isReceived
         ? trimOrUndefined(data.originalNumber)
         : undefined,
+      vatClaim: vatClaimPayload,
     };
 
     updateInvoice(

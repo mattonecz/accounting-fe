@@ -9,6 +9,8 @@ import {
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatMode,
   InvoiceBankAccountSnapshotDto,
+  InvoiceVatClaimDto,
+  InvoiceVatClaimDtoClaimType,
 } from '@/api/model';
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
@@ -86,6 +88,13 @@ export const useInvoiceForm = () => {
           vatRate: isVatPayer ? 21 : undefined,
         },
       ],
+      vatClaim: {
+        shouldClaimVat: true,
+        claimType: InvoiceVatClaimDtoClaimType.FULL,
+        claimRatio: undefined,
+        claimMonth: new Date().toISOString().slice(0, 7),
+        note: '',
+      },
     },
   });
 
@@ -159,13 +168,22 @@ export const useInvoiceForm = () => {
     }
   }, [selectedCurrency, form]);
 
+  const duzpDate = form.watch('duzpDate');
+  useEffect(() => {
+    if (!duzpDate) return;
+    const claimMonthField =
+      form.formState.dirtyFields.vatClaim?.claimMonth ?? false;
+    if (claimMonthField) return;
+    form.setValue('vatClaim.claimMonth', duzpDate.slice(0, 7));
+  }, [duzpDate, form]);
+
   const fieldArray = useFieldArray({
     control: form.control,
     name: 'items',
   });
 
   const calculateTotals = () => {
-    const items = form.getValues('items');
+    const items = form.getValues('items') ?? [];
     items.forEach((item, index) => {
       const computed = (item.quantity || 0) * (item.unitPrice || 0);
       form.setValue(`items.${index}.total`, computed);
@@ -175,7 +193,7 @@ export const useInvoiceForm = () => {
   const submitInvoice = (data: CreateInvoiceDto, mode: InvoiceSubmitMode) => {
     setSubmitMode(mode);
 
-    const { status: _status, bankId, bankSnapshot, ...rest } = data;
+    const { status: _status, bankId, bankSnapshot, vatClaim, ...rest } = data;
 
     const cleanedSnapshot = isReceived
       ? buildBankSnapshot(bankSnapshot)
@@ -186,10 +204,31 @@ export const useInvoiceForm = () => {
       ? rest.vatMode
       : CreateInvoiceDtoVatMode.NON_VAT_PAYER;
 
-    const finalItems = rest.items.map((item) => ({
+    const finalItems = (rest.items ?? []).map((item) => ({
       ...item,
       vatRate: isVatPayer ? item.vatRate : undefined,
     }));
+
+    const sendVatClaim =
+      isReceived &&
+      finalVatMode === CreateInvoiceDtoVatMode.STANDARD &&
+      vatClaim?.shouldClaimVat === true;
+
+    const vatClaimPayload: InvoiceVatClaimDto | undefined = sendVatClaim
+      ? {
+          shouldClaimVat: true,
+          claimType: vatClaim.claimType,
+          claimRatio:
+            vatClaim.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
+            vatClaim.claimRatio != null
+              ? Number(vatClaim.claimRatio)
+              : undefined,
+          claimMonth: vatClaim.claimMonth
+            ? `${vatClaim.claimMonth.slice(0, 7)}-01`
+            : undefined,
+          note: trimOrUndefined(vatClaim.note),
+        }
+      : undefined;
 
     const invoicePayload: CreateInvoiceDto = {
       ...rest,
@@ -205,6 +244,7 @@ export const useInvoiceForm = () => {
       originalNumber: isReceived
         ? trimOrUndefined(rest.originalNumber)
         : undefined,
+      vatClaim: vatClaimPayload,
     };
 
     const payload =

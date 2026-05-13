@@ -8,6 +8,8 @@ import { FormCard } from '@/components/FormCard';
 import { useUpdateInvoiceForm, toNumber } from './useUpdateInvoiceForm';
 import { UpdateBasicInfoCard } from './UpdateBasicInfoCard';
 import { UpdateItemsCard } from './UpdateItemsCard';
+import { InvoiceVatClaimCard } from '@/components/invoices/InvoiceVatClaimCard';
+import { UpdateInvoiceDtoType, UpdateInvoiceDtoVatMode } from '@/api/model';
 
 export default function UpdateInvoice() {
   const { t } = useTranslation();
@@ -122,6 +124,12 @@ export default function UpdateInvoice() {
               )}
             </div>
           </FormCard>
+
+          {isVatPayer &&
+            form.watch('type') === UpdateInvoiceDtoType.RECEIVED &&
+            form.watch('vatMode') === UpdateInvoiceDtoVatMode.STANDARD && (
+              <InvoiceVatClaimCard form={form} />
+            )}
 
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => navigate(-1)}>
