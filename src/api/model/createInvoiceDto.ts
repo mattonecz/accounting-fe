@@ -11,7 +11,7 @@ import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
 import type { CreateInvoiceDtoVatMode } from './createInvoiceDtoVatMode';
 import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
-import type { InvoiceVatClaimDto } from './invoiceVatClaimDto';
+import type { CreateInvoiceDtoVatClaimType } from './createInvoiceDtoVatClaimType';
 
 export interface CreateInvoiceDto {
   kind?: CreateInvoiceDtoKind;
@@ -53,6 +53,10 @@ export interface CreateInvoiceDto {
   /** Supplier-provided invoice number (typically used on RECEIVED invoices to keep the supplier's original reference). */
   originalNumber?: string;
   description?: string;
-  /** Optional VAT claim metadata. When omitted, no claim row is created. */
-  vatClaim?: InvoiceVatClaimDto;
+  vatClaimType?: CreateInvoiceDtoVatClaimType;
+  /** Required when vatClaimType=PARTIAL. Must be in (0,1]. Forced to 1 when vatClaimType=FULL. */
+  vatClaimRatio?: number;
+  /** First day of the month in which VAT is claimed (YYYY-MM-01). */
+  vatClaimMonth?: string;
+  vatClaimNote?: string;
 }

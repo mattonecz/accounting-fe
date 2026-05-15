@@ -267,6 +267,7 @@
         "quantityMin": "Quantity must be ≥ 0",
         "priceRequired": "Price is required",
         "priceMin": "Price must be ≥ 0",
+        "priceGreaterThanZero": "Price must be greater than 0",
         "vatMin": "VAT must be ≥ 0",
         "vatMax": "VAT must be ≤ 100"
       }
@@ -588,7 +589,6 @@
     "title": "VAT Report",
     "description": "Monthly VAT summary from issued and received documents including simplified cost invoices",
     "actions": {
-      "refresh": "Refresh",
       "export": "Generate VAT & KH",
       "exporting": "Generating..."
     },

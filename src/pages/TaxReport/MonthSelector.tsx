@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -7,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MonthSelectorProps {
   selectedMonth: number;
@@ -15,8 +13,6 @@ interface MonthSelectorProps {
   years: number[];
   onMonthChange: (month: number) => void;
   onYearChange: (year: number) => void;
-  onPrevious: () => void;
-  onNext: () => void;
 }
 
 export const MonthSelector = ({
@@ -25,37 +21,24 @@ export const MonthSelector = ({
   years,
   onMonthChange,
   onYearChange,
-  onPrevious,
-  onNext,
 }: MonthSelectorProps) => {
   const { t } = useTranslation();
   const months = Array.from({ length: 12 }, (_, i) => t(`taxReport.months.${i}`));
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="icon" onClick={onPrevious}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <div className="text-lg font-semibold min-w-[180px] text-center">
-          {months[selectedMonth]} {selectedYear}
-        </div>
-        <Button variant="outline" size="icon" onClick={onNext}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-
+    <div className="flex items-center gap-2">
       <Select
         value={selectedMonth.toString()}
         onValueChange={(value) => onMonthChange(Number(value))}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {months.map((month, index) => (
             <SelectItem key={index} value={index.toString()}>
-              {month.charAt(0).toUpperCase() + month.slice(1)}
+              {capitalize(month)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -65,7 +48,7 @@ export const MonthSelector = ({
         value={selectedYear.toString()}
         onValueChange={(value) => onYearChange(Number(value))}
       >
-        <SelectTrigger className="w-[100px]">
+        <SelectTrigger className="w-[110px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

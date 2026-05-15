@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { UseFormReturn } from 'react-hook-form';
-import { CreateInvoiceDto } from '@/api/model';
 import { FormCard } from '@/components/FormCard';
+import type { InvoiceFormValues } from './useInvoiceForm';
 
 interface InvoiceSummaryCardProps {
-  form: UseFormReturn<CreateInvoiceDto>;
+  form: UseFormReturn<InvoiceFormValues>;
   formatMoney: (value?: number) => string;
   isVatPayer: boolean;
 }

@@ -13,7 +13,10 @@ import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { PaymentResponseDto } from './paymentResponseDto';
 import type { InvoiceStatusHistoryItemDto } from './invoiceStatusHistoryItemDto';
-import type { InvoiceVatClaimResponseDto } from './invoiceVatClaimResponseDto';
+import type { InvoiceResponseDtoVatClaimType } from './invoiceResponseDtoVatClaimType';
+import type { InvoiceResponseDtoVatClaimRatio } from './invoiceResponseDtoVatClaimRatio';
+import type { InvoiceResponseDtoVatClaimStatus } from './invoiceResponseDtoVatClaimStatus';
+import type { InvoiceResponseDtoVatClaimNote } from './invoiceResponseDtoVatClaimNote';
 
 export interface InvoiceResponseDto {
   id: string;
@@ -45,5 +48,16 @@ export interface InvoiceResponseDto {
   bankAccount?: InvoiceBankAccountSnapshotDto;
   payments?: PaymentResponseDto[];
   statusHistory?: InvoiceStatusHistoryItemDto[];
-  vatClaim?: InvoiceVatClaimResponseDto;
+  /** @nullable */
+  vatClaimType?: InvoiceResponseDtoVatClaimType;
+  /** @nullable */
+  vatClaimRatio?: InvoiceResponseDtoVatClaimRatio;
+  /** @nullable */
+  vatClaimMonth?: string | null;
+  /** @nullable */
+  vatClaimStatus?: InvoiceResponseDtoVatClaimStatus;
+  /** @nullable */
+  vatClaimedAt?: string | null;
+  /** @nullable */
+  vatClaimNote?: InvoiceResponseDtoVatClaimNote;
 }

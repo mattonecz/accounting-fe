@@ -32,24 +32,24 @@ export const StatCard = ({ title, value, icon: Icon, trend, variant = "default" 
 
   return (
     <Card className="border-border/60 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="mt-3 whitespace-nowrap text-[clamp(1.875rem,2.6vw,2.5rem)] font-bold leading-none tracking-tight text-foreground">
-              {value}
-            </p>
-            {trend && <p className="mt-2 text-xs font-medium text-muted-foreground">{trend}</p>}
-          </div>
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="truncate text-sm font-medium text-muted-foreground">{title}</p>
           <div
             className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ring-1",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1",
               variantStyles[variant].container,
             )}
           >
-            <Icon className={cn("h-5 w-5", variantStyles[variant].icon)} />
+            <Icon className={cn("h-4 w-4", variantStyles[variant].icon)} />
           </div>
         </div>
+        <p className="mt-3 text-2xl font-bold leading-tight tracking-tight text-foreground tabular-nums">
+          {value}
+        </p>
+        {trend && (
+          <p className="mt-1.5 text-xs font-medium text-muted-foreground">{trend}</p>
+        )}
       </CardContent>
     </Card>
   );

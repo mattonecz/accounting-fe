@@ -32,11 +32,10 @@ import {
 } from '@/api/model';
 import { useWatch } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
-import type { UpdateInvoiceDto } from '@/api/model';
-import { getBankAccountLabel } from './useUpdateInvoiceForm';
+import { getBankAccountLabel, type UpdateInvoiceFormValues } from './useUpdateInvoiceForm';
 
 interface UpdateBasicInfoCardProps {
-  form: UseFormReturn<UpdateInvoiceDto>;
+  form: UseFormReturn<UpdateInvoiceFormValues>;
   sortedContacts: Array<{ id: string; name: string }>;
   sortedBanks: Array<{
     id: string;

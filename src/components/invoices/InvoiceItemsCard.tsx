@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/form';
 import { FormCard } from '@/components/FormCard';
 import { Plus, Trash2 } from 'lucide-react';
-import { CreateInvoiceDto } from '@/api/model';
+import type { InvoiceFormValues } from './useInvoiceForm';
 
 interface InvoiceItemsCardProps {
-  form: UseFormReturn<CreateInvoiceDto>;
-  fieldArray: UseFieldArrayReturn<CreateInvoiceDto, 'items'>;
+  form: UseFormReturn<InvoiceFormValues>;
+  fieldArray: UseFieldArrayReturn<InvoiceFormValues, 'items'>;
   formatMoney: (value?: number) => string;
   onRecalculate: () => void;
   isVatPayer: boolean;
@@ -120,7 +120,9 @@ export const InvoiceItemsCard = ({
               name={`items.${index}.unitPrice`}
               rules={{
                 required: t('invoices.items.validation.priceRequired'),
-                min: { value: 0, message: t('validation.minZero') },
+                validate: (value) =>
+                  Number(value) > 0 ||
+                  t('invoices.items.validation.priceGreaterThanZero'),
               }}
               render={({ field }) => (
                 <FormItem className="w-32">

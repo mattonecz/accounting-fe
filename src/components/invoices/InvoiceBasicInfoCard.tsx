@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UseFormReturn } from 'react-hook-form';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { CreateInvoiceDto, CreateInvoiceDtoVatMode } from '@/api/model';
+import { CreateInvoiceDtoVatMode } from '@/api/model';
+import type { InvoiceFormValues } from './useInvoiceForm';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
 import { FormCard } from '@/components/FormCard';
@@ -16,7 +17,7 @@ import { BankResponseDto } from '@/api/model/bankResponseDto';
 import { ContactResponseDto } from '@/api/model/contactResponseDto';
 
 interface InvoiceBasicInfoCardProps {
-  form: UseFormReturn<CreateInvoiceDto>;
+  form: UseFormReturn<InvoiceFormValues>;
   sortedContacts: ContactResponseDto[];
   sortedBanks: BankResponseDto[];
   isCzkCurrency: boolean;

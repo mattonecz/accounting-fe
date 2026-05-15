@@ -1003,66 +1003,6 @@
         ]
       }
     },
-    "/invoices/byMonth": {
-      "post": {
-        "operationId": "invoiceGetByMonth",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetByMonthDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/InvoiceResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get invoices by month and year",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
-    "/invoices/byMonth/vat": {
-      "post": {
-        "operationId": "invoiceGetVatByMonth",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetByMonthDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Get VAT summary by month and year using tax date",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
     "/invoices/byNumber/{number}": {
       "get": {
         "operationId": "invoiceGetByNumber",
@@ -1089,145 +1029,6 @@
           }
         },
         "summary": "Get invoice by number",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
-    "/invoices/{id}/vat-claim/mark-claimed": {
-      "post": {
-        "operationId": "invoiceVatClaimMarkClaimed",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MarkVatClaimedDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Mark VAT claim as CLAIMED for an invoice",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
-    "/invoices/{id}/vat-claim/mark-skipped": {
-      "post": {
-        "operationId": "invoiceVatClaimMarkSkipped",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Mark VAT claim as SKIPPED for an invoice",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
-    "/invoices/vat-claims/byMonth": {
-      "post": {
-        "operationId": "invoiceVatClaimList",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ListVatClaimsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "List VAT claims by month and optional status",
-        "tags": [
-          "Invoices"
-        ]
-      }
-    },
-    "/invoices/simple/byMonth/vat": {
-      "post": {
-        "operationId": "simpleInvoiceGetVatByMonth",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetByMonthDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleInvoiceVatTotalsDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get simple invoice VAT totals by month",
         "tags": [
           "Invoices"
         ]
@@ -1709,6 +1510,262 @@
         "summary": "Export VAT return and control statement XML",
         "tags": [
           "vat"
+        ]
+      }
+    },
+    "/vat/summary-by-month": {
+      "get": {
+        "operationId": "vatSummaryByMonth",
+        "parameters": [
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "description": "Year (YYYY)",
+            "schema": {
+              "minimum": 1900,
+              "maximum": 2100,
+              "example": 2026,
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "description": "Month (1-12)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 12,
+              "example": 4,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvoiceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List invoices contributing to the VAT return for a given month",
+        "tags": [
+          "vat"
+        ]
+      }
+    },
+    "/tax-filings": {
+      "post": {
+        "operationId": "createTaxFiling",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaxFilingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxFilingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create tax filing",
+        "tags": [
+          "tax-filings"
+        ]
+      },
+      "get": {
+        "operationId": "listTaxFilings",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaxFilingResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List tax filings",
+        "tags": [
+          "tax-filings"
+        ]
+      }
+    },
+    "/tax-filings/{id}": {
+      "get": {
+        "operationId": "getTaxFiling",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxFilingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get tax filing",
+        "tags": [
+          "tax-filings"
+        ]
+      }
+    },
+    "/tax-filings/{id}/submit": {
+      "post": {
+        "operationId": "submitTaxFiling",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTaxFilingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxFilingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Submit tax filing",
+        "tags": [
+          "tax-filings"
+        ]
+      }
+    },
+    "/tax-filings/{id}/cancel": {
+      "post": {
+        "operationId": "cancelTaxFiling",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxFilingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Cancel tax filing",
+        "tags": [
+          "tax-filings"
+        ]
+      }
+    },
+    "/tax-filings/{id}/vat-xml": {
+      "get": {
+        "operationId": "downloadTaxFilingVatXml",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Download VAT return XML",
+        "tags": [
+          "tax-filings"
+        ]
+      }
+    },
+    "/tax-filings/{id}/kh-xml": {
+      "get": {
+        "operationId": "downloadTaxFilingKhXml",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Download VAT control statement XML",
+        "tags": [
+          "tax-filings"
         ]
       }
     },
@@ -2510,38 +2567,6 @@
           "total"
         ]
       },
-      "InvoiceVatClaimDto": {
-        "type": "object",
-        "properties": {
-          "shouldClaimVat": {
-            "type": "boolean",
-            "description": "Whether the company intends to claim VAT deduction for this invoice. When false, status is set to SKIPPED automatically."
-          },
-          "claimType": {
-            "type": "string",
-            "enum": [
-              "FULL",
-              "PARTIAL"
-            ],
-            "description": "FULL = 100% deduction, PARTIAL = ratio in (0,1). Required when shouldClaimVat=true."
-          },
-          "claimRatio": {
-            "type": "number",
-            "example": 0.8,
-            "description": "Required when claimType=PARTIAL. Must be in (0,1). Ignored for FULL."
-          },
-          "claimMonth": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-01",
-            "description": "First day of the month in which VAT is claimed (YYYY-MM-01)."
-          },
-          "note": {
-            "type": "string",
-            "description": "Internal note about the VAT claim."
-          }
-        }
-      },
       "CreateInvoiceDto": {
         "type": "object",
         "properties": {
@@ -2677,13 +2702,26 @@
           "description": {
             "type": "string"
           },
-          "vatClaim": {
-            "description": "Optional VAT claim metadata. When omitted, no claim row is created.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/InvoiceVatClaimDto"
-              }
+          "vatClaimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
             ]
+          },
+          "vatClaimRatio": {
+            "type": "number",
+            "example": 0.8,
+            "description": "Required when vatClaimType=PARTIAL. Must be in (0,1]. Forced to 1 when vatClaimType=FULL."
+          },
+          "vatClaimMonth": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-01",
+            "description": "First day of the month in which VAT is claimed (YYYY-MM-01)."
+          },
+          "vatClaimNote": {
+            "type": "string"
           }
         },
         "required": [
@@ -2859,74 +2897,6 @@
           "datetime"
         ]
       },
-      "InvoiceVatClaimResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "invoiceId": {
-            "type": "string"
-          },
-          "companyId": {
-            "type": "string"
-          },
-          "shouldClaimVat": {
-            "type": "boolean"
-          },
-          "claimType": {
-            "type": "string",
-            "enum": [
-              "FULL",
-              "PARTIAL"
-            ],
-            "nullable": true
-          },
-          "claimRatio": {
-            "type": "object",
-            "nullable": true
-          },
-          "claimMonth": {
-            "format": "date",
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "CLAIMED",
-              "SKIPPED"
-            ]
-          },
-          "claimedAt": {
-            "format": "date-time",
-            "type": "string",
-            "nullable": true
-          },
-          "note": {
-            "type": "object",
-            "nullable": true
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "invoiceId",
-          "companyId",
-          "shouldClaimVat",
-          "status",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
       "InvoiceResponseDto": {
         "type": "object",
         "properties": {
@@ -3044,8 +3014,40 @@
               "$ref": "#/components/schemas/InvoiceStatusHistoryItemDto"
             }
           },
-          "vatClaim": {
-            "$ref": "#/components/schemas/InvoiceVatClaimResponseDto"
+          "vatClaimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ],
+            "nullable": true
+          },
+          "vatClaimRatio": {
+            "type": "object",
+            "nullable": true
+          },
+          "vatClaimMonth": {
+            "format": "date",
+            "type": "string",
+            "nullable": true
+          },
+          "vatClaimStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CLAIMED",
+              "SKIPPED"
+            ],
+            "nullable": true
+          },
+          "vatClaimedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "vatClaimNote": {
+            "type": "object",
+            "nullable": true
           }
         },
         "required": [
@@ -3324,13 +3326,34 @@
             "example": 1200,
             "description": "Pre-computed total with VAT (kind=SIMPLE only)."
           },
-          "vatClaim": {
-            "description": "Optional VAT claim metadata. When omitted, claim is left untouched. When provided, an existing claim is updated; if none exists, one is created.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/InvoiceVatClaimDto"
-              }
+          "vatClaimType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL"
             ]
+          },
+          "vatClaimRatio": {
+            "type": "number",
+            "example": 0.8,
+            "description": "Required when vatClaimType=PARTIAL. Must be in (0,1]. Forced to 1 when vatClaimType=FULL."
+          },
+          "vatClaimMonth": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-01",
+            "description": "First day of the month in which VAT is claimed (YYYY-MM-01)."
+          },
+          "vatClaimStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SKIPPED"
+            ],
+            "description": "CLAIMED is reserved for the future tax-filing workflow and cannot be set via API."
+          },
+          "vatClaimNote": {
+            "type": "string"
           }
         },
         "required": [
@@ -3353,110 +3376,6 @@
         },
         "required": [
           "status"
-        ]
-      },
-      "GetByMonthDto": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "type": "number",
-            "example": 2025,
-            "description": "Year (YYYY)",
-            "minimum": 1900,
-            "maximum": 2100
-          },
-          "month": {
-            "type": "number",
-            "example": 6,
-            "description": "Month (1-12)",
-            "minimum": 1,
-            "maximum": 12
-          }
-        },
-        "required": [
-          "year",
-          "month"
-        ]
-      },
-      "MarkVatClaimedDto": {
-        "type": "object",
-        "properties": {
-          "claimMonth": {
-            "format": "date",
-            "type": "string",
-            "example": "2025-06-01",
-            "description": "Month in which the VAT was claimed (first day of the month)."
-          },
-          "claimType": {
-            "type": "string",
-            "enum": [
-              "FULL",
-              "PARTIAL"
-            ]
-          },
-          "claimRatio": {
-            "type": "number",
-            "example": 0.8
-          },
-          "note": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "claimMonth"
-        ]
-      },
-      "ListVatClaimsDto": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "type": "number",
-            "example": 2025,
-            "description": "Year (YYYY)",
-            "minimum": 1900,
-            "maximum": 2100
-          },
-          "month": {
-            "type": "number",
-            "example": 6,
-            "description": "Month (1-12)",
-            "minimum": 1,
-            "maximum": 12
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "CLAIMED",
-              "SKIPPED"
-            ]
-          }
-        },
-        "required": [
-          "year",
-          "month"
-        ]
-      },
-      "SimpleInvoiceVatTotalsDto": {
-        "type": "object",
-        "properties": {
-          "base": {
-            "type": "number",
-            "example": 1000
-          },
-          "vat": {
-            "type": "number",
-            "example": 200
-          },
-          "total": {
-            "type": "number",
-            "example": 1200
-          }
-        },
-        "required": [
-          "base",
-          "vat",
-          "total"
         ]
       },
       "CreateBankDto": {
@@ -3857,6 +3776,169 @@
           "data",
           "llmCalls"
         ]
+      },
+      "CreateTaxFilingDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 12,
+            "example": 4
+          },
+          "year": {
+            "type": "number",
+            "minimum": 1900,
+            "maximum": 2100,
+            "example": 2026
+          },
+          "submissionType": {
+            "type": "string",
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
+          }
+        },
+        "required": [
+          "month",
+          "year",
+          "submissionType"
+        ]
+      },
+      "TaxFilingSummaryDto": {
+        "type": "object",
+        "properties": {
+          "outputVat": {
+            "type": "number"
+          },
+          "inputVat": {
+            "type": "number"
+          },
+          "payableVat": {
+            "type": "number"
+          },
+          "issuedInvoicesCount": {
+            "type": "number"
+          },
+          "receivedInvoicesCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "outputVat",
+          "inputVat",
+          "payableVat",
+          "issuedInvoicesCount",
+          "receivedInvoicesCount"
+        ]
+      },
+      "TaxFilingInvoiceRefDto": {
+        "type": "object",
+        "properties": {
+          "invoiceId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ISSUED",
+              "RECEIVED",
+              "SIMPLE"
+            ]
+          }
+        },
+        "required": [
+          "invoiceId",
+          "role"
+        ]
+      },
+      "TaxFilingResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "month": {
+            "type": "number"
+          },
+          "year": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PROCESSING",
+              "READY",
+              "FAILED",
+              "SUBMITTED",
+              "CANCELLED"
+            ]
+          },
+          "submissionType": {
+            "type": "string",
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
+          },
+          "submissionDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "summary": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TaxFilingSummaryDto"
+              }
+            ]
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxFilingInvoiceRefDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "companyId",
+          "month",
+          "year",
+          "status",
+          "submissionType",
+          "invoices",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SubmitTaxFilingDto": {
+        "type": "object",
+        "properties": {
+          "submissionDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
       },
       "SelectedCompanyInputDto": {
         "type": "object",

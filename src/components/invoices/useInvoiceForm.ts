@@ -7,11 +7,14 @@ import {
   CreateInvoiceDto,
   CreateInvoiceDtoStatus,
   CreateInvoiceDtoType,
+  CreateInvoiceDtoVatClaimType,
   CreateInvoiceDtoVatMode,
   InvoiceBankAccountSnapshotDto,
-  InvoiceVatClaimDto,
-  InvoiceVatClaimDtoClaimType,
 } from '@/api/model';
+
+export type InvoiceFormValues = CreateInvoiceDto & {
+  shouldClaimVat?: boolean;
+};
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
@@ -63,15 +66,12 @@ export const useInvoiceForm = () => {
   const [submitMode, setSubmitMode] = useState<InvoiceSubmitMode>('issued');
 
   const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
-  const initialVatMode: CreateInvoiceDtoVatMode = isVatPayer
-    ? CreateInvoiceDtoVatMode.STANDARD
-    : CreateInvoiceDtoVatMode.NON_VAT_PAYER;
 
-  const form = useForm<CreateInvoiceDto>({
+  const form = useForm<InvoiceFormValues>({
     defaultValues: {
       type: invoiceType,
       currency: 'CZK',
-      vatMode: initialVatMode,
+      vatMode: CreateInvoiceDtoVatMode.STANDARD,
       createdDate: new Date().toISOString().split('T')[0],
       duzpDate: new Date().toISOString().split('T')[0],
       dueDate: (() => {
@@ -88,28 +88,26 @@ export const useInvoiceForm = () => {
           vatRate: isVatPayer ? 21 : undefined,
         },
       ],
-      vatClaim: {
-        shouldClaimVat: true,
-        claimType: InvoiceVatClaimDtoClaimType.FULL,
-        claimRatio: undefined,
-        claimMonth: new Date().toISOString().slice(0, 7),
-        note: '',
-      },
+      shouldClaimVat: true,
+      vatClaimType: CreateInvoiceDtoVatClaimType.FULL,
+      vatClaimRatio: undefined,
+      vatClaimMonth: new Date().toISOString().slice(0, 7),
+      vatClaimNote: '',
     },
   });
 
-  // Once we know whether the user is a VAT payer, sync the form's vatMode
-  // default — react-hook-form has already initialised with whatever value was
-  // present on first render (likely the non-VAT-payer fallback while the
-  // profile request was still pending).
+  // Sync per-item vatRate once the profile loads (the dropdown for vatMode is
+  // hidden for non-VAT payers, and submitInvoice coerces vatMode itself).
   useEffect(() => {
-    const current = form.getValues('vatMode');
-    if (isVatPayer && current === CreateInvoiceDtoVatMode.NON_VAT_PAYER) {
-      form.setValue('vatMode', CreateInvoiceDtoVatMode.STANDARD);
-    }
-    if (!isVatPayer && current !== CreateInvoiceDtoVatMode.NON_VAT_PAYER) {
-      form.setValue('vatMode', CreateInvoiceDtoVatMode.NON_VAT_PAYER);
-    }
+    const items = form.getValues('items') ?? [];
+    items.forEach((item, index) => {
+      if (isVatPayer && item.vatRate == null) {
+        form.setValue(`items.${index}.vatRate`, 21);
+      }
+      if (!isVatPayer && item.vatRate != null) {
+        form.setValue(`items.${index}.vatRate`, undefined);
+      }
+    });
   }, [isVatPayer, form]);
 
   const selectedCurrency = form.watch('currency') || 'CZK';
@@ -172,9 +170,9 @@ export const useInvoiceForm = () => {
   useEffect(() => {
     if (!duzpDate) return;
     const claimMonthField =
-      form.formState.dirtyFields.vatClaim?.claimMonth ?? false;
+      form.formState.dirtyFields.vatClaimMonth ?? false;
     if (claimMonthField) return;
-    form.setValue('vatClaim.claimMonth', duzpDate.slice(0, 7));
+    form.setValue('vatClaimMonth', duzpDate.slice(0, 7));
   }, [duzpDate, form]);
 
   const fieldArray = useFieldArray({
@@ -190,10 +188,20 @@ export const useInvoiceForm = () => {
     });
   };
 
-  const submitInvoice = (data: CreateInvoiceDto, mode: InvoiceSubmitMode) => {
+  const submitInvoice = (data: InvoiceFormValues, mode: InvoiceSubmitMode) => {
     setSubmitMode(mode);
 
-    const { status: _status, bankId, bankSnapshot, vatClaim, ...rest } = data;
+    const {
+      status: _status,
+      bankId,
+      bankSnapshot,
+      shouldClaimVat,
+      vatClaimType,
+      vatClaimRatio,
+      vatClaimMonth,
+      vatClaimNote,
+      ...rest
+    } = data;
 
     const cleanedSnapshot = isReceived
       ? buildBankSnapshot(bankSnapshot)
@@ -212,23 +220,25 @@ export const useInvoiceForm = () => {
     const sendVatClaim =
       isReceived &&
       finalVatMode === CreateInvoiceDtoVatMode.STANDARD &&
-      vatClaim?.shouldClaimVat === true;
+      shouldClaimVat === true;
 
-    const vatClaimPayload: InvoiceVatClaimDto | undefined = sendVatClaim
+    const vatClaimFields: Pick<
+      CreateInvoiceDto,
+      'vatClaimType' | 'vatClaimRatio' | 'vatClaimMonth' | 'vatClaimNote'
+    > = sendVatClaim
       ? {
-          shouldClaimVat: true,
-          claimType: vatClaim.claimType,
-          claimRatio:
-            vatClaim.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
-            vatClaim.claimRatio != null
-              ? Number(vatClaim.claimRatio)
+          vatClaimType,
+          vatClaimRatio:
+            vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL &&
+            vatClaimRatio != null
+              ? Number(vatClaimRatio)
               : undefined,
-          claimMonth: vatClaim.claimMonth
-            ? `${vatClaim.claimMonth.slice(0, 7)}-01`
+          vatClaimMonth: vatClaimMonth
+            ? `${vatClaimMonth.slice(0, 7)}-01`
             : undefined,
-          note: trimOrUndefined(vatClaim.note),
+          vatClaimNote: trimOrUndefined(vatClaimNote),
         }
-      : undefined;
+      : {};
 
     const invoicePayload: CreateInvoiceDto = {
       ...rest,
@@ -244,7 +254,7 @@ export const useInvoiceForm = () => {
       originalNumber: isReceived
         ? trimOrUndefined(rest.originalNumber)
         : undefined,
-      vatClaim: vatClaimPayload,
+      ...vatClaimFields,
     };
 
     const payload =

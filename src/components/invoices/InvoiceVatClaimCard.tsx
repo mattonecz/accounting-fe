@@ -15,17 +15,17 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
-import { InvoiceVatClaimDtoClaimType } from '@/api/model';
+import { CreateInvoiceDtoVatClaimType } from '@/api/model';
 
 interface InvoiceVatClaimCardProps<T extends FieldValues> {
   form: UseFormReturn<T>;
 }
 
-const SHOULD_CLAIM_PATH = 'vatClaim.shouldClaimVat';
-const CLAIM_TYPE_PATH = 'vatClaim.claimType';
-const CLAIM_RATIO_PATH = 'vatClaim.claimRatio';
-const CLAIM_MONTH_PATH = 'vatClaim.claimMonth';
-const NOTE_PATH = 'vatClaim.note';
+const SHOULD_CLAIM_PATH = 'shouldClaimVat';
+const CLAIM_TYPE_PATH = 'vatClaimType';
+const CLAIM_RATIO_PATH = 'vatClaimRatio';
+const CLAIM_MONTH_PATH = 'vatClaimMonth';
+const NOTE_PATH = 'vatClaimNote';
 
 export function InvoiceVatClaimCard<T extends FieldValues>({
   form,
@@ -36,16 +36,16 @@ export function InvoiceVatClaimCard<T extends FieldValues>({
     | boolean
     | undefined;
   const claimType = form.watch(CLAIM_TYPE_PATH as FieldPath<T>) as
-    | InvoiceVatClaimDtoClaimType
+    | CreateInvoiceDtoVatClaimType
     | undefined;
 
   const claimTypeOptions = [
     {
-      value: InvoiceVatClaimDtoClaimType.FULL,
+      value: CreateInvoiceDtoVatClaimType.FULL,
       label: t('invoices.vatClaim.claimType.options.FULL'),
     },
     {
-      value: InvoiceVatClaimDtoClaimType.PARTIAL,
+      value: CreateInvoiceDtoVatClaimType.PARTIAL,
       label: t('invoices.vatClaim.claimType.options.PARTIAL'),
     },
   ];
@@ -89,7 +89,7 @@ export function InvoiceVatClaimCard<T extends FieldValues>({
               }}
             />
 
-            {claimType === InvoiceVatClaimDtoClaimType.PARTIAL && (
+            {claimType === CreateInvoiceDtoVatClaimType.PARTIAL && (
               <InputController
                 control={form.control}
                 name={CLAIM_RATIO_PATH as FieldPath<T>}

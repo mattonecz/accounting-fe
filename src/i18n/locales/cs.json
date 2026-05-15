@@ -268,6 +268,7 @@
         "quantityMin": "Množství musí být ≥ 0",
         "priceRequired": "Cena je povinná",
         "priceMin": "Cena musí být ≥ 0",
+        "priceGreaterThanZero": "Cena musí být větší než 0",
         "vatMin": "DPH musí být ≥ 0",
         "vatMax": "DPH musí být ≤ 100"
       }
@@ -589,7 +590,6 @@
     "title": "Přehled DPH",
     "description": "Měsíční souhrn DPH z vydaných a přijatých dokladů včetně nákladových zjednodušených dokladů",
     "actions": {
-      "refresh": "Obnovit",
       "export": "Vygenerovat KH a DPH",
       "exporting": "Generuji..."
     },

@@ -10,7 +10,8 @@ import type { UpdateInvoiceDtoType } from './updateInvoiceDtoType';
 import type { UpdateInvoiceDtoVatMode } from './updateInvoiceDtoVatMode';
 import type { UpdateInvoiceDtoStatus } from './updateInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
-import type { InvoiceVatClaimDto } from './invoiceVatClaimDto';
+import type { UpdateInvoiceDtoVatClaimType } from './updateInvoiceDtoVatClaimType';
+import type { UpdateInvoiceDtoVatClaimStatus } from './updateInvoiceDtoVatClaimStatus';
 
 export interface UpdateInvoiceDto {
   /** UUID of the invoice */
@@ -44,6 +45,12 @@ export interface UpdateInvoiceDto {
   totalTax?: number;
   /** Pre-computed total with VAT (kind=SIMPLE only). */
   totalWithTax?: number;
-  /** Optional VAT claim metadata. When omitted, claim is left untouched. When provided, an existing claim is updated; if none exists, one is created. */
-  vatClaim?: InvoiceVatClaimDto;
+  vatClaimType?: UpdateInvoiceDtoVatClaimType;
+  /** Required when vatClaimType=PARTIAL. Must be in (0,1]. Forced to 1 when vatClaimType=FULL. */
+  vatClaimRatio?: number;
+  /** First day of the month in which VAT is claimed (YYYY-MM-01). */
+  vatClaimMonth?: string;
+  /** CLAIMED is reserved for the future tax-filing workflow and cannot be set via API. */
+  vatClaimStatus?: UpdateInvoiceDtoVatClaimStatus;
+  vatClaimNote?: string;
 }

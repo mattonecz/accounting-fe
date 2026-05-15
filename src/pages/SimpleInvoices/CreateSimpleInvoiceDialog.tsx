@@ -29,11 +29,15 @@ import {
 } from '@/api/invoices/invoices';
 import { useUserProfileGet } from '@/api/user-profile/user-profile';
 import type { ContactResponseDto, CreateInvoiceDto } from '@/api/model';
-import { CreateInvoiceDtoKind, InvoiceListByCompanyKind, InvoiceVatClaimDtoClaimType } from '@/api/model';
+import { CreateInvoiceDtoKind, CreateInvoiceDtoVatClaimType, InvoiceListByCompanyKind } from '@/api/model';
 import { InvoiceVatClaimCard } from '@/components/invoices/InvoiceVatClaimCard';
 import i18n from '@/i18n';
 
-const getDefaultFormValues = (): CreateInvoiceDto => ({
+type SimpleInvoiceFormValues = CreateInvoiceDto & {
+  shouldClaimVat?: boolean;
+};
+
+const getDefaultFormValues = (): SimpleInvoiceFormValues => ({
   kind: CreateInvoiceDtoKind.SIMPLE,
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
@@ -43,13 +47,11 @@ const getDefaultFormValues = (): CreateInvoiceDto => ({
   totalWithTax: 0,
   description: '',
   contactId: '',
-  vatClaim: {
-    shouldClaimVat: true,
-    claimType: InvoiceVatClaimDtoClaimType.FULL,
-    claimRatio: undefined,
-    claimMonth: new Date().toISOString().slice(0, 7),
-    note: '',
-  },
+  shouldClaimVat: true,
+  vatClaimType: CreateInvoiceDtoVatClaimType.FULL,
+  vatClaimRatio: undefined,
+  vatClaimMonth: new Date().toISOString().slice(0, 7),
+  vatClaimNote: '',
 });
 
 interface CreateSimpleInvoiceDialogProps {
@@ -63,7 +65,7 @@ export const CreateSimpleInvoiceDialog = ({
 }: CreateSimpleInvoiceDialogProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const form = useForm<CreateInvoiceDto>({ defaultValues: getDefaultFormValues() });
+  const form = useForm<SimpleInvoiceFormValues>({ defaultValues: getDefaultFormValues() });
 
   const { data: userProfileResponse } = useUserProfileGet();
   const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
@@ -76,9 +78,9 @@ export const CreateSimpleInvoiceDialog = ({
   const duzpDate = form.watch('duzpDate');
   useEffect(() => {
     if (!duzpDate) return;
-    const claimMonthDirty = form.formState.dirtyFields.vatClaim?.claimMonth ?? false;
+    const claimMonthDirty = form.formState.dirtyFields.vatClaimMonth ?? false;
     if (claimMonthDirty) return;
-    form.setValue('vatClaim.claimMonth', duzpDate.slice(0, 7));
+    form.setValue('vatClaimMonth', duzpDate.slice(0, 7));
   }, [duzpDate, form]);
 
   const createMutation = useInvoiceCreate({
@@ -95,23 +97,25 @@ export const CreateSimpleInvoiceDialog = ({
     },
   });
 
-  const onSubmit = (data: CreateInvoiceDto) => {
-    const vatClaimPayload =
-      isVatPayer && data.vatClaim?.shouldClaimVat
-        ? {
-            shouldClaimVat: true as const,
-            claimType: data.vatClaim.claimType,
-            claimRatio:
-              data.vatClaim.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
-              data.vatClaim.claimRatio != null
-                ? Number(data.vatClaim.claimRatio)
-                : undefined,
-            claimMonth: data.vatClaim.claimMonth
-              ? `${data.vatClaim.claimMonth.slice(0, 7)}-01`
+  const onSubmit = (data: SimpleInvoiceFormValues) => {
+    const sendVatClaim = isVatPayer && data.shouldClaimVat === true;
+    const vatClaimFields: Pick<
+      CreateInvoiceDto,
+      'vatClaimType' | 'vatClaimRatio' | 'vatClaimMonth' | 'vatClaimNote'
+    > = sendVatClaim
+      ? {
+          vatClaimType: data.vatClaimType,
+          vatClaimRatio:
+            data.vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL &&
+            data.vatClaimRatio != null
+              ? Number(data.vatClaimRatio)
               : undefined,
-            note: data.vatClaim.note?.trim() || undefined,
-          }
-        : undefined;
+          vatClaimMonth: data.vatClaimMonth
+            ? `${data.vatClaimMonth.slice(0, 7)}-01`
+            : undefined,
+          vatClaimNote: data.vatClaimNote?.trim() || undefined,
+        }
+      : {};
 
     createMutation.mutate({
       data: {
@@ -124,7 +128,7 @@ export const CreateSimpleInvoiceDialog = ({
         totalTax: data.totalTax,
         totalWithTax: data.totalWithTax,
         description: data.description?.trim() || undefined,
-        vatClaim: vatClaimPayload,
+        ...vatClaimFields,
       },
     });
   };

@@ -11,12 +11,11 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 import type { FieldArrayWithId } from 'react-hook-form';
-import type { UpdateInvoiceDto } from '@/api/model';
-import { toNumber } from './useUpdateInvoiceForm';
+import { toNumber, type UpdateInvoiceFormValues } from './useUpdateInvoiceForm';
 
 interface UpdateItemsCardProps {
-  form: UseFormReturn<UpdateInvoiceDto>;
-  fields: FieldArrayWithId<UpdateInvoiceDto, 'items', 'id'>[];
+  form: UseFormReturn<UpdateInvoiceFormValues>;
+  fields: FieldArrayWithId<UpdateInvoiceFormValues, 'items', 'id'>[];
   formatMoney: (value?: number) => string;
   calculateInvoiceTotals: () => void;
   addItem: () => void;

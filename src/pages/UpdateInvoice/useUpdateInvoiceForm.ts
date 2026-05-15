@@ -16,13 +16,17 @@ import { useUserProfileGet } from '@/api/user-profile/user-profile';
 import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
-  InvoiceVatClaimDto,
-  InvoiceVatClaimDtoClaimType,
   UpdateInvoiceDto,
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
+  UpdateInvoiceDtoVatClaimStatus,
+  UpdateInvoiceDtoVatClaimType,
   UpdateInvoiceDtoVatMode,
 } from '@/api/model';
+
+export type UpdateInvoiceFormValues = UpdateInvoiceDto & {
+  shouldClaimVat?: boolean;
+};
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
   CZK: 'Kč',
@@ -63,7 +67,7 @@ const buildBankSnapshot = (
   return hasAny ? cleaned : undefined;
 };
 
-const getDefaultValues = (): UpdateInvoiceDto => ({
+const getDefaultValues = (): UpdateInvoiceFormValues => ({
   id: '',
   type: UpdateInvoiceDtoType.ISSUED,
   status: UpdateInvoiceDtoStatus.ISSUED,
@@ -132,7 +136,7 @@ export function useUpdateInvoiceForm(id: string) {
 
   const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
 
-  const form = useForm<UpdateInvoiceDto>({
+  const form = useForm<UpdateInvoiceFormValues>({
     defaultValues: getDefaultValues(),
   });
 
@@ -212,27 +216,24 @@ export function useUpdateInvoiceForm(id: string) {
             total: toNumber(item.total),
           }))
         : [DEFAULT_ITEM],
-      vatClaim: invoice.vatClaim
-        ? {
-            shouldClaimVat: invoice.vatClaim.shouldClaimVat,
-            claimType:
-              invoice.vatClaim.claimType ?? InvoiceVatClaimDtoClaimType.FULL,
-            claimRatio:
-              invoice.vatClaim.claimRatio != null
-                ? toNumber(invoice.vatClaim.claimRatio)
-                : undefined,
-            claimMonth: invoice.vatClaim.claimMonth
-              ? invoice.vatClaim.claimMonth.slice(0, 7)
-              : (invoice.duzpDate?.slice(0, 7) ?? ''),
-            note: (invoice.vatClaim.note as unknown as string | null) ?? '',
-          }
-        : {
-            shouldClaimVat: true,
-            claimType: InvoiceVatClaimDtoClaimType.FULL,
-            claimRatio: undefined,
-            claimMonth: invoice.duzpDate?.slice(0, 7) ?? '',
-            note: '',
-          },
+      shouldClaimVat:
+        invoice.vatClaimStatus == null
+          ? true
+          : invoice.vatClaimStatus !== UpdateInvoiceDtoVatClaimStatus.SKIPPED,
+      vatClaimType:
+        (invoice.vatClaimType as UpdateInvoiceDtoVatClaimType | undefined) ??
+        UpdateInvoiceDtoVatClaimType.FULL,
+      vatClaimRatio:
+        invoice.vatClaimRatio != null
+          ? toNumber(invoice.vatClaimRatio)
+          : undefined,
+      vatClaimMonth: invoice.vatClaimMonth
+        ? invoice.vatClaimMonth.slice(0, 7)
+        : (invoice.duzpDate?.slice(0, 7) ?? ''),
+      vatClaimNote:
+        invoice.vatClaimNote != null
+          ? String(invoice.vatClaimNote)
+          : '',
     });
   }, [form, invoiceResponse?.data, sortedBanks, sortedContacts]);
 
@@ -258,60 +259,78 @@ export function useUpdateInvoiceForm(id: string) {
     });
   };
 
-  const handleSubmit = (data: UpdateInvoiceDto) => {
+  const handleSubmit = (data: UpdateInvoiceFormValues) => {
     const isReceived = data.type === UpdateInvoiceDtoType.RECEIVED;
 
+    const {
+      shouldClaimVat,
+      vatClaimType,
+      vatClaimRatio,
+      vatClaimMonth,
+      vatClaimNote,
+      vatClaimStatus: _ignoredStatus,
+      ...rest
+    } = data;
+
     const cleanedSnapshot = isReceived
-      ? buildBankSnapshot(data.bankSnapshot)
+      ? buildBankSnapshot(rest.bankSnapshot)
       : undefined;
-    const finalBankId = !isReceived ? data.bankId || undefined : undefined;
+    const finalBankId = !isReceived ? rest.bankId || undefined : undefined;
 
     const finalVatMode = isVatPayer
-      ? data.vatMode
+      ? rest.vatMode
       : UpdateInvoiceDtoVatMode.NON_VAT_PAYER;
 
-    const finalItems = data.items?.map((item) => ({
+    const finalItems = rest.items?.map((item) => ({
       ...item,
       vatRate: isVatPayer ? item.vatRate : undefined,
     }));
 
-    const sendVatClaim =
-      isReceived &&
-      finalVatMode === UpdateInvoiceDtoVatMode.STANDARD &&
-      data.vatClaim?.shouldClaimVat === true;
+    const isVatClaimApplicable =
+      isReceived && finalVatMode === UpdateInvoiceDtoVatMode.STANDARD;
+    const sendVatClaim = isVatClaimApplicable && shouldClaimVat === true;
 
-    const vatClaimPayload: InvoiceVatClaimDto | undefined = sendVatClaim
+    const vatClaimFields: Pick<
+      UpdateInvoiceDto,
+      | 'vatClaimType'
+      | 'vatClaimRatio'
+      | 'vatClaimMonth'
+      | 'vatClaimNote'
+      | 'vatClaimStatus'
+    > = sendVatClaim
       ? {
-          shouldClaimVat: true,
-          claimType: data.vatClaim?.claimType,
-          claimRatio:
-            data.vatClaim?.claimType === InvoiceVatClaimDtoClaimType.PARTIAL &&
-            data.vatClaim?.claimRatio != null
-              ? Number(data.vatClaim.claimRatio)
+          vatClaimType,
+          vatClaimRatio:
+            vatClaimType === UpdateInvoiceDtoVatClaimType.PARTIAL &&
+            vatClaimRatio != null
+              ? Number(vatClaimRatio)
               : undefined,
-          claimMonth: data.vatClaim?.claimMonth
-            ? `${data.vatClaim.claimMonth.slice(0, 7)}-01`
+          vatClaimMonth: vatClaimMonth
+            ? `${vatClaimMonth.slice(0, 7)}-01`
             : undefined,
-          note: trimOrUndefined(data.vatClaim?.note),
+          vatClaimNote: trimOrUndefined(vatClaimNote),
+          vatClaimStatus: UpdateInvoiceDtoVatClaimStatus.PENDING,
         }
-      : undefined;
+      : isVatClaimApplicable
+        ? { vatClaimStatus: UpdateInvoiceDtoVatClaimStatus.SKIPPED }
+        : {};
 
     const payload: UpdateInvoiceDto = {
-      ...data,
-      id: id || data.id,
+      ...rest,
+      id: id || rest.id,
       vatMode: finalVatMode,
       items: finalItems,
       bankId: finalBankId,
       bankSnapshot: cleanedSnapshot,
-      variableSymbol: trimOrUndefined(data.variableSymbol),
-      specificSymbol: trimOrUndefined(data.specificSymbol),
-      konstantSymbol: trimOrUndefined(data.konstantSymbol),
-      note: trimOrUndefined(data.note),
-      internalNote: trimOrUndefined(data.internalNote),
+      variableSymbol: trimOrUndefined(rest.variableSymbol),
+      specificSymbol: trimOrUndefined(rest.specificSymbol),
+      konstantSymbol: trimOrUndefined(rest.konstantSymbol),
+      note: trimOrUndefined(rest.note),
+      internalNote: trimOrUndefined(rest.internalNote),
       originalNumber: isReceived
-        ? trimOrUndefined(data.originalNumber)
+        ? trimOrUndefined(rest.originalNumber)
         : undefined,
-      vatClaim: vatClaimPayload,
+      ...vatClaimFields,
     };
 
     updateInvoice(
