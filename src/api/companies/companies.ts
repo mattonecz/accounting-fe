@@ -35,7 +35,9 @@ import type {
   CompanyFindByNameParams,
   CompanyResponseDto,
   CreateCompanyDto,
-  UpdateCompanyDto
+  IsdsSettingsDto,
+  UpdateCompanyDto,
+  UpdateIsdsCredentialsDto
 } from '.././model';
 
 
@@ -165,6 +167,156 @@ export const useCompanyUpdate = <TError = AxiosError<CompanyResponseDto>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
+ * @summary Set company ISDS (datové schránky) credentials
+ */
+export const companyUpdateIsdsCredentials = (
+    updateIsdsCredentialsDto: UpdateIsdsCredentialsDto, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<IsdsSettingsDto>> => {
+    
+    
+    return axios.default.patch(
+      `/companies/isds-credentials`,
+      updateIsdsCredentialsDto,options
+    );
+  }
+
+
+
+export const getCompanyUpdateIsdsCredentialsMutationOptions = <TError = AxiosError<IsdsSettingsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext> => {
+
+const mutationKey = ['companyUpdateIsdsCredentials'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, {data: UpdateIsdsCredentialsDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  companyUpdateIsdsCredentials(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompanyUpdateIsdsCredentialsMutationResult = NonNullable<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>>
+    export type CompanyUpdateIsdsCredentialsMutationBody = UpdateIsdsCredentialsDto
+    export type CompanyUpdateIsdsCredentialsMutationError = AxiosError<IsdsSettingsDto>
+
+    /**
+ * @summary Set company ISDS (datové schránky) credentials
+ */
+export const useCompanyUpdateIsdsCredentials = <TError = AxiosError<IsdsSettingsDto>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+        TError,
+        {data: UpdateIsdsCredentialsDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCompanyUpdateIsdsCredentialsMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Get the active company ISDS (datové schránky) settings
+ */
+export const companyGetIsdsSettings = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<IsdsSettingsDto>> => {
+    
+    
+    return axios.default.get(
+      `/companies/isds-credentials`,options
+    );
+  }
+
+
+
+
+export const getCompanyGetIsdsSettingsQueryKey = () => {
+    return [
+    `/companies/isds-credentials`
+    ] as const;
+    }
+
+    
+export const getCompanyGetIsdsSettingsQueryOptions = <TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCompanyGetIsdsSettingsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyGetIsdsSettings>>> = ({ signal }) => companyGetIsdsSettings({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CompanyGetIsdsSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof companyGetIsdsSettings>>>
+export type CompanyGetIsdsSettingsQueryError = AxiosError<IsdsSettingsDto>
+
+
+export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+          TError,
+          Awaited<ReturnType<typeof companyGetIsdsSettings>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+          TError,
+          Awaited<ReturnType<typeof companyGetIsdsSettings>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the active company ISDS (datové schránky) settings
+ */
+
+export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCompanyGetIsdsSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
  * @summary List companies the user belongs to
  */
 export const companyListByUser = (

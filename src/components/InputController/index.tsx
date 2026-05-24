@@ -26,6 +26,8 @@ export interface InputControllerProps<
   placeholder?: string;
   type?: string;
   step?: string;
+  autoComplete?: string;
+  disabled?: boolean;
   className?: string;
   /** 'horizontal' (default) – inline label left, fixed-width input. 'vertical' – label above, full-width input. */
   variant?: 'horizontal' | 'vertical';
@@ -48,6 +50,8 @@ export const InputController = <
   placeholder,
   type,
   step,
+  autoComplete,
+  disabled,
   className,
   variant = 'horizontal',
   containerClassName,
@@ -69,6 +73,8 @@ export const InputController = <
                   placeholder={placeholder}
                   type={type}
                   step={step}
+                  autoComplete={autoComplete}
+                  disabled={disabled}
                   className={cn('w-full', className)}
                   onChange={
                     onChangeOverride
@@ -83,7 +89,9 @@ export const InputController = <
         }
 
         return (
-          <FormItem className={cn('flex items-center gap-4', containerClassName)}>
+          <FormItem
+            className={cn('flex items-center gap-4', containerClassName)}
+          >
             <FormLabel className="w-[200px] text-right">{label}</FormLabel>
             <div className="flex flex-col">
               <FormControl>
@@ -92,6 +100,8 @@ export const InputController = <
                   placeholder={placeholder}
                   type={type}
                   step={step}
+                  autoComplete={autoComplete}
+                  disabled={disabled}
                   className={cn('w-[250px]', className)}
                   onChange={
                     onChangeOverride

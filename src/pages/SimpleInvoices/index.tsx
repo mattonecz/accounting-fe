@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -7,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RefreshCcw } from 'lucide-react';
+import { Plus, RefreshCcw } from 'lucide-react';
 import { useInvoiceListByCompany } from '@/api/invoices/invoices';
 import type { InvoiceResponseDto } from '@/api/model';
 import { InvoiceListByCompanyKind } from '@/api/model';
@@ -15,11 +16,10 @@ import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
 import { formatDate, formatMoney } from '@/lib/formatters';
-import { CreateSimpleInvoiceDialog } from './CreateSimpleInvoiceDialog';
 
 const SimpleInvoices = () => {
   const { t, i18n } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const {
     data: invoices = [],
@@ -87,7 +87,10 @@ const SimpleInvoices = () => {
               <RefreshCcw className="mr-2 h-4 w-4" />
               {t('common.refresh')}
             </Button>
-            <CreateSimpleInvoiceDialog open={open} onOpenChange={setOpen} />
+            <Button className="gap-2" onClick={() => navigate('/invoices/simple/create')}>
+              <Plus className="h-4 w-4" />
+              {t('simpleInvoices.actions.create')}
+            </Button>
           </>
         }
       />

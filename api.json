@@ -586,6 +586,58 @@
         ]
       }
     },
+    "/companies/isds-credentials": {
+      "patch": {
+        "operationId": "companyUpdateIsdsCredentials",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIsdsCredentialsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IsdsSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Set company ISDS (datové schránky) credentials",
+        "tags": [
+          "Companies"
+        ]
+      },
+      "get": {
+        "operationId": "companyGetIsdsSettings",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IsdsSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get the active company ISDS (datové schránky) settings",
+        "tags": [
+          "Companies"
+        ]
+      }
+    },
     "/companies/list": {
       "get": {
         "operationId": "companyListByUser",
@@ -1637,7 +1689,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaxFilingResponseDto"
+                  "$ref": "#/components/schemas/TaxFilingDetailResponseDto"
                 }
               }
             }
@@ -1766,6 +1818,159 @@
         "summary": "Download VAT control statement XML",
         "tags": [
           "tax-filings"
+        ]
+      }
+    },
+    "/data-messages/test-login": {
+      "post": {
+        "operationId": "dataMessagesTestLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestLoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test the ISDS (datové schránky) connection by logging in via SOAP. Pass username + password to verify credentials before saving them; send an empty body to test the company's saved credentials.",
+        "tags": [
+          "data-messages"
+        ]
+      }
+    },
+    "/data-messages/send": {
+      "post": {
+        "operationId": "dataMessagesSend",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendMessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Send a data message with XML attachments via ISDS",
+        "tags": [
+          "data-messages"
+        ]
+      }
+    },
+    "/data-messages/messages": {
+      "get": {
+        "operationId": "dataMessagesList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataMessageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List data messages recorded for the current company",
+        "tags": [
+          "data-messages"
+        ]
+      }
+    },
+    "/data-messages/submit-tax/{taxFilingId}": {
+      "post": {
+        "operationId": "dataMessagesSubmitTax",
+        "parameters": [
+          {
+            "name": "taxFilingId",
+            "required": true,
+            "in": "path",
+            "description": "ID of the tax filing to submit",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitTaxResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Submit a tax filing (DPH + KH XML) to the financial office via ISDS",
+        "tags": [
+          "data-messages"
+        ]
+      }
+    },
+    "/data-messages/messages/{id}/status": {
+      "get": {
+        "operationId": "dataMessagesGetStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "DataMessage record ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get the ISDS delivery status of a recorded data message",
+        "tags": [
+          "data-messages"
         ]
       }
     },
@@ -2424,6 +2629,41 @@
           "id"
         ]
       },
+      "UpdateIsdsCredentialsDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "ISDS (datové schránky) login username"
+          },
+          "password": {
+            "type": "string",
+            "description": "ISDS (datové schránky) login password"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "IsdsSettingsDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS login username, or null when not configured"
+          },
+          "hasPassword": {
+            "type": "boolean",
+            "description": "Whether an ISDS password is stored"
+          }
+        },
+        "required": [
+          "username",
+          "hasPassword"
+        ]
+      },
       "InvoiceSettingsResponseDto": {
         "type": "object",
         "properties": {
@@ -2535,6 +2775,38 @@
           }
         }
       },
+      "ContactSnapshotDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ico": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "psc": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
       "InvoiceItemDto": {
         "type": "object",
         "properties": {
@@ -2593,6 +2865,14 @@
           "contactId": {
             "type": "string",
             "description": "UUID of the external party (Contact)."
+          },
+          "contact": {
+            "description": "Ad-hoc counterparty details for kind=SIMPLE when no contactId is used. Mutually exclusive with contactId. Requires at least `name`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContactSnapshotDto"
+              }
+            ]
           },
           "number": {
             "type": "string",
@@ -2764,38 +3044,6 @@
           "total",
           "createdAt"
         ]
-      },
-      "ContactSnapshotDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "ico": {
-            "type": "string"
-          },
-          "dic": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "street": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "psc": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          }
-        }
       },
       "PaymentResponseDto": {
         "type": "object",
@@ -3228,6 +3476,14 @@
           "contactId": {
             "type": "string",
             "description": "UUID of the external party (Contact)"
+          },
+          "contact": {
+            "description": "Ad-hoc counterparty details for kind=SIMPLE invoices not linked to a Contact. Mutually exclusive with contactId. Cannot be used on an invoice that already has a contactId. Requires at least `name`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContactSnapshotDto"
+              }
+            ]
           },
           "number": {
             "type": "string",
@@ -3799,12 +4055,17 @@
               "CORRECTIVE",
               "FOLLOWUP"
             ]
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date"
           }
         },
         "required": [
           "month",
           "year",
-          "submissionType"
+          "submissionType",
+          "createDate"
         ]
       },
       "TaxFilingSummaryDto": {
@@ -3887,6 +4148,10 @@
               "FOLLOWUP"
             ]
           },
+          "createDate": {
+            "type": "string",
+            "format": "date"
+          },
           "submissionDate": {
             "type": "string",
             "format": "date",
@@ -3926,9 +4191,112 @@
           "year",
           "status",
           "submissionType",
+          "createDate",
           "invoices",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "TaxFilingInvoiceDetailDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "ISSUED",
+              "RECEIVED",
+              "SIMPLE"
+            ]
+          },
+          "invoice": {
+            "$ref": "#/components/schemas/InvoiceResponseDto"
+          }
+        },
+        "required": [
+          "role",
+          "invoice"
+        ]
+      },
+      "TaxFilingDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "month": {
+            "type": "number"
+          },
+          "year": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PROCESSING",
+              "READY",
+              "FAILED",
+              "SUBMITTED",
+              "CANCELLED"
+            ]
+          },
+          "submissionType": {
+            "type": "string",
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "submissionDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "summary": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TaxFilingSummaryDto"
+              }
+            ]
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxFilingInvoiceDetailDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "companyId",
+          "month",
+          "year",
+          "status",
+          "submissionType",
+          "createDate",
+          "createdAt",
+          "updatedAt",
+          "invoices"
         ]
       },
       "SubmitTaxFilingDto": {
@@ -3939,6 +4307,395 @@
             "format": "date"
           }
         }
+      },
+      "TestLoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "wvem4b",
+            "description": "ISDS username to test. Provide together with `password` to verify credentials before they are saved on the company; omit both to test the company's already-saved credentials."
+          },
+          "password": {
+            "type": "string",
+            "description": "ISDS password to test. Must be provided together with `username`."
+          }
+        }
+      },
+      "IsdsOwnerDto": {
+        "type": "object",
+        "properties": {
+          "dbID": {
+            "type": "string",
+            "example": "abc1def",
+            "nullable": true,
+            "description": "Data box identifier (dbID)"
+          },
+          "dbType": {
+            "type": "string",
+            "example": "PFO",
+            "nullable": true,
+            "description": "Data box type (e.g. PFO, PO, OVM)"
+          },
+          "name": {
+            "type": "string",
+            "example": "ACME s.r.o.",
+            "nullable": true,
+            "description": "Owner display name (company name or person full name)"
+          }
+        },
+        "required": [
+          "dbID",
+          "dbType",
+          "name"
+        ]
+      },
+      "TestLoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether ISDS accepted the configured credentials"
+          },
+          "statusCode": {
+            "type": "string",
+            "example": "0000",
+            "description": "ISDS dbStatusCode — \"0000\" means success"
+          },
+          "statusMessage": {
+            "type": "string",
+            "example": "Operace proběhla úspěšně",
+            "description": "Human-readable ISDS dbStatusMessage"
+          },
+          "owner": {
+            "nullable": true,
+            "description": "Owner of the data box that was logged into",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IsdsOwnerDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "statusCode",
+          "statusMessage",
+          "owner"
+        ]
+      },
+      "SendMessageAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "example": "dph_2026_04.xml",
+            "description": "Attachment file name (becomes the ISDS dmFileDescr)"
+          },
+          "content": {
+            "type": "string",
+            "description": "Raw XML content of the attachment"
+          },
+          "mimeType": {
+            "type": "string",
+            "default": "text/xml",
+            "description": "MIME type of the attachment (defaults to text/xml)"
+          }
+        },
+        "required": [
+          "filename",
+          "content"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "recipientId": {
+            "type": "string",
+            "example": "abc1def",
+            "description": "Recipient data box ID (dbIDRecipient — exactly 7 characters)"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Přiznání k DPH 04/2026",
+            "description": "Message subject (dmAnnotation, max 255 characters)"
+          },
+          "attachments": {
+            "description": "XML files to attach — at least one; the first becomes \"main\"",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SendMessageAttachmentDto"
+            }
+          }
+        },
+        "required": [
+          "recipientId",
+          "subject",
+          "attachments"
+        ]
+      },
+      "SendMessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether ISDS accepted and created the message"
+          },
+          "messageId": {
+            "type": "string",
+            "example": "123456",
+            "nullable": true,
+            "description": "ISDS message ID (dmID) — null when the send failed"
+          },
+          "statusCode": {
+            "type": "string",
+            "example": "0000",
+            "description": "ISDS dmStatusCode — \"0000\" means success"
+          },
+          "statusMessage": {
+            "type": "string",
+            "example": "Operace proběhla úspěšně",
+            "description": "Human-readable ISDS dmStatusMessage"
+          }
+        },
+        "required": [
+          "success",
+          "messageId",
+          "statusCode",
+          "statusMessage"
+        ]
+      },
+      "DataMessageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Internal record ID"
+          },
+          "messageId": {
+            "type": "string",
+            "example": "123456",
+            "nullable": true,
+            "description": "ISDS message ID (dmID) — null when the send failed"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "SENT",
+              "RECEIVED"
+            ]
+          },
+          "recipient": {
+            "type": "string",
+            "example": "abc1def",
+            "description": "Recipient data box ID"
+          },
+          "taxFilingId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Tax filing this message submitted, if any"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Message subject"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "SENT",
+              "DELIVERED",
+              "READ",
+              "FAILED",
+              "UNKNOWN"
+            ]
+          },
+          "statusCode": {
+            "type": "string",
+            "example": "0000",
+            "nullable": true,
+            "description": "ISDS dmStatusCode from the send"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS dmStatusMessage — the failure reason when failed"
+          },
+          "rawStateCode": {
+            "type": "number",
+            "example": 4,
+            "nullable": true,
+            "description": "Raw ISDS dmMessageStatus code"
+          },
+          "sentAt": {
+            "type": "string",
+            "description": "When the message was sent (ISO 8601)"
+          },
+          "deliveredAt": {
+            "type": "string",
+            "nullable": true,
+            "description": "Delivery time (ISO 8601)"
+          },
+          "readAt": {
+            "type": "string",
+            "nullable": true,
+            "description": "Acceptance time (ISO 8601)"
+          }
+        },
+        "required": [
+          "id",
+          "messageId",
+          "direction",
+          "recipient",
+          "taxFilingId",
+          "subject",
+          "state",
+          "statusCode",
+          "statusMessage",
+          "rawStateCode",
+          "sentAt",
+          "deliveredAt",
+          "readAt"
+        ]
+      },
+      "SubmitTaxResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether ISDS accepted and created the message"
+          },
+          "messageId": {
+            "type": "string",
+            "example": "123456",
+            "nullable": true,
+            "description": "ISDS message ID (dmID) — null when the send failed"
+          },
+          "statusCode": {
+            "type": "string",
+            "example": "0000",
+            "description": "ISDS dmStatusCode — \"0000\" means success"
+          },
+          "statusMessage": {
+            "type": "string",
+            "example": "Operace proběhla úspěšně",
+            "description": "Human-readable ISDS dmStatusMessage"
+          },
+          "taxFilingId": {
+            "type": "string",
+            "description": "ID of the submitted tax filing"
+          },
+          "taxFilingStatus": {
+            "type": "string",
+            "example": "SUBMITTED",
+            "description": "Tax filing status after the call — SUBMITTED on success, unchanged otherwise"
+          }
+        },
+        "required": [
+          "success",
+          "messageId",
+          "statusCode",
+          "statusMessage",
+          "taxFilingId",
+          "taxFilingStatus"
+        ]
+      },
+      "MessageStatusEventDto": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS event timestamp (dmEventTime)"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS event description (dmEventDescr)"
+          }
+        },
+        "required": [
+          "time",
+          "description"
+        ]
+      },
+      "MessageStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "DataMessage record ID"
+          },
+          "messageId": {
+            "type": "string",
+            "example": "123456",
+            "nullable": true,
+            "description": "ISDS message ID (dmID) — null when the send failed"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "SENT",
+              "DELIVERED",
+              "READ",
+              "FAILED",
+              "UNKNOWN"
+            ],
+            "description": "Derived lifecycle state"
+          },
+          "statusCode": {
+            "type": "string",
+            "example": "0000",
+            "nullable": true,
+            "description": "ISDS dmStatusCode from the send"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS dmStatusMessage — the failure reason when failed"
+          },
+          "rawStateCode": {
+            "type": "number",
+            "example": 4,
+            "nullable": true,
+            "description": "Raw ISDS dmMessageStatus code"
+          },
+          "sentAt": {
+            "type": "string",
+            "description": "When the message was sent (ISO 8601)"
+          },
+          "deliveredAt": {
+            "type": "string",
+            "nullable": true,
+            "description": "When the message was delivered to the data box (ISO 8601)"
+          },
+          "readAt": {
+            "type": "string",
+            "nullable": true,
+            "description": "When the message was accepted/read by the recipient (ISO 8601)"
+          },
+          "events": {
+            "description": "Live ISDS delivery event timeline",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageStatusEventDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "messageId",
+          "state",
+          "statusCode",
+          "statusMessage",
+          "rawStateCode",
+          "sentAt",
+          "deliveredAt",
+          "readAt",
+          "events"
+        ]
       },
       "SelectedCompanyInputDto": {
         "type": "object",

@@ -21,6 +21,7 @@ import {
 import { Form } from '@/components/ui/form';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
+import { IsdsCredentialsForm } from './IsdsCredentialsForm';
 import {
   SPECIAL_TAX_OFFICE_CODE,
   SPECIAL_TAX_OFFICE_WORKPLACE_CODE,
@@ -42,7 +43,9 @@ const normalizeCodeValue = (value?: string | null) => {
   return String(value).trim();
 };
 
-const mapCompanyToForm = (company?: CompanyResponseDto | null): CompanyFormValues => ({
+const mapCompanyToForm = (
+  company?: CompanyResponseDto | null,
+): CompanyFormValues => ({
   name: company?.name ?? '',
   country: company?.country ?? '',
   street: company?.street ?? '',
@@ -77,13 +80,16 @@ interface BillingInfoFormProps {
 
 export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
   const { t } = useTranslation();
-  const [companyFallback, setCompanyFallback] = useState<CompanyResponseDto | null>(null);
+  const [companyFallback, setCompanyFallback] =
+    useState<CompanyResponseDto | null>(null);
 
   const {
     data: companyResponse,
     isError: isCompanyError,
     isLoading: isCompanyLoading,
-  } = useCompanyGet(companyId, { query: { retry: false, enabled: !!companyId } });
+  } = useCompanyGet(companyId, {
+    query: { retry: false, enabled: !!companyId },
+  });
 
   const companyFromApi = companyResponse?.data;
   const company = companyFromApi ?? companyFallback;
@@ -103,7 +109,9 @@ export const BillingInfoForm = ({ companyId }: BillingInfoFormProps) => {
       <Card className="border-destructive/30">
         <CardHeader>
           <CardTitle>{t('settings.billing.errorTitle')}</CardTitle>
-          <CardDescription>{t('settings.billing.errorDescription')}</CardDescription>
+          <CardDescription>
+            {t('settings.billing.errorDescription')}
+          </CardDescription>
         </CardHeader>
       </Card>
     );
@@ -134,8 +142,10 @@ const BillingInfoFormContent = ({
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
-  const { mutate: createCompany, isPending: isCreatingCompany } = useCompanyCreate();
-  const { mutate: updateCompany, isPending: isUpdatingCompany } = useCompanyUpdate();
+  const { mutate: createCompany, isPending: isCreatingCompany } =
+    useCompanyCreate();
+  const { mutate: updateCompany, isPending: isUpdatingCompany } =
+    useCompanyUpdate();
 
   const hasExistingCompany = Boolean(company?.id);
   const isSaving = isCreatingCompany || isUpdatingCompany;
@@ -171,14 +181,25 @@ const BillingInfoFormContent = ({
         setValue('c_pracufo', SPECIAL_TAX_OFFICE_WORKPLACE_CODE);
       return;
     }
-    const hasMatchingWorkplace = workplaceOptions.some((w) => w.code === selectedWorkplaceCode);
-    if (selectedWorkplaceCode && !hasMatchingWorkplace) setValue('c_pracufo', '');
-  }, [selectedTaxOfficeCode, selectedWorkplaceCode, setValue, workplaceOptions]);
+    const hasMatchingWorkplace = workplaceOptions.some(
+      (w) => w.code === selectedWorkplaceCode,
+    );
+    if (selectedWorkplaceCode && !hasMatchingWorkplace)
+      setValue('c_pracufo', '');
+  }, [
+    selectedTaxOfficeCode,
+    selectedWorkplaceCode,
+    setValue,
+    workplaceOptions,
+  ]);
 
   const onSubmit = (data: CompanyFormValues) => {
     const payload = toCompanyPayload(data);
     const handleSuccess = (response: { data: CompanyResponseDto }) => {
-      queryClient.setQueryData(getCompanyGetQueryKey(response.data.id), response);
+      queryClient.setQueryData(
+        getCompanyGetQueryKey(response.data.id),
+        response,
+      );
       if (!companyId || response.data.id !== companyId) {
         onCompanyCreated(response.data);
       } else {
@@ -207,11 +228,20 @@ const BillingInfoFormContent = ({
       );
       return;
     }
-    createCompany({ data: payload }, { onSuccess: handleSuccess, onError: handleError });
+    createCompany(
+      { data: payload },
+      { onSuccess: handleSuccess, onError: handleError },
+    );
   };
 
-  const taxOfficeSelectOptions = TAX_OFFICE_OPTIONS.map((o) => ({ value: o.code, label: o.label }));
-  const workplaceSelectOptions = workplaceOptions.map((o) => ({ value: o.code, label: o.label }));
+  const taxOfficeSelectOptions = TAX_OFFICE_OPTIONS.map((o) => ({
+    value: o.code,
+    label: o.label,
+  }));
+  const workplaceSelectOptions = workplaceOptions.map((o) => ({
+    value: o.code,
+    label: o.label,
+  }));
   const workplaceDescription = !selectedTaxOfficeCode
     ? t('settings.billing.taxOfficeHint.selectFirst')
     : selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
@@ -219,126 +249,153 @@ const BillingInfoFormContent = ({
       : t('settings.billing.taxOfficeHint.normal');
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {!hasExistingCompany && (
-          <Card className="border-dashed">
-            <CardContent className="p-6 text-sm text-muted-foreground">
-              {missingCompanyMessage}
+    <div className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {!hasExistingCompany && (
+            <Card className="border-dashed">
+              <CardContent className="p-6 text-sm text-muted-foreground">
+                {missingCompanyMessage}
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('settings.billing.card.title')}</CardTitle>
+              <CardDescription>
+                {t('settings.billing.card.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-2">
+              <InputController
+                control={form.control}
+                name="name"
+                label={t('settings.billing.fields.name')}
+                placeholder="ACME s.r.o."
+                variant="vertical"
+                containerClassName="md:col-span-2"
+                rules={{
+                  required: t('validation.required', {
+                    field: t('settings.billing.fields.name'),
+                  }),
+                  validate: (value) =>
+                    (value?.trim().length ?? 0) > 0 ||
+                    t('validation.required', {
+                      field: t('settings.billing.fields.name'),
+                    }),
+                }}
+              />
+              <InputController
+                control={form.control}
+                name="ico"
+                label={t('invoices.fields.ico')}
+                placeholder="12345678"
+                variant="vertical"
+              />
+              <InputController
+                control={form.control}
+                name="dic"
+                label={t('invoices.fields.dic')}
+                placeholder="CZ12345678"
+                variant="vertical"
+              />
+              <InputController
+                control={form.control}
+                name="country"
+                label={t('settings.billing.fields.country')}
+                placeholder={t('settings.billing.placeholders.country')}
+                variant="vertical"
+                rules={{
+                  required: t('validation.required', {
+                    field: t('settings.billing.fields.country'),
+                  }),
+                  validate: (value) =>
+                    (value?.trim().length ?? 0) > 0 ||
+                    t('validation.required', {
+                      field: t('settings.billing.fields.country'),
+                    }),
+                }}
+              />
+              <InputController
+                control={form.control}
+                name="street"
+                label={t('settings.billing.fields.street')}
+                placeholder={t('settings.billing.placeholders.street')}
+                variant="vertical"
+                containerClassName="md:col-span-2"
+              />
+              <InputController
+                control={form.control}
+                name="city"
+                label={t('settings.billing.fields.city')}
+                placeholder={t('settings.billing.placeholders.city')}
+                variant="vertical"
+              />
+              <InputController
+                control={form.control}
+                name="psc"
+                label={t('settings.billing.fields.psc')}
+                placeholder="60200"
+                variant="vertical"
+              />
             </CardContent>
           </Card>
-        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('settings.billing.card.title')}</CardTitle>
-            <CardDescription>{t('settings.billing.card.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <InputController
-              control={form.control}
-              name="name"
-              label={t('settings.billing.fields.name')}
-              placeholder="ACME s.r.o."
-              variant="vertical"
-              containerClassName="md:col-span-2"
-              rules={{
-                required: t('validation.required', { field: t('settings.billing.fields.name') }),
-                validate: (value) =>
-                  (value?.trim().length ?? 0) > 0 ||
-                  t('validation.required', { field: t('settings.billing.fields.name') }),
-              }}
-            />
-            <InputController
-              control={form.control}
-              name="ico"
-              label={t('invoices.fields.ico')}
-              placeholder="12345678"
-              variant="vertical"
-            />
-            <InputController
-              control={form.control}
-              name="dic"
-              label={t('invoices.fields.dic')}
-              placeholder="CZ12345678"
-              variant="vertical"
-            />
-            <InputController
-              control={form.control}
-              name="country"
-              label={t('settings.billing.fields.country')}
-              placeholder={t('settings.billing.placeholders.country')}
-              variant="vertical"
-              rules={{
-                required: t('validation.required', { field: t('settings.billing.fields.country') }),
-                validate: (value) =>
-                  (value?.trim().length ?? 0) > 0 ||
-                  t('validation.required', { field: t('settings.billing.fields.country') }),
-              }}
-            />
-            <InputController
-              control={form.control}
-              name="street"
-              label={t('settings.billing.fields.street')}
-              placeholder={t('settings.billing.placeholders.street')}
-              variant="vertical"
-              containerClassName="md:col-span-2"
-            />
-            <InputController
-              control={form.control}
-              name="city"
-              label={t('settings.billing.fields.city')}
-              placeholder={t('settings.billing.placeholders.city')}
-              variant="vertical"
-            />
-            <InputController
-              control={form.control}
-              name="psc"
-              label={t('settings.billing.fields.psc')}
-              placeholder="60200"
-              variant="vertical"
-            />
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('settings.billing.taxCard.title')}</CardTitle>
+              <CardDescription>
+                {t('settings.billing.taxCard.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-2">
+              <SelectController
+                control={form.control}
+                name="c_ufo"
+                label={t('settings.billing.fields.taxOffice')}
+                placeholder={t('settings.billing.placeholders.taxOffice')}
+                options={taxOfficeSelectOptions}
+                variant="vertical"
+                clearLabel={t('common.notSelected')}
+              />
+              <SelectController
+                control={form.control}
+                name="c_pracufo"
+                label={t('settings.billing.fields.taxWorkplace')}
+                placeholder={t('settings.billing.placeholders.taxWorkplace')}
+                options={workplaceSelectOptions}
+                variant="vertical"
+                containerClassName="md:col-span-2"
+                clearLabel={
+                  selectedTaxOfficeCode !== SPECIAL_TAX_OFFICE_CODE
+                    ? t('common.notSelected')
+                    : undefined
+                }
+                disabled={
+                  !selectedTaxOfficeCode ||
+                  selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
+                }
+                description={workplaceDescription}
+              />
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('settings.billing.taxCard.title')}</CardTitle>
-            <CardDescription>{t('settings.billing.taxCard.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <SelectController
-              control={form.control}
-              name="c_ufo"
-              label={t('settings.billing.fields.taxOffice')}
-              placeholder={t('settings.billing.placeholders.taxOffice')}
-              options={taxOfficeSelectOptions}
-              variant="vertical"
-              clearLabel={t('common.notSelected')}
-            />
-            <SelectController
-              control={form.control}
-              name="c_pracufo"
-              label={t('settings.billing.fields.taxWorkplace')}
-              placeholder={t('settings.billing.placeholders.taxWorkplace')}
-              options={workplaceSelectOptions}
-              variant="vertical"
-              containerClassName="md:col-span-2"
-              clearLabel={selectedTaxOfficeCode !== SPECIAL_TAX_OFFICE_CODE ? t('common.notSelected') : undefined}
-              disabled={!selectedTaxOfficeCode || selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE}
-              description={workplaceDescription}
-            />
-          </CardContent>
-        </Card>
+          <div className="flex justify-end">
+            <Button type="submit" size="lg" disabled={isSaving}>
+              {isSaving
+                ? hasExistingCompany
+                  ? t('settings.billing.actions.saving')
+                  : t('settings.billing.actions.creating')
+                : hasExistingCompany
+                  ? t('settings.billing.actions.save')
+                  : t('settings.billing.actions.create')}
+            </Button>
+          </div>
+        </form>
+      </Form>
 
-        <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={isSaving}>
-            {isSaving
-              ? hasExistingCompany ? t('settings.billing.actions.saving') : t('settings.billing.actions.creating')
-              : hasExistingCompany ? t('settings.billing.actions.save') : t('settings.billing.actions.create')}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      {hasExistingCompany && <IsdsCredentialsForm />}
+    </div>
   );
 };

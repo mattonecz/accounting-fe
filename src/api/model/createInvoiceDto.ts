@@ -7,6 +7,7 @@
  */
 import type { CreateInvoiceDtoKind } from './createInvoiceDtoKind';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
+import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
 import type { CreateInvoiceDtoVatMode } from './createInvoiceDtoVatMode';
 import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
@@ -21,6 +22,8 @@ export interface CreateInvoiceDto {
   bankSnapshot?: InvoiceBankAccountSnapshotDto;
   /** UUID of the external party (Contact). */
   contactId?: string;
+  /** Ad-hoc counterparty details for kind=SIMPLE when no contactId is used. Mutually exclusive with contactId. Requires at least `name`. */
+  contact?: ContactSnapshotDto;
   number: string;
   /** Required for kind=INVOICE. */
   currency?: string;

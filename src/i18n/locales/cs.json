@@ -29,11 +29,14 @@
     "invoicesReceived": "Faktury přijaté",
     "simpleInvoices": "Zjednodušené doklady",
     "taxReport": "Přiznání DPH",
+    "taxFilings": "Podání DPH",
+    "dataMessages": "Datové zprávy",
     "logout": "Odhlásit",
     "sectionOverview": "Přehled",
     "sectionBilling": "Fakturace",
     "sectionData": "Data",
-    "sectionReports": "Přehledy"
+    "sectionReports": "Přehledy",
+    "sectionMessages": "Datové zprávy"
   },
   "auth": {
     "title": "FreelanceBooks",
@@ -436,9 +439,17 @@
     },
     "create": {
       "title": "Vytvořit zjednodušený doklad",
+      "description": "Vyplňte údaje pro vytvoření nového zjednodušeného dokladu.",
+      "companySection": "Firma",
+      "documentSection": "Údaje dokladu",
+      "manualOption": "Zadat ručně",
       "fields": {
         "number": "Číslo dokladu",
         "contact": "Firma",
+        "companySelect": "Firma",
+        "companyName": "Název firmy",
+        "companyIco": "IČO",
+        "companyDic": "DIČ",
         "createdDate": "Datum vystavení",
         "duzpDate": "Datum zdanitelného plnění",
         "base": "Základ",
@@ -449,6 +460,7 @@
       "placeholders": {
         "contact": "Vyberte kontakt",
         "contactLoading": "Načítám kontakty...",
+        "companySelect": "Vyberte firmu",
         "note": "Doplňující informace k dokladu..."
       },
       "actions": {
@@ -465,7 +477,8 @@
         "vatRequired": "DPH je povinné",
         "vatMin": "DPH musí být kladné číslo nebo nula",
         "totalWithVatRequired": "Celkem s DPH je povinné",
-        "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula"
+        "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula",
+        "companyNameRequired": "Název firmy je povinný"
       },
       "messages": {
         "created": "Zjednodušený doklad byl vytvořen.",
@@ -649,6 +662,156 @@
       "11": "prosinec"
     }
   },
+  "taxFilings": {
+    "title": "Podání DPH",
+    "description": "Seznam vytvořených podání DPH",
+    "list": {
+      "card": "Všechna podání",
+      "empty": "Zatím nebylo vytvořeno žádné podání.",
+      "columns": {
+        "period": "Období",
+        "status": "Stav",
+        "submissionType": "Typ podání",
+        "createdDate": "Datum vytvoření",
+        "submissionDate": "Datum odeslání",
+        "outputVat": "DPH na výstupu",
+        "inputVat": "DPH na vstupu",
+        "result": "Výsledek období"
+      }
+    },
+    "statuses": {
+      "PROCESSING": "Zpracovává se",
+      "READY": "Připraveno",
+      "FAILED": "Chyba",
+      "SUBMITTED": "Odesláno",
+      "CANCELLED": "Zrušeno"
+    },
+    "submissionTypes": {
+      "REGULAR": "Řádné",
+      "CORRECTIVE": "Opravné",
+      "FOLLOWUP": "Dodatečné"
+    },
+    "actions": {
+      "create": "Vytvořit podání",
+      "testIsdsLogin": "Test přihlášení ISDS"
+    },
+    "statCards": {
+      "inputVat": "DPH na vstupu",
+      "outputVat": "DPH na výstupu",
+      "result": "Výsledek období",
+      "vatDue": "DPH k úhradě",
+      "vatRefund": "Nárok na odpočet"
+    },
+    "create": {
+      "title": "Vytvořit podání DPH",
+      "description": "Vyberte období a vytvořte nové podání DPH",
+      "periodSection": "Období podání",
+      "infoSection": "Informace o podání",
+      "createdDate": "Datum vytvoření",
+      "submissionType": "Typ podání",
+      "submit": "Vytvořit podání",
+      "submitting": "Vytvářím…",
+      "success": "Podání DPH bylo vytvořeno",
+      "error": "Podání DPH se nepodařilo vytvořit"
+    },
+    "invoiceTables": {
+      "issued": "Vydané faktury",
+      "received": "Přijaté faktury a zjednodušené doklady",
+      "empty": "Žádné doklady za vybrané období.",
+      "kindInvoice": "Faktura",
+      "kindSimple": "Zjednodušený doklad",
+      "columns": {
+        "number": "Číslo faktury",
+        "type": "Typ",
+        "partner": "Partner",
+        "duzp": "DUZP",
+        "base": "Základ",
+        "vat": "DPH",
+        "total": "Celkem",
+        "claimType": "Režim odpočtu DPH",
+        "claimRatio": "Poměr",
+        "claimMonth": "Měsíc odpočtu"
+      }
+    },
+    "detail": {
+      "loading": "Načítám podání…",
+      "error": "Podání se nepodařilo načíst.",
+      "invalidId": "Neplatné ID podání.",
+      "infoSection": "Informace o podání",
+      "period": "Období",
+      "status": "Stav",
+      "submissionType": "Typ podání",
+      "createdDate": "Datum vytvoření",
+      "submissionDate": "Datum odeslání",
+      "errorTitle": "Zpracování selhalo",
+      "downloadVatXml": "Stáhnout DPH XML",
+      "downloadKhXml": "Stáhnout KH XML",
+      "downloadError": "Stažení XML se nepodařilo"
+    }
+  },
+  "dataMessages": {
+    "title": "Datové zprávy",
+    "description": "Seznam datových zpráv firmy",
+    "directions": {
+      "SENT": "Odeslaná",
+      "RECEIVED": "Přijatá"
+    },
+    "states": {
+      "SENT": "Odesláno",
+      "DELIVERED": "Doručeno",
+      "READ": "Přečteno",
+      "FAILED": "Chyba",
+      "UNKNOWN": "Neznámý"
+    },
+    "list": {
+      "card": "Všechny zprávy",
+      "empty": "Zatím nebyla zaznamenána žádná datová zpráva.",
+      "columns": {
+        "direction": "Směr",
+        "recipient": "Příjemce",
+        "subject": "Předmět",
+        "state": "Stav",
+        "sentAt": "Odesláno",
+        "deliveredAt": "Doručeno"
+      }
+    },
+    "actions": {
+      "create": "Odeslat novou zprávu"
+    },
+    "create": {
+      "title": "Nová datová zpráva",
+      "description": "Vyplňte příjemce a obsah a odešlete datovou zprávu",
+      "section": "Nová zpráva",
+      "recipientId": "ID datové schránky příjemce",
+      "subject": "Předmět",
+      "filename": "Název přílohy",
+      "xmlContent": "Obsah XML",
+      "submit": "Odeslat zprávu",
+      "submitting": "Odesílám…",
+      "success": "Datová zpráva byla vytvořena",
+      "error": "Datovou zprávu se nepodařilo odeslat"
+    },
+    "detail": {
+      "loading": "Načítám zprávu…",
+      "error": "Zprávu se nepodařilo načíst.",
+      "invalidId": "Neplatné ID zprávy.",
+      "infoSection": "Informace o zprávě",
+      "eventsSection": "Průběh doručení",
+      "noEvents": "Žádné události doručení.",
+      "errorTitle": "Odeslání selhalo",
+      "messageId": "ID zprávy (ISDS)",
+      "direction": "Směr",
+      "recipient": "Příjemce",
+      "subject": "Předmět",
+      "state": "Stav",
+      "statusCode": "Stavový kód odeslání",
+      "statusMessage": "Stavová zpráva ISDS",
+      "sentAt": "Odesláno",
+      "deliveredAt": "Doručeno",
+      "readAt": "Přečteno",
+      "rawStateCode": "Stavový kód ISDS"
+    }
+  },
   "settings": {
     "menu": {
       "personal": "Osobní údaje",
@@ -753,6 +916,35 @@
         "updateError": "Úprava fakturačních údajů se nepodařila.",
         "createSuccess": "Fakturační údaje byly úspěšně vytvořeny.",
         "createError": "Vytvoření fakturačních údajů se nepodařilo."
+      },
+      "isds": {
+        "card": {
+          "title": "Datové schránky – přihlašovací údaje",
+          "description": "Přihlašovací údaje do datové schránky (ISDS) pro odesílání podání."
+        },
+        "fields": {
+          "username": "Přihlašovací jméno",
+          "password": "Heslo"
+        },
+        "placeholders": {
+          "username": "wvem4b"
+        },
+        "passwordSetInfo": "Heslo je uložené. Zadejte ho znovu pouze pokud ho chcete změnit.",
+        "actions": {
+          "test": "Otestovat připojení",
+          "testing": "Testuji...",
+          "save": "Uložit",
+          "saving": "Ukládám...",
+          "showPassword": "Zobrazit heslo",
+          "hidePassword": "Skrýt heslo"
+        },
+        "messages": {
+          "saveSuccess": "Přihlašovací údaje datové schránky byly uloženy.",
+          "saveError": "Uložení přihlašovacích údajů se nepodařilo.",
+          "testSuccess": "Připojení k datové schránce proběhlo úspěšně.",
+          "testFailure": "Připojení k datové schránce se nezdařilo.",
+          "testError": "Test připojení se nepodařilo provést."
+        }
       }
     },
     "defaults": {

@@ -16,8 +16,15 @@ import OutgoingInvoices from './pages/OutgoingInvoices';
 import CreateInvoice from './pages/CreateInvoice';
 import UpdateInvoice from './pages/UpdateInvoice';
 import SimpleInvoices from './pages/SimpleInvoices';
+import CreateSimpleInvoice from './pages/CreateSimpleInvoice';
 import InvoiceDetail from './pages/InvoiceDetail';
 import TaxReport from './pages/TaxReport';
+import TaxFilings from './pages/TaxFilings';
+import CreateTaxFiling from './pages/CreateTaxFiling';
+import TaxFilingDetail from './pages/TaxFilingDetail';
+import DataMessages from './pages/DataMessages';
+import CreateDataMessage from './pages/CreateDataMessage';
+import DataMessageDetail from './pages/DataMessageDetail';
 import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
 import NotFound from './pages/NotFound';
@@ -80,10 +87,35 @@ const App = () => (
                             element={<SimpleInvoices />}
                           />
                           <Route
+                            path="/invoices/simple/create"
+                            element={<CreateSimpleInvoice />}
+                          />
+                          <Route
                             path="/invoices/:id"
                             element={<InvoiceDetail />}
                           />
                           <Route path="/tax-report" element={<TaxReport />} />
+                          <Route path="/tax-filings" element={<TaxFilings />} />
+                          <Route
+                            path="/tax-filings/create"
+                            element={<CreateTaxFiling />}
+                          />
+                          <Route
+                            path="/tax-filings/:id"
+                            element={<TaxFilingDetail />}
+                          />
+                          <Route
+                            path="/data-messages"
+                            element={<DataMessages />}
+                          />
+                          <Route
+                            path="/data-messages/create"
+                            element={<CreateDataMessage />}
+                          />
+                          <Route
+                            path="/data-messages/:id"
+                            element={<DataMessageDetail />}
+                          />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </div>

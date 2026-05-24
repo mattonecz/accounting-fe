@@ -29,11 +29,14 @@
     "invoicesReceived": "Received Invoices",
     "simpleInvoices": "Simple Invoices",
     "taxReport": "VAT Return",
+    "taxFilings": "VAT Filings",
+    "dataMessages": "Data Messages",
     "logout": "Log out",
     "sectionOverview": "Overview",
     "sectionBilling": "Billing",
     "sectionData": "Data",
-    "sectionReports": "Reports"
+    "sectionReports": "Reports",
+    "sectionMessages": "Data Messages"
   },
   "auth": {
     "title": "FreelanceBooks",
@@ -435,9 +438,17 @@
     },
     "create": {
       "title": "Create Simple Invoice",
+      "description": "Fill in the details to create a new simplified document.",
+      "companySection": "Company",
+      "documentSection": "Document details",
+      "manualOption": "Enter manually",
       "fields": {
         "number": "Document Number",
         "contact": "Company",
+        "companySelect": "Company",
+        "companyName": "Company name",
+        "companyIco": "Company ID",
+        "companyDic": "VAT ID",
         "createdDate": "Issue Date",
         "duzpDate": "Tax Date",
         "base": "Base",
@@ -448,6 +459,7 @@
       "placeholders": {
         "contact": "Select contact",
         "contactLoading": "Loading contacts...",
+        "companySelect": "Select company",
         "note": "Additional document information..."
       },
       "actions": {
@@ -464,7 +476,8 @@
         "vatRequired": "VAT is required",
         "vatMin": "VAT must be a positive number or zero",
         "totalWithVatRequired": "Total with VAT is required",
-        "totalWithVatMin": "Total with VAT must be a positive number or zero"
+        "totalWithVatMin": "Total with VAT must be a positive number or zero",
+        "companyNameRequired": "Company name is required"
       },
       "messages": {
         "created": "Simple invoice created successfully.",
@@ -648,6 +661,156 @@
       "11": "December"
     }
   },
+  "taxFilings": {
+    "title": "VAT Filings",
+    "description": "List of created VAT filings",
+    "list": {
+      "card": "All filings",
+      "empty": "No filings have been created yet.",
+      "columns": {
+        "period": "Period",
+        "status": "Status",
+        "submissionType": "Submission type",
+        "createdDate": "Created date",
+        "submissionDate": "Submission date",
+        "outputVat": "Output VAT",
+        "inputVat": "Input VAT",
+        "result": "Period result"
+      }
+    },
+    "statuses": {
+      "PROCESSING": "Processing",
+      "READY": "Ready",
+      "FAILED": "Failed",
+      "SUBMITTED": "Submitted",
+      "CANCELLED": "Cancelled"
+    },
+    "submissionTypes": {
+      "REGULAR": "Regular",
+      "CORRECTIVE": "Corrective",
+      "FOLLOWUP": "Follow-up"
+    },
+    "actions": {
+      "create": "Create filing",
+      "testIsdsLogin": "Test ISDS login"
+    },
+    "statCards": {
+      "inputVat": "Input VAT",
+      "outputVat": "Output VAT",
+      "result": "Period result",
+      "vatDue": "VAT payable",
+      "vatRefund": "VAT refund"
+    },
+    "create": {
+      "title": "Create VAT filing",
+      "description": "Select a period and create a new VAT filing",
+      "periodSection": "Filing period",
+      "infoSection": "Filing information",
+      "createdDate": "Created date",
+      "submissionType": "Submission type",
+      "submit": "Create filing",
+      "submitting": "Creating…",
+      "success": "VAT filing has been created",
+      "error": "Failed to create VAT filing"
+    },
+    "invoiceTables": {
+      "issued": "Issued invoices",
+      "received": "Received invoices and simple documents",
+      "empty": "No documents for the selected period.",
+      "kindInvoice": "Invoice",
+      "kindSimple": "Simple document",
+      "columns": {
+        "number": "Invoice number",
+        "type": "Type",
+        "partner": "Partner",
+        "duzp": "Tax date",
+        "base": "Base",
+        "vat": "VAT",
+        "total": "Total",
+        "claimType": "VAT claim mode",
+        "claimRatio": "Ratio",
+        "claimMonth": "Claim month"
+      }
+    },
+    "detail": {
+      "loading": "Loading filing…",
+      "error": "Failed to load the filing.",
+      "invalidId": "Invalid filing ID.",
+      "infoSection": "Filing information",
+      "period": "Period",
+      "status": "Status",
+      "submissionType": "Submission type",
+      "createdDate": "Created date",
+      "submissionDate": "Submission date",
+      "errorTitle": "Processing failed",
+      "downloadVatXml": "Download VAT XML",
+      "downloadKhXml": "Download KH XML",
+      "downloadError": "Failed to download XML"
+    }
+  },
+  "dataMessages": {
+    "title": "Data Messages",
+    "description": "List of the company's data messages",
+    "directions": {
+      "SENT": "Sent",
+      "RECEIVED": "Received"
+    },
+    "states": {
+      "SENT": "Sent",
+      "DELIVERED": "Delivered",
+      "READ": "Read",
+      "FAILED": "Failed",
+      "UNKNOWN": "Unknown"
+    },
+    "list": {
+      "card": "All messages",
+      "empty": "No data messages have been recorded yet.",
+      "columns": {
+        "direction": "Direction",
+        "recipient": "Recipient",
+        "subject": "Subject",
+        "state": "State",
+        "sentAt": "Sent",
+        "deliveredAt": "Delivered"
+      }
+    },
+    "actions": {
+      "create": "Send new message"
+    },
+    "create": {
+      "title": "New data message",
+      "description": "Fill in the recipient and content, then send the data message",
+      "section": "New message",
+      "recipientId": "Recipient data box ID",
+      "subject": "Subject",
+      "filename": "Attachment name",
+      "xmlContent": "XML content",
+      "submit": "Send message",
+      "submitting": "Sending…",
+      "success": "Data message has been created",
+      "error": "Failed to send the data message"
+    },
+    "detail": {
+      "loading": "Loading message…",
+      "error": "Failed to load the message.",
+      "invalidId": "Invalid message ID.",
+      "infoSection": "Message information",
+      "eventsSection": "Delivery timeline",
+      "noEvents": "No delivery events.",
+      "errorTitle": "Sending failed",
+      "messageId": "Message ID (ISDS)",
+      "direction": "Direction",
+      "recipient": "Recipient",
+      "subject": "Subject",
+      "state": "State",
+      "statusCode": "Send status code",
+      "statusMessage": "ISDS status message",
+      "sentAt": "Sent",
+      "deliveredAt": "Delivered",
+      "readAt": "Read",
+      "rawStateCode": "ISDS raw status code"
+    }
+  },
   "settings": {
     "menu": {
       "personal": "Personal Info",
@@ -752,6 +915,35 @@
         "updateError": "Failed to update billing info.",
         "createSuccess": "Billing info created successfully.",
         "createError": "Failed to create billing info."
+      },
+      "isds": {
+        "card": {
+          "title": "Data box – login credentials",
+          "description": "Data box (ISDS) login credentials used for submitting filings."
+        },
+        "fields": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "placeholders": {
+          "username": "wvem4b"
+        },
+        "passwordSetInfo": "A password is already stored. Enter it again only if you want to change it.",
+        "actions": {
+          "test": "Test connection",
+          "testing": "Testing...",
+          "save": "Save",
+          "saving": "Saving...",
+          "showPassword": "Show password",
+          "hidePassword": "Hide password"
+        },
+        "messages": {
+          "saveSuccess": "Data box credentials saved.",
+          "saveError": "Failed to save credentials.",
+          "testSuccess": "Connection to the data box succeeded.",
+          "testFailure": "Connection to the data box failed.",
+          "testError": "Failed to run the connection test."
+        }
       }
     },
     "defaults": {

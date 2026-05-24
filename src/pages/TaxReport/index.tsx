@@ -17,7 +17,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { formatMoney } from '@/lib/formatters';
-import { MonthSelector } from './MonthSelector';
+import { MonthSelector } from '@/components/MonthSelector';
 import { VatBreakdownTable } from './VatBreakdownTable';
 import { VatExplanationCard } from './VatExplanationCard';
 

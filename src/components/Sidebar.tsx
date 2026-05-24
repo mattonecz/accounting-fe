@@ -9,6 +9,8 @@ import {
   LogOut,
   Calculator,
   Receipt,
+  FileCheck,
+  MessageSquare,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -46,7 +48,20 @@ export const Sidebar = () => {
     },
     {
       label: t('nav.sectionReports'),
-      items: [{ name: t('nav.taxReport'), href: '/tax-report', icon: Calculator }],
+      items: [
+        { name: t('nav.taxReport'), href: '/tax-report', icon: Calculator },
+        { name: t('nav.taxFilings'), href: '/tax-filings', icon: FileCheck },
+      ],
+    },
+    {
+      label: t('nav.sectionMessages'),
+      items: [
+        {
+          name: t('nav.dataMessages'),
+          href: '/data-messages',
+          icon: MessageSquare,
+        },
+      ],
     },
   ];
 

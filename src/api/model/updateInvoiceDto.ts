@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
+import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { UpdateInvoiceDtoType } from './updateInvoiceDtoType';
 import type { UpdateInvoiceDtoVatMode } from './updateInvoiceDtoVatMode';
 import type { UpdateInvoiceDtoStatus } from './updateInvoiceDtoStatus';
@@ -21,6 +22,8 @@ export interface UpdateInvoiceDto {
   bankSnapshot?: InvoiceBankAccountSnapshotDto;
   /** UUID of the external party (Contact) */
   contactId?: string;
+  /** Ad-hoc counterparty details for kind=SIMPLE invoices not linked to a Contact. Mutually exclusive with contactId. Cannot be used on an invoice that already has a contactId. Requires at least `name`. */
+  contact?: ContactSnapshotDto;
   number?: string;
   currency?: string;
   type?: UpdateInvoiceDtoType;
