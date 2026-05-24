@@ -7,7 +7,7 @@ import type { LoginResponseDto } from '@/api/model';
 import { refresh as refreshTokenApi, authListMemberships, logout as logoutApi } from '@/api/auth/auth';
 
 // Configure axios baseURL
-axios.default.defaults.baseURL = 'http://localhost:3001';
+axios.default.defaults.baseURL = import.meta.env.PUBLIC_API_BASE_URL;
 axios.default.defaults.withCredentials = true;
 
 export type UserData = {
