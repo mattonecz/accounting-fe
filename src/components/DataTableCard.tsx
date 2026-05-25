@@ -44,10 +44,10 @@ export function DataTableCard<T>({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+      <CardHeader className="px-4 py-4 sm:px-6 sm:py-6">
+        <CardTitle className="text-xl sm:text-2xl">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0 pb-2 sm:px-6 sm:pb-6">
         <Table>
           <TableHeader>
             <TableRow>

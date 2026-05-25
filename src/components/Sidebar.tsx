@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
@@ -11,6 +12,7 @@ import {
   Receipt,
   FileCheck,
   MessageSquare,
+  Menu,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -18,8 +20,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useSnackbar } from 'notistack';
 import { SettingsMenu } from '@/components/settings/SettingsMenu';
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
-export const Sidebar = () => {
+const SidebarNavigation = ({ onNavigate }: { onNavigate?: () => void }) => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -69,11 +77,12 @@ export const Sidebar = () => {
     logout();
     enqueueSnackbar(t('auth.messages.logoutSuccess'), { variant: 'success' });
     navigate('/auth');
+    onNavigate?.();
   };
 
   return (
-    <div className="sticky top-0 flex h-screen w-64 flex-col border-r bg-card">
-      <div className="flex h-16 items-center border-b px-6">
+    <>
+      <div className="flex h-16 shrink-0 items-center border-b px-6">
         <Wallet className="mr-3 h-6 w-6 text-primary" />
         <h1 className="text-xl font-bold text-foreground">FreelanceBooks</h1>
       </div>
@@ -89,6 +98,7 @@ export const Sidebar = () => {
                 <Link
                   key={item.href}
                   to={item.href}
+                  onClick={() => onNavigate?.()}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
@@ -104,9 +114,11 @@ export const Sidebar = () => {
           </div>
         ))}
       </nav>
-      <div className="border-t border-border p-4">
+      <div className="shrink-0 border-t border-border p-4">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">{user?.name || user?.email}</span>
+          <span className="truncate text-sm text-muted-foreground">
+            {user?.name || user?.email}
+          </span>
           <SettingsMenu />
         </div>
         <Button
@@ -117,6 +129,46 @@ export const Sidebar = () => {
           <LogOut className="h-4 w-4" />
           {t('nav.logout')}
         </Button>
+      </div>
+    </>
+  );
+};
+
+export const Sidebar = () => (
+  <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:flex">
+    <SidebarNavigation />
+  </aside>
+);
+
+export const MobileTopBar = () => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-card px-3 md:hidden">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t('nav.openMenu', { defaultValue: 'Menu' })}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent
+          side="left"
+          className="flex w-72 flex-col p-0 sm:max-w-xs"
+        >
+          <SheetTitle className="sr-only">FreelanceBooks</SheetTitle>
+          <SidebarNavigation onNavigate={() => setOpen(false)} />
+        </SheetContent>
+      </Sheet>
+      <div className="flex items-center">
+        <Wallet className="mr-2 h-5 w-5 text-primary" />
+        <span className="text-base font-semibold text-foreground">
+          FreelanceBooks
+        </span>
       </div>
     </div>
   );
