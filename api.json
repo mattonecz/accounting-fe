@@ -3943,6 +3943,11 @@
             "type": "string",
             "nullable": true
           },
+          "documentNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Invoice / receipt / document number as printed"
+          },
           "total": {
             "type": "number",
             "nullable": true
@@ -3971,6 +3976,7 @@
         },
         "required": [
           "vendor",
+          "documentNumber",
           "total",
           "vat",
           "vatBreakdown",

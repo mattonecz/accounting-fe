@@ -1,10 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bot, ImageUp, MessageSquare, SendHorizonal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Bot,
+  FileText,
+  ImageUp,
+  MessageSquare,
+  SendHorizonal,
+} from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useAiChatChat } from '@/api/ai-chat/ai-chat';
 import { useDocumentParseReceipt } from '@/api/documents/documents';
-import type { ChatResponseDto, ParseReceiptResponseDto } from '@/api/model';
+import type {
+  ChatResponseDto,
+  ReceiptParseDataDto,
+} from '@/api/model';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,6 +27,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { formatDate, formatMoney } from '@/lib/formatters';
 
 const getLastAssistantIndex = (history: ChatResponseDto['history']) =>
   history.reduce<number>((foundIndex, item, index) => {
@@ -26,24 +37,114 @@ const getLastAssistantIndex = (history: ChatResponseDto['history']) =>
 
 const formatUsd = (value: number) => `$${value.toFixed(6)}`;
 
-type ClientChatMessage = {
+type TextClientMessage = {
+  kind: 'text';
   role: 'user' | 'assistant';
   content: string;
 };
 
+type ReceiptClientMessage = {
+  kind: 'receipt';
+  role: 'assistant';
+  data: ReceiptParseDataDto;
+};
+
+type ClientChatMessage = TextClientMessage | ReceiptClientMessage;
+
+interface ReceiptResultCardProps {
+  data: ReceiptParseDataDto;
+  onCreate: (data: ReceiptParseDataDto) => void;
+}
+
+const ReceiptResultCard = ({ data, onCreate }: ReceiptResultCardProps) => {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const currency = data.currency ?? 'CZK';
+  const fmtMoney = (value: number) => formatMoney(value, currency, lang);
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-sm font-semibold text-foreground">
+          {data.vendor || t('aiChat.receiptResult.unknownVendor')}
+        </p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+          {data.documentNumber ? (
+            <span className="font-mono">{data.documentNumber}</span>
+          ) : null}
+          {data.date ? <span>{formatDate(data.date, lang)}</span> : null}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 rounded-lg border bg-background/60 p-3 text-xs">
+        <div>
+          <span className="block font-medium text-muted-foreground">
+            {t('aiChat.receiptResult.total')}
+          </span>
+          <span className="text-sm font-semibold text-foreground tabular-nums">
+            {data.total != null ? fmtMoney(data.total) : '-'}
+          </span>
+        </div>
+        <div>
+          <span className="block font-medium text-muted-foreground">
+            {t('aiChat.receiptResult.vat')}
+          </span>
+          <span className="text-sm font-semibold text-foreground tabular-nums">
+            {data.vat != null ? fmtMoney(data.vat) : '-'}
+          </span>
+        </div>
+      </div>
+
+      {data.vatBreakdown && data.vatBreakdown.length > 0 ? (
+        <div className="overflow-hidden rounded-lg border">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40 text-muted-foreground">
+              <tr>
+                <th className="px-2 py-1.5 text-left font-medium">
+                  {t('aiChat.receiptResult.rate')}
+                </th>
+                <th className="px-2 py-1.5 text-right font-medium">
+                  {t('aiChat.receiptResult.base')}
+                </th>
+                <th className="px-2 py-1.5 text-right font-medium">
+                  {t('aiChat.receiptResult.vatAmount')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.vatBreakdown.map((row, index) => (
+                <tr key={`${row.rate}-${index}`} className="border-t">
+                  <td className="px-2 py-1.5 font-medium">{row.rate}%</td>
+                  <td className="px-2 py-1.5 text-right tabular-nums">
+                    {row.base != null ? fmtMoney(row.base) : '-'}
+                  </td>
+                  <td className="px-2 py-1.5 text-right tabular-nums">
+                    {row.amount != null ? fmtMoney(row.amount) : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      <Button
+        type="button"
+        size="sm"
+        className="w-full gap-2"
+        onClick={() => onCreate(data)}
+      >
+        <FileText className="h-4 w-4" />
+        {t('aiChat.receiptResult.createSimpleInvoice')}
+      </Button>
+    </div>
+  );
+};
+
 export const AiChatDialog = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const formatReceiptResult = (result: ParseReceiptResponseDto) => {
-    const { vendor, total, vat, currency, date } = result.data;
-    return [
-      t('aiChat.receiptResult.title'),
-      `${t('aiChat.receiptResult.vendor')}: ${vendor || '-'}`,
-      `${t('aiChat.receiptResult.total')}: ${total ?? '-'}${currency ? ` ${currency}` : ''}`,
-      `${t('aiChat.receiptResult.vat')}: ${vat ?? '-'}`,
-      `${t('aiChat.receiptResult.date')}: ${date || '-'}`,
-    ].join('\n');
-  };
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [chat, setChat] = useState<ChatResponseDto | null>(null);
@@ -51,7 +152,8 @@ export const AiChatDialog = () => {
   const [pendingUserMessage, setPendingUserMessage] = useState('');
   const { enqueueSnackbar } = useSnackbar();
   const { mutateAsync: sendMessage, isPending } = useAiChatChat();
-  const { mutateAsync: parseReceipt, isPending: isParsingReceipt } = useDocumentParseReceipt();
+  const { mutateAsync: parseReceipt, isPending: isParsingReceipt } =
+    useDocumentParseReceipt();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -60,7 +162,9 @@ export const AiChatDialog = () => {
 
   const allMessages = [
     ...history.map((message, index) => ({
-      ...message,
+      kind: 'text' as const,
+      role: message.role,
+      content: message.content,
       source: 'server' as const,
       serverIndex: index,
     })),
@@ -93,32 +197,48 @@ export const AiChatDialog = () => {
     }
   };
 
-  const handleReceiptSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleReceiptSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file || isParsingReceipt) return;
 
     setClientMessages((msgs) => [
       ...msgs,
-      { role: 'user', content: t('aiChat.uploading', { name: file.name }) },
+      {
+        kind: 'text',
+        role: 'user',
+        content: t('aiChat.uploading', { name: file.name }),
+      },
     ]);
 
     try {
       const response = await parseReceipt({ data: { file } });
-      console.log('receipt/parse result', response.data);
       setClientMessages((msgs) => [
         ...msgs,
-        { role: 'assistant', content: formatReceiptResult(response.data) },
+        { kind: 'receipt', role: 'assistant', data: response.data.data },
       ]);
-      enqueueSnackbar(t('aiChat.messages.receiptSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('aiChat.messages.receiptSuccess'), {
+        variant: 'success',
+      });
     } catch {
       enqueueSnackbar(t('aiChat.messages.receiptFailed'), { variant: 'error' });
       setClientMessages((msgs) => [
         ...msgs,
-        { role: 'assistant', content: t('aiChat.receiptFailedMessage') },
+        {
+          kind: 'text',
+          role: 'assistant',
+          content: t('aiChat.receiptFailedMessage'),
+        },
       ]);
     } finally {
       event.target.value = '';
     }
+  };
+
+  const handleCreateFromReceipt = (data: ReceiptParseDataDto) => {
+    setOpen(false);
+    navigate('/invoices/simple/create', { state: { receipt: data } });
   };
 
   return (
@@ -170,34 +290,53 @@ export const AiChatDialog = () => {
                         : 'border bg-background text-foreground',
                     )}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {message.kind === 'receipt' ? (
+                      <ReceiptResultCard
+                        data={message.data}
+                        onCreate={handleCreateFromReceipt}
+                      />
+                    ) : (
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    )}
                     {message.source === 'server' &&
                     message.role === 'assistant' &&
                     message.serverIndex === lastAssistantIndex &&
                     chat ? (
                       <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground sm:grid-cols-3">
                         <div>
-                          <span className="block font-medium text-foreground">Model</span>
+                          <span className="block font-medium text-foreground">
+                            Model
+                          </span>
                           {chat.metrics.model}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">{t('aiChat.metrics.duration')}</span>
+                          <span className="block font-medium text-foreground">
+                            {t('aiChat.metrics.duration')}
+                          </span>
                           {chat.metrics.durationMs} ms
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">{t('aiChat.metrics.promptTokens')}</span>
+                          <span className="block font-medium text-foreground">
+                            {t('aiChat.metrics.promptTokens')}
+                          </span>
                           {chat.metrics.tokens.promptTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">{t('aiChat.metrics.completionTokens')}</span>
+                          <span className="block font-medium text-foreground">
+                            {t('aiChat.metrics.completionTokens')}
+                          </span>
                           {chat.metrics.tokens.completionTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">{t('aiChat.metrics.totalTokens')}</span>
+                          <span className="block font-medium text-foreground">
+                            {t('aiChat.metrics.totalTokens')}
+                          </span>
                           {chat.metrics.tokens.totalTokens}
                         </div>
                         <div>
-                          <span className="block font-medium text-foreground">{t('aiChat.metrics.cost')}</span>
+                          <span className="block font-medium text-foreground">
+                            {t('aiChat.metrics.cost')}
+                          </span>
                           {formatUsd(chat.metrics.estimatedCostUsd)}
                         </div>
                       </div>
@@ -275,7 +414,11 @@ export const AiChatDialog = () => {
                 >
                   <ImageUp className="h-4 w-4" />
                 </Button>
-                <Button type="submit" className="gap-2" disabled={isPending || !input.trim()}>
+                <Button
+                  type="submit"
+                  className="gap-2"
+                  disabled={isPending || !input.trim()}
+                >
                   <SendHorizonal className="h-4 w-4" />
                   {t('aiChat.send')}
                 </Button>

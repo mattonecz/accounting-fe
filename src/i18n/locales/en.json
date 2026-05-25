@@ -441,6 +441,7 @@
       "description": "Fill in the details to create a new simplified document.",
       "companySection": "Company",
       "documentSection": "Document details",
+      "itemsSection": "VAT rates",
       "manualOption": "Enter manually",
       "fields": {
         "number": "Document Number",
@@ -455,6 +456,18 @@
         "vat": "VAT",
         "totalWithVat": "Total with VAT",
         "note": "Note"
+      },
+      "items": {
+        "addRate": "Add rate",
+        "remove": "Remove rate",
+        "vatRate": "VAT rate",
+        "base": "Base",
+        "vat": "VAT",
+        "total": "Total with VAT",
+        "lineName": "Supply at {{rate}}% VAT",
+        "summaryBase": "Total base",
+        "summaryVat": "Total VAT",
+        "summaryTotal": "Total with VAT"
       },
       "placeholders": {
         "contact": "Select contact",
@@ -475,6 +488,7 @@
         "baseMin": "Base amount must be a positive number or zero",
         "vatRequired": "VAT is required",
         "vatMin": "VAT must be a positive number or zero",
+        "vatRateRequired": "VAT rate is required",
         "totalWithVatRequired": "Total with VAT is required",
         "totalWithVatMin": "Total with VAT must be a positive number or zero",
         "companyNameRequired": "Company name is required"
@@ -1107,9 +1121,14 @@
     "receiptResult": {
       "title": "Receipt parsing result:",
       "vendor": "Vendor",
+      "unknownVendor": "Unknown vendor",
       "total": "Total",
       "vat": "VAT",
-      "date": "Date"
+      "date": "Date",
+      "rate": "Rate",
+      "base": "Base",
+      "vatAmount": "VAT",
+      "createSimpleInvoice": "Create simple invoice"
     },
     "messages": {
       "chatFailed": "AI chat request failed",

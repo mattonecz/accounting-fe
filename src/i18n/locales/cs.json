@@ -442,6 +442,7 @@
       "description": "Vyplňte údaje pro vytvoření nového zjednodušeného dokladu.",
       "companySection": "Firma",
       "documentSection": "Údaje dokladu",
+      "itemsSection": "Sazby DPH",
       "manualOption": "Zadat ručně",
       "fields": {
         "number": "Číslo dokladu",
@@ -456,6 +457,18 @@
         "vat": "DPH",
         "totalWithVat": "Celkem s DPH",
         "note": "Poznámka"
+      },
+      "items": {
+        "addRate": "Přidat sazbu",
+        "remove": "Odebrat sazbu",
+        "vatRate": "Sazba DPH",
+        "base": "Základ",
+        "vat": "DPH",
+        "total": "Celkem s DPH",
+        "lineName": "Plnění {{rate}}% DPH",
+        "summaryBase": "Základ celkem",
+        "summaryVat": "DPH celkem",
+        "summaryTotal": "Celkem s DPH"
       },
       "placeholders": {
         "contact": "Vyberte kontakt",
@@ -476,6 +489,7 @@
         "baseMin": "Základ musí být kladné číslo nebo nula",
         "vatRequired": "DPH je povinné",
         "vatMin": "DPH musí být kladné číslo nebo nula",
+        "vatRateRequired": "Sazba DPH je povinná",
         "totalWithVatRequired": "Celkem s DPH je povinné",
         "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula",
         "companyNameRequired": "Název firmy je povinný"
@@ -1108,9 +1122,14 @@
     "receiptResult": {
       "title": "Výsledek parsování účtenky:",
       "vendor": "Dodavatel",
+      "unknownVendor": "Neznámý dodavatel",
       "total": "Celkem",
       "vat": "DPH",
-      "date": "Datum"
+      "date": "Datum",
+      "rate": "Sazba",
+      "base": "Základ",
+      "vatAmount": "DPH",
+      "createSimpleInvoice": "Vytvořit zjednodušený doklad"
     },
     "messages": {
       "chatFailed": "Požadavek AI chatu selhal",

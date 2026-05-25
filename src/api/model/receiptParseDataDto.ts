@@ -10,6 +10,11 @@ import type { VatBreakdownItemDto } from './vatBreakdownItemDto';
 export interface ReceiptParseDataDto {
   /** @nullable */
   vendor: string | null;
+  /**
+   * Invoice / receipt / document number as printed
+   * @nullable
+   */
+  documentNumber: string | null;
   /** @nullable */
   total: number | null;
   /**
