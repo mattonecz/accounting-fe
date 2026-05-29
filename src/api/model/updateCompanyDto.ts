@@ -12,6 +12,10 @@ export interface UpdateCompanyDto {
   country?: string;
   email?: string;
   street?: string;
+  houseNumber?: string;
+  orientationNumber?: string;
+  registrationNumber?: string;
+  platceDPH?: boolean;
   city?: string;
   psc?: string;
   ico?: string;

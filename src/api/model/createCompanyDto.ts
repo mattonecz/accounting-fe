@@ -11,6 +11,10 @@ export interface CreateCompanyDto {
   country: string;
   email?: string;
   street?: string;
+  houseNumber?: string;
+  orientationNumber?: string;
+  registrationNumber?: string;
+  platceDPH?: boolean;
   city?: string;
   psc?: string;
   ico?: string;

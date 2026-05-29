@@ -18,7 +18,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Form } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Switch } from '@/components/ui/switch';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
 import { IsdsCredentialsForm } from './IsdsCredentialsForm';
@@ -31,6 +40,12 @@ import {
 } from '@/lib/taxOfficeCodebooks';
 
 type CompanyFormValues = Omit<CreateCompanyDto, 'email' | 'description'>;
+
+const ADDRESS_NUMBER_FIELDS = [
+  'houseNumber',
+  'orientationNumber',
+  'registrationNumber',
+] as const satisfies readonly (keyof CompanyFormValues)[];
 
 const specialTaxOfficeWorkplaceOption = {
   officeCode: SPECIAL_TAX_OFFICE_CODE,
@@ -49,6 +64,10 @@ const mapCompanyToForm = (
   name: company?.name ?? '',
   country: company?.country ?? '',
   street: company?.street ?? '',
+  houseNumber: company?.houseNumber ?? '',
+  orientationNumber: company?.orientationNumber ?? '',
+  registrationNumber: company?.registrationNumber ?? '',
+  platceDPH: company?.platceDPH ?? false,
   city: company?.city ?? '',
   psc: company?.psc ?? '',
   ico: company?.ico ?? '',
@@ -66,6 +85,10 @@ const toCompanyPayload = (data: CompanyFormValues): CompanyFormValues => ({
   name: data.name.trim(),
   country: data.country.trim(),
   street: toOptionalField(data.street ?? ''),
+  houseNumber: toOptionalField(data.houseNumber ?? ''),
+  orientationNumber: toOptionalField(data.orientationNumber ?? ''),
+  registrationNumber: toOptionalField(data.registrationNumber ?? ''),
+  platceDPH: data.platceDPH ?? false,
   city: toOptionalField(data.city ?? ''),
   psc: toOptionalField(data.psc ?? ''),
   ico: toOptionalField(data.ico ?? ''),
@@ -157,7 +180,18 @@ const BillingInfoFormContent = ({
   const form = useForm<CompanyFormValues>({
     defaultValues: mapCompanyToForm(company),
   });
-  const { reset, watch, setValue } = form;
+  const { reset, watch, setValue, getValues, trigger } = form;
+
+  const validateAtLeastOneNumber = () => {
+    const values = getValues();
+    const hasAnyNumber = ADDRESS_NUMBER_FIELDS.some(
+      (fieldName) => (values[fieldName] as string | undefined)?.trim(),
+    );
+    return (
+      Boolean(hasAnyNumber) ||
+      t('settings.billing.validation.addressNumberRequired')
+    );
+  };
 
   const selectedTaxOfficeCode = watch('c_ufo');
   const selectedWorkplaceCode = watch('c_pracufo');
@@ -300,6 +334,29 @@ const BillingInfoFormContent = ({
                 placeholder="CZ12345678"
                 variant="vertical"
               />
+              <FormField
+                control={form.control}
+                name="platceDPH"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col justify-center space-y-2 md:col-span-2">
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Switch
+                          checked={!!field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className="!mt-0">
+                        {t('settings.billing.fields.platceDPH')}
+                      </FormLabel>
+                    </div>
+                    <FormDescription>
+                      {t('settings.billing.fields.platceDPHHint')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <InputController
                 control={form.control}
                 name="country"
@@ -324,6 +381,40 @@ const BillingInfoFormContent = ({
                 placeholder={t('settings.billing.placeholders.street')}
                 variant="vertical"
                 containerClassName="md:col-span-2"
+              />
+              <InputController
+                control={form.control}
+                name="houseNumber"
+                label={t('settings.billing.fields.houseNumber')}
+                placeholder={t('settings.billing.placeholders.houseNumber')}
+                variant="vertical"
+                rules={{ validate: validateAtLeastOneNumber }}
+                onChangeOverride={(e, onChange) => {
+                  onChange(e.target.value);
+                  void trigger('houseNumber');
+                }}
+              />
+              <InputController
+                control={form.control}
+                name="orientationNumber"
+                label={t('settings.billing.fields.orientationNumber')}
+                placeholder={t('settings.billing.placeholders.orientationNumber')}
+                variant="vertical"
+                onChangeOverride={(e, onChange) => {
+                  onChange(e.target.value);
+                  void trigger('houseNumber');
+                }}
+              />
+              <InputController
+                control={form.control}
+                name="registrationNumber"
+                label={t('settings.billing.fields.registrationNumber')}
+                placeholder={t('settings.billing.placeholders.registrationNumber')}
+                variant="vertical"
+                onChangeOverride={(e, onChange) => {
+                  onChange(e.target.value);
+                  void trigger('houseNumber');
+                }}
               />
               <InputController
                 control={form.control}

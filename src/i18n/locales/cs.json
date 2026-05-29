@@ -893,7 +893,12 @@
         "ico": "IČO",
         "dic": "DIČ",
         "country": "Stát",
-        "street": "Ulice a č.p.",
+        "street": "Ulice",
+        "houseNumber": "Číslo popisné",
+        "orientationNumber": "Číslo orientační",
+        "registrationNumber": "Číslo evidenční",
+        "platceDPH": "Plátce DPH",
+        "platceDPHHint": "Zaškrtněte, pokud je firma plátcem DPH.",
         "city": "Město",
         "psc": "PSČ",
         "taxOffice": "Finanční úřad",
@@ -904,7 +909,10 @@
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "Česká republika",
-        "street": "Masarykova 12",
+        "street": "Masarykova",
+        "houseNumber": "12",
+        "orientationNumber": "3",
+        "registrationNumber": "",
         "city": "Brno",
         "psc": "60200",
         "taxOffice": "Vyberte finanční úřad",
@@ -912,7 +920,8 @@
       },
       "validation": {
         "nameRequired": "Název firmy je povinný",
-        "countryRequired": "Stát je povinný"
+        "countryRequired": "Stát je povinný",
+        "addressNumberRequired": "Vyplňte alespoň jedno z čísel: popisné, orientační nebo evidenční"
       },
       "taxOfficeHint": {
         "selectFirst": "Nejdřív vyberte finanční úřad.",
@@ -1045,6 +1054,10 @@
         "dic": "DIČ firmy",
         "country": "Země",
         "street": "Ulice",
+        "houseNumber": "Číslo popisné",
+        "orientationNumber": "Číslo orientační",
+        "registrationNumber": "Číslo evidenční",
+        "platceDPH": "Plátce DPH",
         "city": "Město",
         "psc": "PSČ"
       },
@@ -1053,7 +1066,10 @@
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "CZ",
-        "street": "Hlavní 1",
+        "street": "Hlavní",
+        "houseNumber": "1",
+        "orientationNumber": "2",
+        "registrationNumber": "",
         "city": "Praha",
         "psc": "110 00"
       }
@@ -1089,7 +1105,8 @@
     "validation": {
       "firstNameRequired": "Jméno je povinné",
       "lastNameRequired": "Příjmení je povinné",
-      "companyNameRequired": "Název firmy je povinný"
+      "companyNameRequired": "Název firmy je povinný",
+      "addressNumberRequired": "Vyplňte alespoň jedno z čísel: popisné, orientační nebo evidenční"
     },
     "taxOfficeClear": "Nevybráno"
   },

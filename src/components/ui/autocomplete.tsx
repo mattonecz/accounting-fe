@@ -99,19 +99,28 @@ export function Autocomplete({
     setOpen(false);
 
     if (typeof data === 'object' && data !== null && 'ico' in data) {
-      const streetName = data.sidlo.nazevUlice || data.sidlo.nazevCastiObce;
-      const baseAddress = streetName + ' ' + data.sidlo.cisloDomovni;
+      const sidlo = data.sidlo;
+      const streetName = sidlo.nazevUlice || sidlo.nazevCastiObce || undefined;
+      // typCisloDomovni: 1 = číslo popisné, 2 = číslo evidenční
+      const isEvidencni = sidlo.typCisloDomovni === 2;
+      const cisloDomovni =
+        sidlo.cisloDomovni != null ? String(sidlo.cisloDomovni) : undefined;
+      const cisloOrientacni =
+        sidlo.cisloOrientacni != null
+          ? String(sidlo.cisloOrientacni)
+          : undefined;
       onChange(
         {
           name: data.obchodniJmeno,
           country: 'CZ',
           ico: data.ico,
           dic: data.dic,
-          city: data.sidlo.nazevObce,
-          street: data.sidlo.cisloOrientacni
-            ? baseAddress + '/' + data.sidlo.cisloOrientacni
-            : baseAddress,
-          psc: data.sidlo.psc.toString(),
+          city: sidlo.nazevObce,
+          street: streetName,
+          houseNumber: isEvidencni ? undefined : cisloDomovni,
+          registrationNumber: isEvidencni ? cisloDomovni : undefined,
+          orientationNumber: cisloOrientacni,
+          psc: sidlo.psc != null ? sidlo.psc.toString() : undefined,
         },
         withFinancniUrad ? data.financniUrad : undefined,
       );

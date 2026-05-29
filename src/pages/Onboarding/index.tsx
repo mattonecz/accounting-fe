@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -35,6 +36,9 @@ import {
 
 const CLEAR_SELECT_VALUE = '__none__';
 
+// Jediná podporovaná země (zatím nepodporujeme jiné státy).
+const DEFAULT_COUNTRY = 'Česká republika';
+
 const specialTaxOfficeWorkplaceOption = {
   officeCode: SPECIAL_TAX_OFFICE_CODE,
   code: SPECIAL_TAX_OFFICE_WORKPLACE_CODE,
@@ -51,12 +55,22 @@ interface OnboardingForm {
   companyDic: string;
   country: string;
   street: string;
+  houseNumber: string;
+  orientationNumber: string;
+  registrationNumber: string;
+  platceDPH: boolean;
   city: string;
   psc: string;
   dic: string;
   c_ufo: string;
   c_pracufo: string;
 }
+
+const ADDRESS_NUMBER_FIELDS = [
+  'houseNumber',
+  'orientationNumber',
+  'registrationNumber',
+] as const satisfies readonly (keyof OnboardingForm)[];
 
 function findTaxOfficeCode(financniUrad: string): string {
   if (!financniUrad) return '';
@@ -83,6 +97,8 @@ export default function Onboarding() {
     handleSubmit,
     setValue,
     watch,
+    getValues,
+    trigger,
     formState: { errors },
   } = useForm<OnboardingForm>({
     defaultValues: {
@@ -93,8 +109,12 @@ export default function Onboarding() {
       companyName: '',
       ico: '',
       companyDic: '',
-      country: 'CZ',
+      country: DEFAULT_COUNTRY,
       street: '',
+      houseNumber: '',
+      orientationNumber: '',
+      registrationNumber: '',
+      platceDPH: false,
       city: '',
       psc: '',
       dic: '',
@@ -131,17 +151,31 @@ export default function Onboarding() {
     if (selectedWorkplaceCode && !hasMatch) setValue('c_pracufo', '');
   }, [selectedTaxOfficeCode, selectedWorkplaceCode, setValue, workplaceOptions]);
 
+  const validateAtLeastOneNumber = () => {
+    const values = getValues();
+    const hasAnyNumber = ADDRESS_NUMBER_FIELDS.some((fieldName) =>
+      values[fieldName]?.trim(),
+    );
+    return Boolean(hasAnyNumber) || t('onboarding.validation.addressNumberRequired');
+  };
+
   const handleCompanySelect = (company: CreateCompanyDto) => {
     setValue('companyName', company.name ?? '');
     setValue('ico', company.ico ?? '');
     setValue('companyDic', company.dic ?? '');
-    setValue('country', company.country ?? 'CZ');
     setValue('street', company.street ?? '');
+    setValue('houseNumber', company.houseNumber ?? '');
+    setValue('orientationNumber', company.orientationNumber ?? '');
+    setValue('registrationNumber', company.registrationNumber ?? '');
+    if (typeof company.platceDPH === 'boolean') {
+      setValue('platceDPH', company.platceDPH);
+    }
     setValue('city', company.city ?? '');
     setValue('psc', company.psc ?? '');
     if (company.dic) {
       setValue('dic', company.dic);
     }
+    void trigger('houseNumber');
   };
 
   const handleCompanySelectWithAres = (
@@ -160,10 +194,14 @@ export default function Onboarding() {
   const onSubmit = (data: OnboardingForm) => {
     const companyPayload: CreateCompanyDto = {
       name: data.companyName,
-      country: data.country,
+      country: DEFAULT_COUNTRY,
       ico: data.ico || undefined,
       dic: data.companyDic || undefined,
       street: data.street || undefined,
+      houseNumber: data.houseNumber || undefined,
+      orientationNumber: data.orientationNumber || undefined,
+      registrationNumber: data.registrationNumber || undefined,
+      platceDPH: data.platceDPH,
       city: data.city || undefined,
       psc: data.psc || undefined,
       c_ufo: data.c_ufo || undefined,
@@ -235,7 +273,6 @@ export default function Onboarding() {
                     required: t('onboarding.validation.firstNameRequired'),
                     validate: (v) => v.trim().length > 0 || t('onboarding.validation.firstNameRequired'),
                   })}
-                  placeholder={t('onboarding.personal.placeholders.firstName')}
                 />
                 {errors.firstName && (
                   <p className="text-sm text-destructive">
@@ -252,7 +289,6 @@ export default function Onboarding() {
                     validate: (v) =>
                       v.trim().length > 0 || t('onboarding.validation.lastNameRequired'),
                   })}
-                  placeholder={t('onboarding.personal.placeholders.lastName')}
                 />
                 {errors.lastName && (
                   <p className="text-sm text-destructive">
@@ -265,7 +301,6 @@ export default function Onboarding() {
                 <Input
                   id="email"
                   {...register('email')}
-                  placeholder={t('onboarding.personal.placeholders.email')}
                 />
               </div>
               <div className="space-y-2">
@@ -273,7 +308,6 @@ export default function Onboarding() {
                 <Input
                   id="phone"
                   {...register('phone')}
-                  placeholder={t('onboarding.personal.placeholders.phone')}
                 />
               </div>
             </CardContent>
@@ -290,14 +324,13 @@ export default function Onboarding() {
                 withFinancniUrad
               />
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="companyName">{t('onboarding.company.fields.name')}</Label>
                   <Input
                     id="companyName"
                     {...register('companyName', {
                       required: t('onboarding.validation.companyNameRequired'),
                     })}
-                    placeholder={t('onboarding.company.placeholders.name')}
                   />
                   {errors.companyName && (
                     <p className="text-sm text-destructive">
@@ -307,30 +340,99 @@ export default function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ico">{t('onboarding.company.fields.ico')}</Label>
-                  <Input id="ico" {...register('ico')} placeholder={t('onboarding.company.placeholders.ico')} />
+                  <Input id="ico" {...register('ico')} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="companyDic">{t('onboarding.company.fields.dic')}</Label>
                   <Input
                     id="companyDic"
                     {...register('companyDic')}
-                    placeholder={t('onboarding.company.placeholders.dic')}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="country">{t('onboarding.company.fields.country')}</Label>
-                  <Input
-                    id="country"
-                    {...register('country')}
-                    placeholder={t('onboarding.company.placeholders.country')}
-                  />
-                </div>
+                <Controller
+                  control={control}
+                  name="platceDPH"
+                  render={({ field }) => (
+                    <div className="flex items-center gap-3 md:col-span-2">
+                      <Switch
+                        id="platceDPH"
+                        checked={!!field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <Label htmlFor="platceDPH" className="!mt-0">
+                        {t('onboarding.company.fields.platceDPH')}
+                      </Label>
+                    </div>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <Label htmlFor="country">
+                        {t('onboarding.company.fields.country')}
+                      </Label>
+                      <Select
+                        value={field.value || DEFAULT_COUNTRY}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger id="country">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={DEFAULT_COUNTRY}>
+                            {DEFAULT_COUNTRY}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                />
                 <div className="space-y-2">
                   <Label htmlFor="street">{t('onboarding.company.fields.street')}</Label>
                   <Input
                     id="street"
                     {...register('street')}
-                    placeholder={t('onboarding.company.placeholders.street')}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="houseNumber">
+                    {t('onboarding.company.fields.houseNumber')}
+                  </Label>
+                  <Input
+                    id="houseNumber"
+                    {...register('houseNumber', {
+                      validate: validateAtLeastOneNumber,
+                      onChange: () => void trigger('houseNumber'),
+                    })}
+                  />
+                  {errors.houseNumber && (
+                    <p className="text-sm text-destructive">
+                      {errors.houseNumber.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="orientationNumber">
+                    {t('onboarding.company.fields.orientationNumber')}
+                  </Label>
+                  <Input
+                    id="orientationNumber"
+                    {...register('orientationNumber', {
+                      onChange: () => void trigger('houseNumber'),
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="registrationNumber">
+                    {t('onboarding.company.fields.registrationNumber')}
+                  </Label>
+                  <Input
+                    id="registrationNumber"
+                    {...register('registrationNumber', {
+                      onChange: () => void trigger('houseNumber'),
+                    })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -338,7 +440,6 @@ export default function Onboarding() {
                   <Input
                     id="city"
                     {...register('city')}
-                    placeholder={t('onboarding.company.placeholders.city')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -346,7 +447,6 @@ export default function Onboarding() {
                   <Input
                     id="psc"
                     {...register('psc')}
-                    placeholder={t('onboarding.company.placeholders.psc')}
                   />
                 </div>
               </div>
@@ -364,7 +464,6 @@ export default function Onboarding() {
                 <Input
                   id="dic"
                   {...register('dic')}
-                  placeholder={t('onboarding.tax.placeholders.dic')}
                 />
               </div>
 

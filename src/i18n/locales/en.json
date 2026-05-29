@@ -892,7 +892,12 @@
         "ico": "ICO",
         "dic": "Tax ID",
         "country": "Country",
-        "street": "Street Address",
+        "street": "Street",
+        "houseNumber": "House Number",
+        "orientationNumber": "Orientation Number",
+        "registrationNumber": "Registration Number",
+        "platceDPH": "VAT payer",
+        "platceDPHHint": "Check if the company is a VAT payer.",
         "city": "City",
         "psc": "ZIP Code",
         "taxOffice": "Tax Office",
@@ -903,7 +908,10 @@
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "Czech Republic",
-        "street": "Masarykova 12",
+        "street": "Masarykova",
+        "houseNumber": "12",
+        "orientationNumber": "3",
+        "registrationNumber": "",
         "city": "Brno",
         "psc": "60200",
         "taxOffice": "Select tax office",
@@ -911,7 +919,8 @@
       },
       "validation": {
         "nameRequired": "Company name is required",
-        "countryRequired": "Country is required"
+        "countryRequired": "Country is required",
+        "addressNumberRequired": "Fill in at least one number: house, orientation or registration"
       },
       "taxOfficeHint": {
         "selectFirst": "Select a tax office first.",
@@ -1044,6 +1053,10 @@
         "dic": "Company Tax ID",
         "country": "Country",
         "street": "Street",
+        "houseNumber": "House Number",
+        "orientationNumber": "Orientation Number",
+        "registrationNumber": "Registration Number",
+        "platceDPH": "VAT payer",
         "city": "City",
         "psc": "ZIP Code"
       },
@@ -1052,7 +1065,10 @@
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "CZ",
-        "street": "Main St 1",
+        "street": "Main St",
+        "houseNumber": "1",
+        "orientationNumber": "2",
+        "registrationNumber": "",
         "city": "Prague",
         "psc": "110 00"
       }
@@ -1088,7 +1104,8 @@
     "validation": {
       "firstNameRequired": "First name is required",
       "lastNameRequired": "Last name is required",
-      "companyNameRequired": "Company name is required"
+      "companyNameRequired": "Company name is required",
+      "addressNumberRequired": "Fill in at least one number: house, orientation or registration"
     },
     "taxOfficeClear": "Not selected"
   },

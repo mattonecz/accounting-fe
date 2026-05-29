@@ -2512,6 +2512,19 @@
           "street": {
             "type": "string"
           },
+          "houseNumber": {
+            "type": "string"
+          },
+          "orientationNumber": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          },
+          "platceDPH": {
+            "type": "boolean",
+            "default": false
+          },
           "city": {
             "type": "string"
           },
@@ -2557,6 +2570,18 @@
           "street": {
             "type": "string"
           },
+          "houseNumber": {
+            "type": "string"
+          },
+          "orientationNumber": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          },
+          "platceDPH": {
+            "type": "boolean"
+          },
           "city": {
             "type": "string"
           },
@@ -2582,7 +2607,8 @@
         "required": [
           "id",
           "name",
-          "country"
+          "country",
+          "platceDPH"
         ]
       },
       "UpdateCompanyDto": {
@@ -2602,6 +2628,18 @@
           },
           "street": {
             "type": "string"
+          },
+          "houseNumber": {
+            "type": "string"
+          },
+          "orientationNumber": {
+            "type": "string"
+          },
+          "registrationNumber": {
+            "type": "string"
+          },
+          "platceDPH": {
+            "type": "boolean"
           },
           "city": {
             "type": "string"

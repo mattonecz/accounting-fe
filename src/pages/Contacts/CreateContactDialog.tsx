@@ -63,7 +63,25 @@ export const CreateContactDialog = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Autocomplete onChange={(data) => form.reset({ ...data, description: undefined })} />
+            <Autocomplete
+              onChange={(data) => {
+                const mainNumber = data.houseNumber || data.registrationNumber;
+                const numberPart = mainNumber
+                  ? data.orientationNumber
+                    ? `${mainNumber}/${data.orientationNumber}`
+                    : mainNumber
+                  : '';
+                form.reset({
+                  name: data.name,
+                  country: data.country,
+                  ico: data.ico,
+                  dic: data.dic,
+                  city: data.city,
+                  street: [data.street, numberPart].filter(Boolean).join(' ') || undefined,
+                  psc: data.psc,
+                });
+              }}
+            />
             <InputController control={form.control} name="name" label={t('contacts.fields.name')} type="text" rules={{ required: t('validation.required', { field: t('contacts.fields.name') }) }} placeholder={t('contacts.placeholders.name')} />
             <InputController control={form.control} name="ico" label={t('contacts.fields.ico')} type="text" placeholder="1234567890" />
             <InputController control={form.control} name="dic" label={t('contacts.fields.dic')} type="text" placeholder="CZ1234567890" />
