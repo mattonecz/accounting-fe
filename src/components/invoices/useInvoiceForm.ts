@@ -18,7 +18,8 @@ export type InvoiceFormValues = CreateInvoiceDto & {
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
-import { useUserProfileGet } from '@/api/user-profile/user-profile';
+import { useCompanyGet } from '@/api/companies/companies';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
   CZK: 'Kč',
@@ -60,12 +61,13 @@ export const useInvoiceForm = () => {
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
   const { data: invoiceNumber } = useInvoiceGetCount();
-  const { data: userProfileResponse } = useUserProfileGet();
+  const { activeCompanyId } = useAuth();
+  const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const { mutate: createInvoice, isPending: isCreatingInvoice } =
     useInvoiceCreate();
   const [submitMode, setSubmitMode] = useState<InvoiceSubmitMode>('issued');
 
-  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
+  const isVatPayer = !!companyResponse?.data?.vatPayer;
 
   const form = useForm<InvoiceFormValues>({
     defaultValues: {

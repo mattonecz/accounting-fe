@@ -34,7 +34,8 @@ import {
   getInvoiceListByCompanyQueryKey,
   useInvoiceCreate,
 } from '@/api/invoices/invoices';
-import { useUserProfileGet } from '@/api/user-profile/user-profile';
+import { useCompanyGet } from '@/api/companies/companies';
+import { useAuth } from '@/contexts/AuthContext';
 import type {
   ContactResponseDto,
   ContactSnapshotDto,
@@ -179,8 +180,9 @@ const CreateSimpleInvoice = () => {
     window.history.replaceState({}, '');
   }, [receiptFromState, form]);
 
-  const { data: userProfileResponse } = useUserProfileGet();
-  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
+  const { activeCompanyId } = useAuth();
+  const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
+  const isVatPayer = !!companyResponse?.data?.vatPayer;
 
   const { data: contacts = [], isLoading: isContactsLoading } =
     useListContacts<ContactResponseDto[]>({

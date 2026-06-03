@@ -21,7 +21,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,7 +38,9 @@ import {
   TAX_OFFICE_WORKPLACE_OPTIONS,
 } from '@/lib/taxOfficeCodebooks';
 
-type CompanyFormValues = Omit<CreateCompanyDto, 'email' | 'description'>;
+type CompanyFormValues = CreateCompanyDto;
+
+const COMPANY_TYPE_VALUES = ['OSVC', 'SRO'] as const;
 
 const ADDRESS_NUMBER_FIELDS = [
   'houseNumber',
@@ -61,17 +62,22 @@ const normalizeCodeValue = (value?: string | null) => {
 const mapCompanyToForm = (
   company?: CompanyResponseDto | null,
 ): CompanyFormValues => ({
+  companyType: company?.companyType ?? 'OSVC',
   name: company?.name ?? '',
+  surname: company?.surname ?? '',
+  companyName: company?.companyName ?? '',
   country: company?.country ?? '',
+  email: company?.email ?? '',
   street: company?.street ?? '',
   houseNumber: company?.houseNumber ?? '',
   orientationNumber: company?.orientationNumber ?? '',
   registrationNumber: company?.registrationNumber ?? '',
-  platceDPH: company?.platceDPH ?? false,
+  vatPayer: company?.vatPayer ?? false,
   city: company?.city ?? '',
   psc: company?.psc ?? '',
   ico: company?.ico ?? '',
   dic: company?.dic ?? '',
+  description: company?.description ?? '',
   c_ufo: normalizeCodeValue(company?.c_ufo),
   c_pracufo: normalizeCodeValue(company?.c_pracufo),
 });
@@ -81,21 +87,36 @@ const toOptionalField = (value: string) => {
   return trimmedValue.length > 0 ? trimmedValue : undefined;
 };
 
-const toCompanyPayload = (data: CompanyFormValues): CompanyFormValues => ({
-  name: data.name.trim(),
-  country: data.country.trim(),
-  street: toOptionalField(data.street ?? ''),
-  houseNumber: toOptionalField(data.houseNumber ?? ''),
-  orientationNumber: toOptionalField(data.orientationNumber ?? ''),
-  registrationNumber: toOptionalField(data.registrationNumber ?? ''),
-  platceDPH: data.platceDPH ?? false,
-  city: toOptionalField(data.city ?? ''),
-  psc: toOptionalField(data.psc ?? ''),
-  ico: toOptionalField(data.ico ?? ''),
-  dic: toOptionalField(data.dic ?? ''),
-  c_ufo: toOptionalField(data.c_ufo ?? ''),
-  c_pracufo: toOptionalField(data.c_pracufo ?? ''),
-});
+const toCompanyPayload = (data: CompanyFormValues): CompanyFormValues => {
+  const isOsvc = data.companyType === 'OSVC';
+  const firstName = (data.name ?? '').trim();
+  const lastName = (data.surname ?? '').trim();
+  // U OSVČ se název firmy bere z vyplněného pole, jinak se složí z "jméno příjmení".
+  const companyName =
+    (data.companyName ?? '').trim() ||
+    (isOsvc ? `${firstName} ${lastName}`.trim() : '');
+
+  return {
+    companyType: data.companyType,
+    name: isOsvc ? firstName || undefined : undefined,
+    surname: isOsvc ? lastName || undefined : undefined,
+    companyName: companyName || undefined,
+    country: data.country.trim(),
+    email: toOptionalField(data.email ?? ''),
+    street: toOptionalField(data.street ?? ''),
+    houseNumber: toOptionalField(data.houseNumber ?? ''),
+    orientationNumber: toOptionalField(data.orientationNumber ?? ''),
+    registrationNumber: toOptionalField(data.registrationNumber ?? ''),
+    vatPayer: data.vatPayer ?? false,
+    city: data.city.trim(),
+    psc: data.psc.trim(),
+    ico: data.ico.trim(),
+    dic: toOptionalField(data.dic ?? ''),
+    description: toOptionalField(data.description ?? ''),
+    c_ufo: toOptionalField(data.c_ufo ?? ''),
+    c_pracufo: toOptionalField(data.c_pracufo ?? ''),
+  };
+};
 
 interface BillingInfoFormProps {
   companyId: string;
@@ -180,7 +201,8 @@ const BillingInfoFormContent = ({
   const form = useForm<CompanyFormValues>({
     defaultValues: mapCompanyToForm(company),
   });
-  const { reset, watch, setValue, getValues, trigger } = form;
+  const { reset, watch, setValue, setError, getValues, trigger } = form;
+  const isOsvc = watch('companyType') === 'OSVC';
 
   const validateAtLeastOneNumber = () => {
     const values = getValues();
@@ -228,6 +250,38 @@ const BillingInfoFormContent = ({
   ]);
 
   const onSubmit = (data: CompanyFormValues) => {
+    // OSVČ: povinné jméno + příjmení. SRO: povinný název firmy.
+    if (data.companyType === 'OSVC') {
+      let invalid = false;
+      if (!(data.name ?? '').trim()) {
+        setError('name', {
+          type: 'required',
+          message: t('validation.required', {
+            field: t('settings.billing.fields.firstName'),
+          }),
+        });
+        invalid = true;
+      }
+      if (!(data.surname ?? '').trim()) {
+        setError('surname', {
+          type: 'required',
+          message: t('validation.required', {
+            field: t('settings.billing.fields.lastName'),
+          }),
+        });
+        invalid = true;
+      }
+      if (invalid) return;
+    } else if (!(data.companyName ?? '').trim()) {
+      setError('companyName', {
+        type: 'required',
+        message: t('validation.required', {
+          field: t('settings.billing.fields.companyName'),
+        }),
+      });
+      return;
+    }
+
     const payload = toCompanyPayload(data);
     const handleSuccess = (response: { data: CompanyResponseDto }) => {
       queryClient.setQueryData(
@@ -302,23 +356,29 @@ const BillingInfoFormContent = ({
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
+              {isOsvc && (
+                <>
+                  <InputController
+                    control={form.control}
+                    name="name"
+                    label={t('settings.billing.fields.firstName')}
+                    variant="vertical"
+                  />
+                  <InputController
+                    control={form.control}
+                    name="surname"
+                    label={t('settings.billing.fields.lastName')}
+                    variant="vertical"
+                  />
+                </>
+              )}
               <InputController
                 control={form.control}
-                name="name"
-                label={t('settings.billing.fields.name')}
-                placeholder="ACME s.r.o."
+                name="companyName"
+                label={t('settings.billing.fields.companyName')}
+                placeholder={t('settings.billing.placeholders.companyName')}
                 variant="vertical"
                 containerClassName="md:col-span-2"
-                rules={{
-                  required: t('validation.required', {
-                    field: t('settings.billing.fields.name'),
-                  }),
-                  validate: (value) =>
-                    (value?.trim().length ?? 0) > 0 ||
-                    t('validation.required', {
-                      field: t('settings.billing.fields.name'),
-                    }),
-                }}
               />
               <InputController
                 control={form.control}
@@ -334,25 +394,33 @@ const BillingInfoFormContent = ({
                 placeholder="CZ12345678"
                 variant="vertical"
               />
+              <SelectController
+                control={form.control}
+                name="companyType"
+                label={t('settings.billing.fields.companyType')}
+                placeholder={t('settings.billing.placeholders.companyType')}
+                options={COMPANY_TYPE_VALUES.map((value) => ({
+                  value,
+                  label: t(`settings.billing.companyType.${value}`),
+                }))}
+                variant="vertical"
+              />
               <FormField
                 control={form.control}
-                name="platceDPH"
+                name="vatPayer"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col justify-center space-y-2 md:col-span-2">
-                    <div className="flex items-center gap-3">
+                  <FormItem className="space-y-2">
+                    <FormLabel>
+                      {t('settings.billing.fields.platceDPH')}
+                    </FormLabel>
+                    <div className="flex h-10 items-center">
                       <FormControl>
                         <Switch
                           checked={!!field.value}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormLabel className="!mt-0">
-                        {t('settings.billing.fields.platceDPH')}
-                      </FormLabel>
                     </div>
-                    <FormDescription>
-                      {t('settings.billing.fields.platceDPHHint')}
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -429,6 +497,14 @@ const BillingInfoFormContent = ({
                 label={t('settings.billing.fields.psc')}
                 placeholder="60200"
                 variant="vertical"
+              />
+              <InputController
+                control={form.control}
+                name="description"
+                label={t('settings.billing.fields.description')}
+                placeholder={t('settings.billing.placeholders.description')}
+                variant="vertical"
+                containerClassName="md:col-span-2"
               />
             </CardContent>
           </Card>

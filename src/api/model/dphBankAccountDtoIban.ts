@@ -6,7 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserCompanyCompanySummaryDto {
-  id: string;
-  name?: string;
-}
+/**
+ * IBAN, for foreign accounts.
+ * @nullable
+ */
+export type DphBankAccountDtoIban = { [key: string]: unknown } | null;

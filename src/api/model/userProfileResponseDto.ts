@@ -10,7 +10,6 @@ export interface UserProfileResponseDto {
   id: string;
   firstName: string;
   lastName: string;
-  dic?: string;
   phone?: string;
   email?: string;
 }

@@ -6,7 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserCompanyCompanySummaryDto {
-  id: string;
-  name?: string;
-}
+/**
+ * Bank code (kód banky).
+ * @nullable
+ */
+export type DphBankAccountDtoBankCode = { [key: string]: unknown } | null;

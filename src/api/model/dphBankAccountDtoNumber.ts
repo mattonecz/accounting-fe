@@ -6,7 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserCompanyCompanySummaryDto {
-  id: string;
-  name?: string;
-}
+/**
+ * Domestic account number.
+ * @nullable
+ */
+export type DphBankAccountDtoNumber = { [key: string]: unknown } | null;

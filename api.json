@@ -524,6 +524,38 @@
         ]
       }
     },
+    "/ares/registration-data": {
+      "post": {
+        "operationId": "getRegistrationData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationDataRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationDataResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get ARES registration data (+ optional VAT status)",
+        "tags": [
+          "Ares"
+        ]
+      }
+    },
     "/companies": {
       "post": {
         "operationId": "companyCreate",
@@ -2079,8 +2111,7 @@
           }
         },
         "required": [
-          "id",
-          "name"
+          "id"
         ]
       },
       "UserCompanyResponseDto": {
@@ -2441,6 +2472,12 @@
           "obchodniJmeno": {
             "type": "string"
           },
+          "jmeno": {
+            "type": "string"
+          },
+          "prijmeni": {
+            "type": "string"
+          },
           "sidlo": {
             "$ref": "#/components/schemas/SidloDto"
           },
@@ -2497,10 +2534,173 @@
           "ekonomickeSubjekty"
         ]
       },
+      "RegistrationDataRequestDto": {
+        "type": "object",
+        "properties": {
+          "ico": {
+            "type": "string",
+            "description": "IČO — přesně 8 číslic.",
+            "example": "45274649"
+          }
+        },
+        "required": [
+          "ico"
+        ]
+      },
+      "DphBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "publishedAt": {
+            "type": "string",
+            "description": "Date the account was published (ISO date)."
+          },
+          "standard": {
+            "type": "boolean",
+            "description": "True for a standard domestic account, false for non-standard."
+          },
+          "prefix": {
+            "type": "object",
+            "nullable": true,
+            "description": "Account prefix (předčíslí)."
+          },
+          "number": {
+            "type": "object",
+            "nullable": true,
+            "description": "Domestic account number."
+          },
+          "bankCode": {
+            "type": "object",
+            "nullable": true,
+            "description": "Bank code (kód banky)."
+          },
+          "iban": {
+            "type": "object",
+            "nullable": true,
+            "description": "IBAN, for foreign accounts."
+          },
+          "formatted": {
+            "type": "object",
+            "nullable": true,
+            "description": "Human-readable account, e.g. \"19-2000145399/0800\" or the IBAN."
+          }
+        },
+        "required": [
+          "publishedAt",
+          "standard",
+          "prefix",
+          "number",
+          "bankCode",
+          "iban",
+          "formatted"
+        ]
+      },
+      "RegistrationDataResponseDto": {
+        "type": "object",
+        "properties": {
+          "ico": {
+            "type": "string"
+          },
+          "obchodniJmeno": {
+            "type": "string"
+          },
+          "jmeno": {
+            "type": "string"
+          },
+          "prijmeni": {
+            "type": "string"
+          },
+          "sidlo": {
+            "$ref": "#/components/schemas/SidloDto"
+          },
+          "pravniForma": {
+            "type": "string"
+          },
+          "financniUrad": {
+            "type": "string"
+          },
+          "datumVzniku": {
+            "type": "string"
+          },
+          "datumAktualizace": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string",
+            "description": "Looked-up DIČ, without the \"CZ\" prefix."
+          },
+          "icoId": {
+            "type": "string"
+          },
+          "adresaDorucovaci": {
+            "$ref": "#/components/schemas/AdresaDorucovaciDto"
+          },
+          "found": {
+            "type": "boolean",
+            "description": "False when the DIČ is not registered as a VAT payer."
+          },
+          "unreliable": {
+            "type": "object",
+            "nullable": true,
+            "description": "True if flagged unreliable (nespolehlivý plátce), false if reliable, null when not found."
+          },
+          "unreliableSince": {
+            "type": "object",
+            "nullable": true,
+            "description": "Date the payer was flagged unreliable (ISO date), if any."
+          },
+          "taxOfficeCode": {
+            "type": "object",
+            "nullable": true,
+            "description": "Financial office code (číslo FÚ) the payer belongs to."
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DphBankAccountDto"
+            }
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "CRPDPH status code (0 = OK)."
+          },
+          "statusText": {
+            "type": "string",
+            "description": "CRPDPH status text."
+          },
+          "generatedAt": {
+            "type": "string",
+            "description": "When the registry generated the answer."
+          }
+        },
+        "required": [
+          "ico",
+          "obchodniJmeno",
+          "sidlo",
+          "pravniForma",
+          "financniUrad",
+          "datumVzniku",
+          "datumAktualizace",
+          "icoId",
+          "adresaDorucovaci"
+        ]
+      },
       "CreateCompanyDto": {
         "type": "object",
         "properties": {
+          "companyType": {
+            "type": "string",
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
+          },
           "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "companyName": {
             "type": "string"
           },
           "country": {
@@ -2521,7 +2721,7 @@
           "registrationNumber": {
             "type": "string"
           },
-          "platceDPH": {
+          "vatPayer": {
             "type": "boolean",
             "default": false
           },
@@ -2548,8 +2748,11 @@
           }
         },
         "required": [
-          "name",
-          "country"
+          "companyType",
+          "country",
+          "city",
+          "psc",
+          "ico"
         ]
       },
       "CompanyResponseDto": {
@@ -2560,6 +2763,19 @@
           },
           "name": {
             "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "companyType": {
+            "type": "string",
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
           },
           "country": {
             "type": "string"
@@ -2579,7 +2795,7 @@
           "registrationNumber": {
             "type": "string"
           },
-          "platceDPH": {
+          "vatPayer": {
             "type": "boolean"
           },
           "city": {
@@ -2606,9 +2822,8 @@
         },
         "required": [
           "id",
-          "name",
           "country",
-          "platceDPH"
+          "vatPayer"
         ]
       },
       "UpdateCompanyDto": {
@@ -2617,7 +2832,20 @@
           "id": {
             "type": "string"
           },
+          "companyType": {
+            "type": "string",
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
+          },
           "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "companyName": {
             "type": "string"
           },
           "country": {
@@ -2638,7 +2866,7 @@
           "registrationNumber": {
             "type": "string"
           },
-          "platceDPH": {
+          "vatPayer": {
             "type": "boolean"
           },
           "city": {
@@ -2664,7 +2892,11 @@
           }
         },
         "required": [
-          "id"
+          "id",
+          "companyType",
+          "city",
+          "psc",
+          "ico"
         ]
       },
       "UpdateIsdsCredentialsDto": {
@@ -3780,11 +4012,6 @@
           "lastName": {
             "type": "string"
           },
-          "dic": {
-            "type": "string",
-            "description": "Tax identification number used for VAT filings",
-            "example": "9007180501"
-          },
           "phone": {
             "type": "string",
             "description": "Phone number used in VAT filings",
@@ -3813,9 +4040,6 @@
           "lastName": {
             "type": "string"
           },
-          "dic": {
-            "type": "string"
-          },
           "phone": {
             "type": "string"
           },
@@ -3837,11 +4061,6 @@
           },
           "lastName": {
             "type": "string"
-          },
-          "dic": {
-            "type": "string",
-            "description": "Tax identification number used for VAT filings",
-            "example": "9007180501"
           },
           "phone": {
             "type": "string",

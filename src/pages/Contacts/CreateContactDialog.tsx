@@ -72,7 +72,7 @@ export const CreateContactDialog = ({
                     : mainNumber
                   : '';
                 form.reset({
-                  name: data.name,
+                  name: data.companyName ?? data.name,
                   country: data.country,
                   ico: data.ico,
                   dic: data.dic,

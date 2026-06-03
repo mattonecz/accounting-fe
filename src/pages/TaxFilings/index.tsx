@@ -24,7 +24,7 @@ const TaxFilings = () => {
     if (isTestingLogin) return;
     setIsTestingLogin(true);
     try {
-      const response = await dataMessagesTestLogin();
+      const response = await dataMessagesTestLogin({});
       console.log('data-messages/test-login result', response.data);
     } catch (error) {
       console.error('data-messages/test-login failed', error);

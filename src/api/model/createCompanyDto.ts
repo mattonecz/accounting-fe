@@ -5,19 +5,23 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { CreateCompanyDtoCompanyType } from './createCompanyDtoCompanyType';
 
 export interface CreateCompanyDto {
-  name: string;
+  companyType: CreateCompanyDtoCompanyType;
+  name?: string;
+  surname?: string;
+  companyName?: string;
   country: string;
   email?: string;
   street?: string;
   houseNumber?: string;
   orientationNumber?: string;
   registrationNumber?: string;
-  platceDPH?: boolean;
-  city?: string;
-  psc?: string;
-  ico?: string;
+  vatPayer?: boolean;
+  city: string;
+  psc: string;
+  ico: string;
   dic?: string;
   description?: string;
   c_ufo?: string;

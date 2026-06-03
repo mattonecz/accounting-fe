@@ -12,7 +12,8 @@ import {
 } from '@/api/invoices/invoices';
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
-import { useUserProfileGet } from '@/api/user-profile/user-profile';
+import { useCompanyGet } from '@/api/companies/companies';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
@@ -130,11 +131,12 @@ export function useUpdateInvoiceForm(id: string) {
   const { data: invoiceResponse, isLoading, isError } = useInvoiceGet(id || '');
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
-  const { data: userProfileResponse } = useUserProfileGet();
+  const { activeCompanyId } = useAuth();
+  const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const { mutate: updateInvoice, isPending: isUpdatingInvoice } =
     useInvoiceUpdate();
 
-  const isVatPayer = !!userProfileResponse?.data?.dic?.trim();
+  const isVatPayer = !!companyResponse?.data?.vatPayer;
 
   const form = useForm<UpdateInvoiceFormValues>({
     defaultValues: getDefaultValues(),

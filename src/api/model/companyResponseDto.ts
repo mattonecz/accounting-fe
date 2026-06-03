@@ -5,17 +5,21 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
+import type { CompanyResponseDtoCompanyType } from './companyResponseDtoCompanyType';
 
 export interface CompanyResponseDto {
   id: string;
-  name: string;
+  name?: string;
+  companyName?: string;
+  surname?: string;
+  companyType?: CompanyResponseDtoCompanyType;
   country: string;
   email?: string;
   street?: string;
   houseNumber?: string;
   orientationNumber?: string;
   registrationNumber?: string;
-  platceDPH: boolean;
+  vatPayer: boolean;
   city?: string;
   psc?: string;
   ico?: string;

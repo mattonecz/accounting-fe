@@ -6,7 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserCompanyCompanySummaryDto {
-  id: string;
-  name?: string;
-}
+/**
+ * Account prefix (předčíslí).
+ * @nullable
+ */
+export type DphBankAccountDtoPrefix = { [key: string]: unknown } | null;

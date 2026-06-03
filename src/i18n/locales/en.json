@@ -889,8 +889,14 @@
       "missingCompanyExisting": "The company assigned to this account was not found. A new record will be created on save.",
       "fields": {
         "name": "Company Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "companyName": "Company Name",
+        "companyType": "Company Type",
         "ico": "ICO",
         "dic": "Tax ID",
+        "email": "Email",
+        "description": "Note",
         "country": "Country",
         "street": "Street",
         "houseNumber": "House Number",
@@ -903,8 +909,16 @@
         "taxOffice": "Tax Office",
         "taxWorkplace": "Tax Office Branch"
       },
+      "companyType": {
+        "OSVC": "Sole trader",
+        "SRO": "Ltd."
+      },
       "placeholders": {
         "name": "ACME Ltd.",
+        "companyName": "ACME Ltd.",
+        "companyType": "Select company type",
+        "email": "info@acme.com",
+        "description": "Optional note",
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "Czech Republic",
@@ -1049,6 +1063,7 @@
       "description": "Your company details. Enter ICO or name to search in ARES.",
       "fields": {
         "name": "Company Name",
+        "companyType": "Company Type",
         "ico": "ICO",
         "dic": "Company Tax ID",
         "country": "Country",
@@ -1060,8 +1075,13 @@
         "city": "City",
         "psc": "ZIP Code"
       },
+      "companyType": {
+        "OSVC": "Sole trader",
+        "SRO": "Ltd."
+      },
       "placeholders": {
         "name": "Company Ltd.",
+        "companyType": "Select company type",
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "CZ",
@@ -1092,20 +1112,33 @@
         "normal": "Only branches belonging to the selected tax office are shown."
       }
     },
+    "step1": {
+      "title": "Let's start",
+      "description": "Enter the ICO. We'll try to fill in the rest from ARES."
+    },
     "actions": {
       "complete": "Complete Registration",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "continue": "Continue",
+      "loadingRegistration": "Loading data from ARES...",
+      "fillManually": "Fill in manually",
+      "back": "Back"
     },
     "messages": {
-      "success": "Profile and company created successfully.",
+      "success": "Company created successfully.",
       "partial": "Company created, but profile could not be saved. You can edit it in settings.",
-      "companyFailed": "Failed to create company."
+      "companyFailed": "Failed to create company.",
+      "registrationFailed": "Could not load data from ARES. Please fill it in manually."
     },
     "validation": {
       "firstNameRequired": "First name is required",
       "lastNameRequired": "Last name is required",
       "companyNameRequired": "Company name is required",
-      "addressNumberRequired": "Fill in at least one number: house, orientation or registration"
+      "addressNumberRequired": "Fill in at least one number: house, orientation or registration",
+      "icoRequired": "Company ID (IČO) is required",
+      "icoInvalid": "Company ID (IČO) must be exactly 8 digits",
+      "cityRequired": "City is required",
+      "pscRequired": "ZIP code is required"
     },
     "taxOfficeClear": "Not selected"
   },
@@ -1113,7 +1146,8 @@
     "label": "Search in ARES",
     "placeholder": "Enter company name or full ICO",
     "loading": "Loading suggestions...",
-    "empty": "No suggestions found."
+    "empty": "No suggestions found.",
+    "ico": "CRN: {{ico}}"
   },
   "aiChat": {
     "title": "AI Assistant",

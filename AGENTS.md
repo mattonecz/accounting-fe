@@ -28,6 +28,7 @@
 - Follow existing React Query usage patterns on pages: call generated hooks directly in the page or a focused feature component, then render loading, empty, and error states close to the relevant UI.
 - Prefer generated API DTO contracts from `src/api/model/` for form typing and payload shaping. Do not introduce local Zod schemas for forms when the API contract already defines the data shape.
 - Preserve the current mixed Czech and English product language unless the task explicitly standardizes copy.
+- Always add user-facing text to translations. Never hardcode display strings (labels, placeholders, messages, units) in components — add a key to both `src/i18n/locales/cs.json` and `src/i18n/locales/en.json` and render it via `t('...')`. Use interpolation (`{{var}}`) for dynamic values rather than concatenating translated fragments. Domain terms differ per locale (e.g. IČO in Czech is CRN in English), so translate the term itself, not just surrounding words.
 - Invoice terminology and finance-domain behavior are documented in `docs/adr/0001-frontend-orientation-log.md`. Read that document before changing invoice, VAT, or simple-invoice flows.
 
 ### Shared Reusable Components

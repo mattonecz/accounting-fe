@@ -11,6 +11,8 @@ import type { AdresaDorucovaciDto } from './adresaDorucovaciDto';
 export interface EkonomickySubjektDto {
   ico: string;
   obchodniJmeno: string;
+  jmeno?: string;
+  prijmeni?: string;
   sidlo: SidloDto;
   pravniForma: string;
   financniUrad: string;

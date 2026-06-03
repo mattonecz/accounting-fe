@@ -890,8 +890,14 @@
       "missingCompanyExisting": "Firma přiřazená k účtu nebyla nalezena. Po uložení se vytvoří nový záznam.",
       "fields": {
         "name": "Název firmy",
+        "firstName": "Jméno",
+        "lastName": "Příjmení",
+        "companyName": "Název firmy",
+        "companyType": "Typ firmy",
         "ico": "IČO",
         "dic": "DIČ",
+        "email": "E-mail",
+        "description": "Poznámka",
         "country": "Stát",
         "street": "Ulice",
         "houseNumber": "Číslo popisné",
@@ -904,8 +910,16 @@
         "taxOffice": "Finanční úřad",
         "taxWorkplace": "Územní pracoviště"
       },
+      "companyType": {
+        "OSVC": "OSVČ",
+        "SRO": "S.r.o."
+      },
       "placeholders": {
         "name": "ACME s.r.o.",
+        "companyName": "ACME s.r.o.",
+        "companyType": "Vyberte typ firmy",
+        "email": "info@acme.cz",
+        "description": "Volitelná poznámka",
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "Česká republika",
@@ -1050,6 +1064,7 @@
       "description": "Údaje o vaší firmě. Zadejte IČO nebo název pro vyhledání v ARES.",
       "fields": {
         "name": "Název firmy",
+        "companyType": "Typ firmy",
         "ico": "IČO",
         "dic": "DIČ firmy",
         "country": "Země",
@@ -1061,8 +1076,13 @@
         "city": "Město",
         "psc": "PSČ"
       },
+      "companyType": {
+        "OSVC": "OSVČ",
+        "SRO": "S.r.o."
+      },
       "placeholders": {
         "name": "Firma s.r.o.",
+        "companyType": "Vyberte typ firmy",
         "ico": "12345678",
         "dic": "CZ12345678",
         "country": "CZ",
@@ -1093,20 +1113,33 @@
         "normal": "Nabídka obsahuje pouze pracoviště patřící k vybranému finančnímu úřadu."
       }
     },
+    "step1": {
+      "title": "Začínáme",
+      "description": "Zadejte IČO. Zbytek se pokusíme doplnit z ARES."
+    },
     "actions": {
       "complete": "Dokončit registraci",
-      "saving": "Ukládám..."
+      "saving": "Ukládám...",
+      "continue": "Pokračovat",
+      "loadingRegistration": "Načítám údaje z ARES...",
+      "fillManually": "Vyplnit ručně",
+      "back": "Zpět"
     },
     "messages": {
-      "success": "Profil a firma byly úspěšně vytvořeny.",
+      "success": "Firma byla úspěšně vytvořena.",
       "partial": "Firma vytvořena, ale profil se nepodařilo uložit. Můžete ho upravit v nastavení.",
-      "companyFailed": "Vytvoření firmy se nepodařilo."
+      "companyFailed": "Vytvoření firmy se nepodařilo.",
+      "registrationFailed": "Údaje z ARES se nepodařilo načíst. Vyplňte je prosím ručně."
     },
     "validation": {
       "firstNameRequired": "Jméno je povinné",
       "lastNameRequired": "Příjmení je povinné",
       "companyNameRequired": "Název firmy je povinný",
-      "addressNumberRequired": "Vyplňte alespoň jedno z čísel: popisné, orientační nebo evidenční"
+      "addressNumberRequired": "Vyplňte alespoň jedno z čísel: popisné, orientační nebo evidenční",
+      "icoRequired": "IČO je povinné",
+      "icoInvalid": "IČO musí mít přesně 8 číslic",
+      "cityRequired": "Město je povinné",
+      "pscRequired": "PSČ je povinné"
     },
     "taxOfficeClear": "Nevybráno"
   },
@@ -1114,7 +1147,8 @@
     "label": "Vyhledat v ARES",
     "placeholder": "Zadejte název nebo celé IČO",
     "loading": "Načítám návrhy...",
-    "empty": "Žádné výsledky."
+    "empty": "Žádné výsledky.",
+    "ico": "IČO: {{ico}}"
   },
   "aiChat": {
     "title": "AI Asistent",

@@ -15,7 +15,7 @@ import { Label } from './label';
 import { CreateCompanyDto } from '@/api/model';
 
 interface AutocompleteProps {
-  onChange: (value: CreateCompanyDto, financniUrad?: string) => void;
+  onChange: (value: Partial<CreateCompanyDto>, financniUrad?: string) => void;
   withFinancniUrad?: boolean;
   debounceMs?: number;
   disabled?: boolean;
@@ -111,7 +111,9 @@ export function Autocomplete({
           : undefined;
       onChange(
         {
-          name: data.obchodniJmeno,
+          name: data.jmeno,
+          companyName: data.obchodniJmeno,
+          surname: data.prijmeni,
           country: 'CZ',
           ico: data.ico,
           dic: data.dic,
@@ -169,11 +171,18 @@ export function Autocomplete({
                     {suggestions.map((suggestion, index) => (
                       <CommandItem
                         key={index}
-                        value={suggestion.obchodniJmeno}
+                        value={`${suggestion.ico ?? ''}-${index}`}
                         onSelect={() => handleSelect(suggestion)}
-                        className="cursor-pointer"
+                        className="flex cursor-pointer items-center justify-between gap-4"
                       >
-                        {suggestion.obchodniJmeno}
+                        <span className="min-w-0 truncate">
+                          {suggestion.obchodniJmeno}
+                        </span>
+                        {suggestion.ico && (
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {t('autocomplete.ico', { ico: suggestion.ico })}
+                          </span>
+                        )}
                       </CommandItem>
                     ))}
                   </CommandGroup>

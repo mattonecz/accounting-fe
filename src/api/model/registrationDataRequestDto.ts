@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserCompanyCompanySummaryDto {
-  id: string;
-  name?: string;
+export interface RegistrationDataRequestDto {
+  /** IČO — přesně 8 číslic. */
+  ico: string;
 }
