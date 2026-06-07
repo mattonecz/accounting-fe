@@ -16,7 +16,7 @@ export type MessageStatusResponseDtoState = typeof MessageStatusResponseDtoState
 export const MessageStatusResponseDtoState = {
   SENT: 'SENT',
   DELIVERED: 'DELIVERED',
-  READ: 'READ',
+  SERVED: 'SERVED',
   FAILED: 'FAILED',
   UNKNOWN: 'UNKNOWN',
 } as const;

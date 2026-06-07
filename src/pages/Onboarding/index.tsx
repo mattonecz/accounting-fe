@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { SwitchController } from '@/components/SwitchController';
 import {
   Select,
   SelectContent,
@@ -380,6 +380,7 @@ export default function Onboarding() {
                     control={control}
                     name="ico"
                     label={t('onboarding.company.fields.ico')}
+                    variant="vertical"
                     rules={{
                       required: t('onboarding.validation.icoRequired'),
                       validate: (v: string) =>
@@ -429,6 +430,7 @@ export default function Onboarding() {
                   <Autocomplete
                     onChange={handleCompanySelectWithAres}
                     withFinancniUrad
+                    getDphStatus
                   />
                   <div className="grid gap-4 md:grid-cols-2">
                     {isOsvc && (
@@ -524,21 +526,10 @@ export default function Onboarding() {
                         </div>
                       )}
                     />
-                    <Controller
+                    <SwitchController
                       control={control}
                       name="vatPayer"
-                      render={({ field }) => (
-                        <div className="flex items-center gap-3 md:col-span-2">
-                          <Switch
-                            id="vatPayer"
-                            checked={!!field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                          <Label htmlFor="vatPayer" className="!mt-0">
-                            {t('onboarding.company.fields.platceDPH')}
-                          </Label>
-                        </div>
-                      )}
+                      label={t('onboarding.company.fields.platceDPH')}
                     />
                     <Controller
                       control={control}

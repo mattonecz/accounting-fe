@@ -14,6 +14,7 @@ export interface CreateCompanyDto {
   companyName?: string;
   country: string;
   email?: string;
+  phone?: string;
   street?: string;
   houseNumber?: string;
   orientationNumber?: string;

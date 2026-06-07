@@ -5,9 +5,9 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import type { EkonomickySubjektDto } from './ekonomickySubjektDto';
+import type { RegistrationDataResponseDto } from './registrationDataResponseDto';
 
 export interface AresResponseDto {
   pocetCelkem: number;
-  ekonomickeSubjekty: EkonomickySubjektDto[];
+  ekonomickeSubjekty: RegistrationDataResponseDto[];
 }

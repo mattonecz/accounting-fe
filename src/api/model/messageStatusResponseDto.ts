@@ -36,15 +36,15 @@ export interface MessageStatusResponseDto {
   /** When the message was sent (ISO 8601) */
   sentAt: string;
   /**
-   * When the message was delivered to the data box (ISO 8601)
+   * When the message was legally served (doručeno) — ISDS dmAcceptanceTime (by login or fiction) (ISO 8601)
    * @nullable
    */
   deliveredAt: string | null;
   /**
-   * When the message was accepted/read by the recipient (ISO 8601)
+   * When the message reached the data box (dodáno) — ISDS dmDeliveryTime (ISO 8601)
    * @nullable
    */
-  readAt: string | null;
+  servedAt: string | null;
   /** Live ISDS delivery event timeline */
   events: MessageStatusEventDto[];
 }

@@ -11,4 +11,6 @@ export interface ContactSearchDto {
   ico?: string[];
   start?: number;
   pocet?: number;
+  /** When true, each result is enriched with its CRPDPH VAT status and — for sole traders (právní forma 101) — the RZP proprietor name, as in getRegistrationData. */
+  getDphStatus?: boolean;
 }

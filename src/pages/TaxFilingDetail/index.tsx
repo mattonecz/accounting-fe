@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { Calculator, Download, TrendingDown, TrendingUp } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { Calculator, Download, Send, TrendingDown, TrendingUp } from 'lucide-react';
+import { useDataMessagesSubmitTax } from '@/api/data-messages/data-messages';
 import {
   downloadTaxFilingKhXml,
   downloadTaxFilingVatXml,
+  getGetTaxFilingQueryKey,
   useGetTaxFiling,
 } from '@/api/tax-filings/tax-filings';
 import {
@@ -35,7 +38,9 @@ const TaxFilingDetail = () => {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const [downloading, setDownloading] = useState<XmlKind | null>(null);
+  const submitTax = useDataMessagesSubmitTax();
 
   const { data, isLoading, isError } = useGetTaxFiling(id || '', {
     query: {
@@ -85,6 +90,26 @@ const TaxFilingDetail = () => {
   const canDownloadXml =
     filing.status === TaxFilingResponseDtoStatus.READY ||
     filing.status === TaxFilingResponseDtoStatus.SUBMITTED;
+  const canSubmit = filing.status === TaxFilingResponseDtoStatus.READY;
+
+  const handleSubmit = async () => {
+    try {
+      const response = await submitTax.mutateAsync({ taxFilingId: filing.id });
+      if (response.data.success) {
+        enqueueSnackbar(t('taxFilings.detail.submitSuccess'), { variant: 'success' });
+      } else {
+        enqueueSnackbar(
+          t('taxFilings.detail.submitFailed', { message: response.data.statusMessage }),
+          { variant: 'error' },
+        );
+      }
+      await queryClient.invalidateQueries({
+        queryKey: getGetTaxFilingQueryKey(filing.id),
+      });
+    } catch {
+      enqueueSnackbar(t('taxFilings.detail.submitError'), { variant: 'error' });
+    }
+  };
 
   const handleDownload = async (kind: XmlKind) => {
     setDownloading(kind);
@@ -98,7 +123,8 @@ const TaxFilingDetail = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${kind}-${filing.year}-${String(filing.month).padStart(2, '0')}.xml`;
+      const filePrefix = kind === 'vat' ? 'dph' : kind;
+      link.download = `${filePrefix}-${filing.year}-${String(filing.month).padStart(2, '0')}.xml`;
       link.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -138,6 +164,18 @@ const TaxFilingDetail = () => {
                   {t('taxFilings.detail.downloadKhXml')}
                 </Button>
               </>
+            )}
+            {canSubmit && (
+              <Button
+                className="gap-2"
+                disabled={submitTax.isPending}
+                onClick={() => void handleSubmit()}
+              >
+                <Send className="h-4 w-4" />
+                {submitTax.isPending
+                  ? t('taxFilings.detail.submitting')
+                  : t('taxFilings.detail.submitToTax')}
+              </Button>
             )}
           </>
         }

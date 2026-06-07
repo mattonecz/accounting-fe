@@ -17,11 +17,11 @@ const stateStyles: Record<
     className: 'border-sky-200 bg-sky-100 text-sky-700',
     icon: Send,
   },
-  [DataMessageDtoState.DELIVERED]: {
+  [DataMessageDtoState.SERVED]: {
     className: 'border-amber-200 bg-amber-100 text-amber-700',
     icon: PackageCheck,
   },
-  [DataMessageDtoState.READ]: {
+  [DataMessageDtoState.DELIVERED]: {
     className: 'border-emerald-200 bg-emerald-100 text-emerald-700',
     icon: CheckCircle2,
   },

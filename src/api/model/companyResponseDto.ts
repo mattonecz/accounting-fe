@@ -15,6 +15,7 @@ export interface CompanyResponseDto {
   companyType?: CompanyResponseDtoCompanyType;
   country: string;
   email?: string;
+  phone?: string;
   street?: string;
   houseNumber?: string;
   orientationNumber?: string;

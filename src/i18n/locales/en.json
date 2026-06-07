@@ -759,7 +759,12 @@
       "errorTitle": "Processing failed",
       "downloadVatXml": "Download VAT XML",
       "downloadKhXml": "Download KH XML",
-      "downloadError": "Failed to download XML"
+      "downloadError": "Failed to download XML",
+      "submitToTax": "Submit to tax office",
+      "submitting": "Submitting…",
+      "submitSuccess": "Filing submitted to the tax office",
+      "submitFailed": "Submission to the tax office failed: {{message}}",
+      "submitError": "Failed to submit to the tax office"
     }
   },
   "dataMessages": {
@@ -771,8 +776,8 @@
     },
     "states": {
       "SENT": "Sent",
+      "SERVED": "Delivered to data box",
       "DELIVERED": "Delivered",
-      "READ": "Read",
       "FAILED": "Failed",
       "UNKNOWN": "Unknown"
     },
@@ -820,8 +825,8 @@
       "statusCode": "Send status code",
       "statusMessage": "ISDS status message",
       "sentAt": "Sent",
+      "servedAt": "Delivered to data box",
       "deliveredAt": "Delivered",
-      "readAt": "Read",
       "rawStateCode": "ISDS raw status code"
     }
   },

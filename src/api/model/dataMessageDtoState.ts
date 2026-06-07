@@ -13,7 +13,7 @@ export type DataMessageDtoState = typeof DataMessageDtoState[keyof typeof DataMe
 export const DataMessageDtoState = {
   SENT: 'SENT',
   DELIVERED: 'DELIVERED',
-  READ: 'READ',
+  SERVED: 'SERVED',
   FAILED: 'FAILED',
   UNKNOWN: 'UNKNOWN',
 } as const;

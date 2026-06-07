@@ -10,6 +10,21 @@ export const formatDate = (date: string | Date | null | undefined, lang?: string
   }).format(typeof date === 'string' ? new Date(date) : date);
 };
 
+export const formatDateTime = (
+  date: string | Date | null | undefined,
+  lang?: string,
+): string => {
+  if (!date) return '-';
+  const locale = lang ?? i18n.language ?? 'cs';
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(typeof date === 'string' ? new Date(date) : date);
+};
+
 export const formatMoney = (
   amount: number,
   currency: string,

@@ -2006,6 +2006,38 @@
         ]
       }
     },
+    "/data-messages/messages/{id}": {
+      "get": {
+        "operationId": "dataMessagesGetById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "DataMessage record ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataMessageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a single recorded data message by id (no ISDS refresh)",
+        "tags": [
+          "data-messages"
+        ]
+      }
+    },
     "/ai-chat/chat": {
       "post": {
         "operationId": "aiChatChat",
@@ -2363,6 +2395,11 @@
           },
           "pocet": {
             "type": "number"
+          },
+          "getDphStatus": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, each result is enriched with its CRPDPH VAT status and — for sole traders (právní forma 101) — the RZP proprietor name, as in getRegistrationData."
           }
         }
       },
@@ -2461,90 +2498,6 @@
         "required": [
           "radekAdresy1",
           "radekAdresy2"
-        ]
-      },
-      "EkonomickySubjektDto": {
-        "type": "object",
-        "properties": {
-          "ico": {
-            "type": "string"
-          },
-          "obchodniJmeno": {
-            "type": "string"
-          },
-          "jmeno": {
-            "type": "string"
-          },
-          "prijmeni": {
-            "type": "string"
-          },
-          "sidlo": {
-            "$ref": "#/components/schemas/SidloDto"
-          },
-          "pravniForma": {
-            "type": "string"
-          },
-          "financniUrad": {
-            "type": "string"
-          },
-          "datumVzniku": {
-            "type": "string"
-          },
-          "datumAktualizace": {
-            "type": "string"
-          },
-          "dic": {
-            "type": "string"
-          },
-          "icoId": {
-            "type": "string"
-          },
-          "adresaDorucovaci": {
-            "$ref": "#/components/schemas/AdresaDorucovaciDto"
-          }
-        },
-        "required": [
-          "ico",
-          "obchodniJmeno",
-          "sidlo",
-          "pravniForma",
-          "financniUrad",
-          "datumVzniku",
-          "datumAktualizace",
-          "dic",
-          "icoId",
-          "adresaDorucovaci"
-        ]
-      },
-      "AresResponseDto": {
-        "type": "object",
-        "properties": {
-          "pocetCelkem": {
-            "type": "number"
-          },
-          "ekonomickeSubjekty": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EkonomickySubjektDto"
-            }
-          }
-        },
-        "required": [
-          "pocetCelkem",
-          "ekonomickeSubjekty"
-        ]
-      },
-      "RegistrationDataRequestDto": {
-        "type": "object",
-        "properties": {
-          "ico": {
-            "type": "string",
-            "description": "IČO — přesně 8 číslic.",
-            "example": "45274649"
-          }
-        },
-        "required": [
-          "ico"
         ]
       },
       "DphBankAccountDto": {
@@ -2684,6 +2637,37 @@
           "adresaDorucovaci"
         ]
       },
+      "AresResponseDto": {
+        "type": "object",
+        "properties": {
+          "pocetCelkem": {
+            "type": "number"
+          },
+          "ekonomickeSubjekty": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegistrationDataResponseDto"
+            }
+          }
+        },
+        "required": [
+          "pocetCelkem",
+          "ekonomickeSubjekty"
+        ]
+      },
+      "RegistrationDataRequestDto": {
+        "type": "object",
+        "properties": {
+          "ico": {
+            "type": "string",
+            "description": "IČO — přesně 8 číslic.",
+            "example": "45274649"
+          }
+        },
+        "required": [
+          "ico"
+        ]
+      },
       "CreateCompanyDto": {
         "type": "object",
         "properties": {
@@ -2707,6 +2691,9 @@
             "type": "string"
           },
           "email": {
+            "type": "string"
+          },
+          "phone": {
             "type": "string"
           },
           "street": {
@@ -2783,6 +2770,9 @@
           "email": {
             "type": "string"
           },
+          "phone": {
+            "type": "string"
+          },
           "street": {
             "type": "string"
           },
@@ -2852,6 +2842,9 @@
             "type": "string"
           },
           "email": {
+            "type": "string"
+          },
+          "phone": {
             "type": "string"
           },
           "street": {
@@ -4730,6 +4723,25 @@
           "statusMessage"
         ]
       },
+      "MessageStatusEventDto": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS event timestamp (dmEventTime)"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISDS event description (dmEventDescr)"
+          }
+        },
+        "required": [
+          "time",
+          "description"
+        ]
+      },
       "DataMessageDto": {
         "type": "object",
         "properties": {
@@ -4769,7 +4781,7 @@
             "enum": [
               "SENT",
               "DELIVERED",
-              "READ",
+              "SERVED",
               "FAILED",
               "UNKNOWN"
             ]
@@ -4798,12 +4810,19 @@
           "deliveredAt": {
             "type": "string",
             "nullable": true,
-            "description": "Delivery time (ISO 8601)"
+            "description": "Legal-service time, doručeno — dmAcceptanceTime (ISO 8601)"
           },
-          "readAt": {
+          "servedAt": {
             "type": "string",
             "nullable": true,
-            "description": "Acceptance time (ISO 8601)"
+            "description": "Delivery-to-data-box time, dodáno — dmDeliveryTime (ISO 8601)"
+          },
+          "events": {
+            "description": "Persisted ISDS delivery event timeline (last refresh)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageStatusEventDto"
+            }
           }
         },
         "required": [
@@ -4819,7 +4838,8 @@
           "rawStateCode",
           "sentAt",
           "deliveredAt",
-          "readAt"
+          "servedAt",
+          "events"
         ]
       },
       "SubmitTaxResponseDto": {
@@ -4865,25 +4885,6 @@
           "taxFilingStatus"
         ]
       },
-      "MessageStatusEventDto": {
-        "type": "object",
-        "properties": {
-          "time": {
-            "type": "string",
-            "nullable": true,
-            "description": "ISDS event timestamp (dmEventTime)"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true,
-            "description": "ISDS event description (dmEventDescr)"
-          }
-        },
-        "required": [
-          "time",
-          "description"
-        ]
-      },
       "MessageStatusResponseDto": {
         "type": "object",
         "properties": {
@@ -4902,7 +4903,7 @@
             "enum": [
               "SENT",
               "DELIVERED",
-              "READ",
+              "SERVED",
               "FAILED",
               "UNKNOWN"
             ],
@@ -4932,12 +4933,12 @@
           "deliveredAt": {
             "type": "string",
             "nullable": true,
-            "description": "When the message was delivered to the data box (ISO 8601)"
+            "description": "When the message was legally served (doručeno) — ISDS dmAcceptanceTime (by login or fiction) (ISO 8601)"
           },
-          "readAt": {
+          "servedAt": {
             "type": "string",
             "nullable": true,
-            "description": "When the message was accepted/read by the recipient (ISO 8601)"
+            "description": "When the message reached the data box (dodáno) — ISDS dmDeliveryTime (ISO 8601)"
           },
           "events": {
             "description": "Live ISDS delivery event timeline",
@@ -4956,8 +4957,61 @@
           "rawStateCode",
           "sentAt",
           "deliveredAt",
-          "readAt",
+          "servedAt",
           "events"
+        ]
+      },
+      "EkonomickySubjektDto": {
+        "type": "object",
+        "properties": {
+          "ico": {
+            "type": "string"
+          },
+          "obchodniJmeno": {
+            "type": "string"
+          },
+          "jmeno": {
+            "type": "string"
+          },
+          "prijmeni": {
+            "type": "string"
+          },
+          "sidlo": {
+            "$ref": "#/components/schemas/SidloDto"
+          },
+          "pravniForma": {
+            "type": "string"
+          },
+          "financniUrad": {
+            "type": "string"
+          },
+          "datumVzniku": {
+            "type": "string"
+          },
+          "datumAktualizace": {
+            "type": "string"
+          },
+          "dic": {
+            "type": "string"
+          },
+          "icoId": {
+            "type": "string"
+          },
+          "adresaDorucovaci": {
+            "$ref": "#/components/schemas/AdresaDorucovaciDto"
+          }
+        },
+        "required": [
+          "ico",
+          "obchodniJmeno",
+          "sidlo",
+          "pravniForma",
+          "financniUrad",
+          "datumVzniku",
+          "datumAktualizace",
+          "dic",
+          "icoId",
+          "adresaDorucovaci"
         ]
       },
       "SelectedCompanyInputDto": {

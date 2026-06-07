@@ -405,3 +405,92 @@ export function useDataMessagesGetStatus<TData = Awaited<ReturnType<typeof dataM
 
 
 
+/**
+ * @summary Get a single recorded data message by id (no ISDS refresh)
+ */
+export const dataMessagesGetById = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<DataMessageDto>> => {
+    
+    
+    return axios.default.get(
+      `/data-messages/messages/${id}`,options
+    );
+  }
+
+
+
+
+export const getDataMessagesGetByIdQueryKey = (id?: string,) => {
+    return [
+    `/data-messages/messages/${id}`
+    ] as const;
+    }
+
+    
+export const getDataMessagesGetByIdQueryOptions = <TData = Awaited<ReturnType<typeof dataMessagesGetById>>, TError = AxiosError<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDataMessagesGetByIdQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dataMessagesGetById>>> = ({ signal }) => dataMessagesGetById(id, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DataMessagesGetByIdQueryResult = NonNullable<Awaited<ReturnType<typeof dataMessagesGetById>>>
+export type DataMessagesGetByIdQueryError = AxiosError<unknown>
+
+
+export function useDataMessagesGetById<TData = Awaited<ReturnType<typeof dataMessagesGetById>>, TError = AxiosError<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dataMessagesGetById>>,
+          TError,
+          Awaited<ReturnType<typeof dataMessagesGetById>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDataMessagesGetById<TData = Awaited<ReturnType<typeof dataMessagesGetById>>, TError = AxiosError<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dataMessagesGetById>>,
+          TError,
+          Awaited<ReturnType<typeof dataMessagesGetById>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDataMessagesGetById<TData = Awaited<ReturnType<typeof dataMessagesGetById>>, TError = AxiosError<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a single recorded data message by id (no ISDS refresh)
+ */
+
+export function useDataMessagesGetById<TData = Awaited<ReturnType<typeof dataMessagesGetById>>, TError = AxiosError<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dataMessagesGetById>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDataMessagesGetByIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

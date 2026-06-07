@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import {
+  useDataMessagesGetById,
   useDataMessagesGetStatus,
-  useDataMessagesList,
 } from '@/api/data-messages/data-messages';
 import { MessageStatusResponseDtoState } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { FormCard } from '@/components/FormCard';
 import { DataMessageStatusBadge } from '@/components/DataMessageStatusBadge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { formatDate } from '@/lib/formatters';
+import { formatDate, formatDateTime } from '@/lib/formatters';
 
 const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="flex items-center justify-between border-b border-border/60 py-2 last:border-0">
@@ -19,29 +19,45 @@ const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) =>
   </div>
 );
 
+// States where the message is still in flight and the live ISDS status
+// endpoint is worth calling. Final states render from the stored record.
 const NON_TERMINAL_STATES: MessageStatusResponseDtoState[] = [
   MessageStatusResponseDtoState.SENT,
-  MessageStatusResponseDtoState.DELIVERED,
+  MessageStatusResponseDtoState.SERVED,
 ];
 
 const DataMessageDetail = () => {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
 
-  const { data, isLoading, isError } = useDataMessagesGetStatus(id || '', {
+  const {
+    data: recordData,
+    isLoading: recordLoading,
+    isError: recordError,
+  } = useDataMessagesGetById(id || '');
+  const record = recordData?.data;
+
+  // Only hit the live ISDS status endpoint while the message is still in
+  // flight; final states render straight from the stored record.
+  const shouldFetchStatus = record
+    ? NON_TERMINAL_STATES.includes(record.state)
+    : false;
+
+  const { data } = useDataMessagesGetStatus(id || '', {
     query: {
+      enabled: Boolean(id) && shouldFetchStatus,
+      // Refresh only while the message is still SENT; stop once it advances.
       refetchInterval: (query) =>
-        query.state.data?.data.state &&
-        NON_TERMINAL_STATES.includes(query.state.data.data.state)
+        query.state.data?.data.state === MessageStatusResponseDtoState.SENT
           ? 5000
           : false,
     },
   });
 
-  const { data: listData } = useDataMessagesList();
-
   const fmtDate = (value: unknown) =>
     value ? formatDate(value as string, i18n.language) : '–';
+  const fmtDateTime = (value: unknown) =>
+    value ? formatDateTime(value as string, i18n.language) : '–';
   const fmtText = (value: unknown) => (value ? String(value) : '–');
 
   if (!id) {
@@ -52,7 +68,7 @@ const DataMessageDetail = () => {
     );
   }
 
-  if (isLoading) {
+  if (recordLoading) {
     return (
       <PageLayout>
         <p className="text-muted-foreground">{t('dataMessages.detail.loading')}</p>
@@ -60,9 +76,7 @@ const DataMessageDetail = () => {
     );
   }
 
-  const status = data?.data;
-
-  if (isError || !status) {
+  if (recordError || !record) {
     return (
       <PageLayout>
         <p className="text-destructive">{t('dataMessages.detail.error')}</p>
@@ -70,12 +84,15 @@ const DataMessageDetail = () => {
     );
   }
 
-  const record = listData?.data.find((message) => message.id === id);
-  const subject = record?.subject ?? id;
-  const events = status.events ?? [];
+  const status = data?.data;
+  // Prefer the live status response while polling; otherwise use the stored
+  // record (final messages, where the live endpoint isn't called).
+  const source = status ?? record;
+  const subject = record.subject;
+  const events = source.events;
   const hasError =
-    status.state === MessageStatusResponseDtoState.FAILED &&
-    Boolean(status.statusMessage);
+    source.state === MessageStatusResponseDtoState.FAILED &&
+    Boolean(source.statusMessage);
 
   return (
     <PageLayout className="space-y-4">
@@ -83,13 +100,13 @@ const DataMessageDetail = () => {
         title={subject}
         description={t('dataMessages.title')}
         backButton
-        actions={<DataMessageStatusBadge state={status.state} />}
+        actions={<DataMessageStatusBadge state={source.state} />}
       />
 
       {hasError && (
         <Alert variant="destructive">
           <AlertTitle>{t('dataMessages.detail.errorTitle')}</AlertTitle>
-          <AlertDescription>{String(status.statusMessage)}</AlertDescription>
+          <AlertDescription>{String(source.statusMessage)}</AlertDescription>
         </Alert>
       )}
 
@@ -97,7 +114,7 @@ const DataMessageDetail = () => {
         <div className="space-y-1">
           <InfoRow
             label={t('dataMessages.detail.messageId')}
-            value={fmtText(status.messageId)}
+            value={fmtText(source.messageId)}
           />
           <InfoRow
             label={t('dataMessages.detail.direction')}
@@ -117,31 +134,31 @@ const DataMessageDetail = () => {
           />
           <InfoRow
             label={t('dataMessages.detail.state')}
-            value={<DataMessageStatusBadge state={status.state} />}
+            value={<DataMessageStatusBadge state={source.state} />}
           />
           <InfoRow
             label={t('dataMessages.detail.statusCode')}
-            value={fmtText(status.statusCode)}
+            value={fmtText(source.statusCode)}
           />
           <InfoRow
             label={t('dataMessages.detail.statusMessage')}
-            value={fmtText(status.statusMessage)}
+            value={fmtText(source.statusMessage)}
           />
           <InfoRow
             label={t('dataMessages.detail.sentAt')}
-            value={fmtDate(status.sentAt)}
+            value={fmtDate(source.sentAt)}
+          />
+          <InfoRow
+            label={t('dataMessages.detail.servedAt')}
+            value={fmtDate(source.servedAt)}
           />
           <InfoRow
             label={t('dataMessages.detail.deliveredAt')}
-            value={fmtDate(status.deliveredAt)}
-          />
-          <InfoRow
-            label={t('dataMessages.detail.readAt')}
-            value={fmtDate(status.readAt)}
+            value={fmtDate(source.deliveredAt)}
           />
           <InfoRow
             label={t('dataMessages.detail.rawStateCode')}
-            value={fmtText(status.rawStateCode)}
+            value={fmtText(source.rawStateCode)}
           />
         </div>
       </FormCard>
@@ -159,7 +176,7 @@ const DataMessageDetail = () => {
                 className="flex flex-col gap-0.5 border-l-2 border-border pl-3"
               >
                 <span className="text-xs text-muted-foreground">
-                  {fmtDate(event.time)}
+                  {fmtDateTime(event.time)}
                 </span>
                 <span className="text-sm">
                   {event.description ? String(event.description) : '–'}

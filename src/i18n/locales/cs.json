@@ -760,7 +760,12 @@
       "errorTitle": "Zpracování selhalo",
       "downloadVatXml": "Stáhnout DPH XML",
       "downloadKhXml": "Stáhnout KH XML",
-      "downloadError": "Stažení XML se nepodařilo"
+      "downloadError": "Stažení XML se nepodařilo",
+      "submitToTax": "Podat na FÚ",
+      "submitting": "Odesílám…",
+      "submitSuccess": "Podání bylo odesláno na finanční úřad",
+      "submitFailed": "Odeslání na finanční úřad selhalo: {{message}}",
+      "submitError": "Odeslání na finanční úřad se nepodařilo"
     }
   },
   "dataMessages": {
@@ -772,8 +777,8 @@
     },
     "states": {
       "SENT": "Odesláno",
+      "SERVED": "Dodáno",
       "DELIVERED": "Doručeno",
-      "READ": "Přečteno",
       "FAILED": "Chyba",
       "UNKNOWN": "Neznámý"
     },
@@ -821,8 +826,8 @@
       "statusCode": "Stavový kód odeslání",
       "statusMessage": "Stavová zpráva ISDS",
       "sentAt": "Odesláno",
+      "servedAt": "Dodáno",
       "deliveredAt": "Doručeno",
-      "readAt": "Přečteno",
       "rawStateCode": "Stavový kód ISDS"
     }
   },

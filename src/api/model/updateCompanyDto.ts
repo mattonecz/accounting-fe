@@ -15,6 +15,7 @@ export interface UpdateCompanyDto {
   companyName?: string;
   country?: string;
   email?: string;
+  phone?: string;
   street?: string;
   houseNumber?: string;
   orientationNumber?: string;

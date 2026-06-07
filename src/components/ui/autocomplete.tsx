@@ -10,13 +10,17 @@ import {
 import { cn } from '@/lib/utils';
 import { useAresSearch } from '@/api/ares/ares';
 import { useEffect } from 'react';
-import { EkonomickySubjektDto } from '@/api/model/ekonomickySubjektDto';
 import { Label } from './label';
-import { CreateCompanyDto } from '@/api/model';
+import { CreateCompanyDto, RegistrationDataResponseDto } from '@/api/model';
 
 interface AutocompleteProps {
   onChange: (value: Partial<CreateCompanyDto>, financniUrad?: string) => void;
   withFinancniUrad?: boolean;
+  /**
+   * When true, each ARES result is enriched with its CRPDPH VAT status
+   * (mapped to `vatPayer`) and the RZP proprietor name for sole traders.
+   */
+  getDphStatus?: boolean;
   debounceMs?: number;
   disabled?: boolean;
   className?: string;
@@ -25,15 +29,16 @@ interface AutocompleteProps {
 export function Autocomplete({
   onChange,
   withFinancniUrad = false,
+  getDphStatus = false,
   debounceMs = 300,
   disabled = false,
   className,
 }: AutocompleteProps) {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
-  const [suggestions, setSuggestions] = React.useState<EkonomickySubjektDto[]>(
-    [],
-  );
+  const [suggestions, setSuggestions] = React.useState<
+    RegistrationDataResponseDto[]
+  >([]);
   const [loading, setLoading] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
   const debounceTimerRef = React.useRef<NodeJS.Timeout>(null);
@@ -76,10 +81,10 @@ export function Autocomplete({
 
     setLoading(true);
     debounceTimerRef.current = setTimeout(async () => {
-      const data = /^[0-9]+$/.test(newValue)
+      const query = /^[0-9]+$/.test(newValue)
         ? { ico: [newValue] }
         : { obchodniJmeno: newValue };
-      searchCompanies({ data });
+      searchCompanies({ data: { ...query, getDphStatus } });
     }, debounceMs);
   };
 
@@ -93,7 +98,7 @@ export function Autocomplete({
     setLoading(false);
   }, [status, error]);
 
-  const handleSelect = (data: EkonomickySubjektDto) => {
+  const handleSelect = (data: RegistrationDataResponseDto) => {
     setInputValue('');
     setSuggestions([]);
     setOpen(false);
@@ -123,6 +128,8 @@ export function Autocomplete({
           registrationNumber: isEvidencni ? cisloDomovni : undefined,
           orientationNumber: cisloOrientacni,
           psc: sidlo.psc != null ? sidlo.psc.toString() : undefined,
+          // Enriched only when getDphStatus is requested; `found` === is VAT payer.
+          ...(getDphStatus ? { vatPayer: !!data.found } : {}),
         },
         withFinancniUrad ? data.financniUrad : undefined,
       );
@@ -130,11 +137,8 @@ export function Autocomplete({
   };
 
   return (
-    <div
-      ref={wrapperRef}
-      className="grid w-full grid-cols-[200px_minmax(0,1fr)] items-start gap-4"
-    >
-      <Label className="pt-2 text-right">{t('autocomplete.label')}</Label>
+    <div ref={wrapperRef} className="w-full space-y-2">
+      <Label>{t('autocomplete.label')}</Label>
       <div className="relative min-w-0">
         <input
           type="text"

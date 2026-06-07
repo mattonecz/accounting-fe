@@ -7,6 +7,7 @@
  */
 import type { DataMessageDtoDirection } from './dataMessageDtoDirection';
 import type { DataMessageDtoState } from './dataMessageDtoState';
+import type { MessageStatusEventDto } from './messageStatusEventDto';
 
 export interface DataMessageDto {
   /** Internal record ID */
@@ -45,13 +46,15 @@ export interface DataMessageDto {
   /** When the message was sent (ISO 8601) */
   sentAt: string;
   /**
-   * Delivery time (ISO 8601)
+   * Legal-service time, doručeno — dmAcceptanceTime (ISO 8601)
    * @nullable
    */
   deliveredAt: string | null;
   /**
-   * Acceptance time (ISO 8601)
+   * Delivery-to-data-box time, dodáno — dmDeliveryTime (ISO 8601)
    * @nullable
    */
-  readAt: string | null;
+  servedAt: string | null;
+  /** Persisted ISDS delivery event timeline (last refresh) */
+  events: MessageStatusEventDto[];
 }

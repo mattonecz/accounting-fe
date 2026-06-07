@@ -18,17 +18,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Switch } from '@/components/ui/switch';
+import { Form } from '@/components/ui/form';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
+import { SwitchController } from '@/components/SwitchController';
 import { IsdsCredentialsForm } from './IsdsCredentialsForm';
 import {
   SPECIAL_TAX_OFFICE_CODE,
@@ -405,25 +398,10 @@ const BillingInfoFormContent = ({
                 }))}
                 variant="vertical"
               />
-              <FormField
+              <SwitchController
                 control={form.control}
                 name="vatPayer"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>
-                      {t('settings.billing.fields.platceDPH')}
-                    </FormLabel>
-                    <div className="flex h-10 items-center">
-                      <FormControl>
-                        <Switch
-                          checked={!!field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t('settings.billing.fields.platceDPH')}
               />
               <InputController
                 control={form.control}
