@@ -204,7 +204,8 @@
       "vatRate": "VAT %",
       "status": "Status",
       "quantity": "Quantity",
-      "unitPrice": "Unit Price"
+      "unitPrice": "Unit Price",
+      "paymentDays": "Payment term (days)"
     },
     "placeholders": {
       "number": "20250001",

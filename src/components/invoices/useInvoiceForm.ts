@@ -3,6 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import i18n from '@/i18n';
+import { addDays } from '@/lib/formatters';
 import {
   CreateInvoiceDto,
   CreateInvoiceDtoStatus,
@@ -14,6 +15,8 @@ import {
 
 export type InvoiceFormValues = CreateInvoiceDto & {
   shouldClaimVat?: boolean;
+  /** Helper field – number of days until the due date. Not sent to the backend. */
+  paymentDays?: number;
 };
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
@@ -69,18 +72,18 @@ export const useInvoiceForm = () => {
 
   const isVatPayer = !!companyResponse?.data?.vatPayer;
 
+  const today = new Date().toISOString().split('T')[0];
+  const defaultPaymentDays = 14;
+
   const form = useForm<InvoiceFormValues>({
     defaultValues: {
       type: invoiceType,
       currency: 'CZK',
       vatMode: CreateInvoiceDtoVatMode.STANDARD,
-      createdDate: new Date().toISOString().split('T')[0],
-      duzpDate: new Date().toISOString().split('T')[0],
-      dueDate: (() => {
-        const date = new Date();
-        date.setDate(date.getDate() + 14);
-        return date.toISOString().split('T')[0];
-      })(),
+      createdDate: today,
+      duzpDate: today,
+      dueDate: addDays(today, defaultPaymentDays),
+      paymentDays: defaultPaymentDays,
       items: [
         {
           name: '',
@@ -198,6 +201,7 @@ export const useInvoiceForm = () => {
       bankId,
       bankSnapshot,
       shouldClaimVat,
+      paymentDays: _paymentDays,
       vatClaimType,
       vatClaimRatio,
       vatClaimMonth,

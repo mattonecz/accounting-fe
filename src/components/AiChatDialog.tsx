@@ -1,3 +1,11 @@
+// AI chat is temporarily disabled: the backend `/ai-chat` endpoint was removed
+// from the API spec, so the generated client (`@/api/ai-chat/ai-chat` and
+// `ChatResponseDto`) no longer exists. This stub keeps the build green.
+// To restore: re-enable the endpoint on the backend, run `npx orval`, then
+// uncomment the original implementation below.
+export const AiChatDialog = () => null;
+
+/* --- ORIGINAL IMPLEMENTATION (disabled until AI chat is re-enabled) ---
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -430,3 +438,4 @@ export const AiChatDialog = () => {
     </Dialog>
   );
 };
+--- END ORIGINAL IMPLEMENTATION --- */

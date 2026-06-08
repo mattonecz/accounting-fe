@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UseFormReturn } from 'react-hook-form';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInvoiceDtoVatMode } from '@/api/model';
+import { addDays, daysBetween } from '@/lib/formatters';
 import type { InvoiceFormValues } from './useInvoiceForm';
 import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
@@ -42,6 +43,40 @@ export const InvoiceBasicInfoCard = ({
 }: InvoiceBasicInfoCardProps) => {
   const { t } = useTranslation();
   const [optionalOpen, setOptionalOpen] = useState(false);
+
+  // When the issue date changes, mirror it into the DUZP (tax) date and
+  // recompute the due date from the current payment term.
+  const handleCreatedDateChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    const value = e.target.value;
+    onChange(value);
+    form.setValue('duzpDate', value);
+    const days = Number(form.getValues('paymentDays')) || 0;
+    form.setValue('dueDate', addDays(value, days));
+  };
+
+  // Payment term (days) and the due date are linked both ways.
+  const handlePaymentDaysChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    const days = parseInt(e.target.value, 10);
+    onChange(Number.isNaN(days) ? undefined : days);
+    const createdDate = form.getValues('createdDate');
+    form.setValue('dueDate', addDays(createdDate, Number.isNaN(days) ? 0 : days));
+  };
+
+  const handleDueDateChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    const value = e.target.value;
+    onChange(value);
+    const createdDate = form.getValues('createdDate') ?? '';
+    form.setValue('paymentDays', daysBetween(createdDate, value));
+  };
 
   const contactOptions = sortedContacts.map((c) => ({ value: c.id, label: c.name ?? '-' }));
   const bankOptions = sortedBanks.map((b) => ({ value: b.id, label: getBankAccountLabel(b) }));
@@ -91,6 +126,18 @@ export const InvoiceBasicInfoCard = ({
             />
           )}
 
+          {!isReceived && (
+            <SelectController
+              control={form.control}
+              name="bankId"
+              label={t('invoices.fields.bank')}
+              placeholder={t('invoices.placeholders.selectBank')}
+              options={bankOptions}
+              triggerClassName="w-[400px]"
+              rules={{ required: t('validation.required', { field: t('invoices.fields.bank') }) }}
+            />
+          )}
+
           <SelectController
             control={form.control}
             name="currency"
@@ -130,6 +177,7 @@ export const InvoiceBasicInfoCard = ({
             type="date"
             className="w-[160px]"
             rules={{ required: t('validation.required', { field: t('invoices.fields.createdDate') }) }}
+            onChangeOverride={handleCreatedDateChange}
           />
 
           <InputController
@@ -143,24 +191,27 @@ export const InvoiceBasicInfoCard = ({
 
           <InputController
             control={form.control}
+            name="paymentDays"
+            label={t('invoices.fields.paymentDays')}
+            type="number"
+            step="1"
+            className="w-[160px]"
+            onChangeOverride={handlePaymentDaysChange}
+            rules={{
+              required: t('validation.required', { field: t('invoices.fields.paymentDays') }),
+              min: { value: 0, message: t('validation.minZero') },
+            }}
+          />
+
+          <InputController
+            control={form.control}
             name="dueDate"
             label={t('invoices.fields.dueDate')}
             type="date"
             className="w-[160px]"
             rules={{ required: t('validation.required', { field: t('invoices.fields.dueDate') }) }}
+            onChangeOverride={handleDueDateChange}
           />
-
-          {!isReceived && (
-            <SelectController
-              control={form.control}
-              name="bankId"
-              label={t('invoices.fields.bank')}
-              placeholder={t('invoices.placeholders.selectBank')}
-              options={bankOptions}
-              triggerClassName="w-[400px]"
-              rules={{ required: t('validation.required', { field: t('invoices.fields.bank') }) }}
-            />
-          )}
         </div>
       </FormCard>
 

@@ -91,7 +91,6 @@ export default function UpdateInvoice() {
           <UpdateItemsCard
             form={form}
             fields={fields}
-            formatMoney={formatMoney}
             calculateInvoiceTotals={calculateInvoiceTotals}
             addItem={addItem}
             removeItem={removeItem}

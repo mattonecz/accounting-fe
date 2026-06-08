@@ -32,6 +32,7 @@ import {
 } from '@/api/model';
 import { useWatch } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
+import { addDays, daysBetween } from '@/lib/formatters';
 import { getBankAccountLabel, type UpdateInvoiceFormValues } from './useUpdateInvoiceForm';
 
 interface UpdateBasicInfoCardProps {
@@ -156,6 +157,35 @@ export const UpdateBasicInfoCard = ({
             />
           )}
 
+          {!isReceived && (
+            <FormField
+              control={form.control}
+              name="bankId"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-4">
+                  <FormLabel className="w-[200px] text-right">{t('invoices.fields.bank')}</FormLabel>
+                  <div className="flex flex-col">
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-[400px]">
+                          <SelectValue placeholder={t('invoices.placeholders.selectBank')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {sortedBanks.map((account) => (
+                          <SelectItem key={account.id} value={account.id}>
+                            {getBankAccountLabel(account)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
+
           <FormField
             control={form.control}
             name="currency"
@@ -227,7 +257,19 @@ export const UpdateBasicInfoCard = ({
                 <FormLabel className="w-[200px] text-right">{t('invoices.fields.createdDate')}</FormLabel>
                 <div className="flex flex-col">
                   <FormControl>
-                    <Input type="date" className="w-[160px]" {...field} />
+                    <Input
+                      type="date"
+                      className="w-[160px]"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
+                        // Mirror issue date into the tax date and recompute the due date.
+                        form.setValue('duzpDate', value);
+                        const days = Number(form.getValues('paymentDays')) || 0;
+                        form.setValue('dueDate', addDays(value, days));
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </div>
@@ -254,14 +296,29 @@ export const UpdateBasicInfoCard = ({
 
           <FormField
             control={form.control}
-            name="dueDate"
-            rules={{ required: t('validation.required', { field: t('invoices.fields.dueDate') }) }}
+            name="paymentDays"
+            rules={{
+              required: t('validation.required', { field: t('invoices.fields.paymentDays') }),
+              min: { value: 0, message: t('validation.minZero') },
+            }}
             render={({ field }) => (
               <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-[200px] text-right">{t('invoices.fields.dueDate')}</FormLabel>
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.paymentDays')}</FormLabel>
                 <div className="flex flex-col">
                   <FormControl>
-                    <Input type="date" className="w-[160px]" {...field} />
+                    <Input
+                      type="number"
+                      step="1"
+                      className="w-[160px]"
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const days = parseInt(e.target.value, 10);
+                        field.onChange(Number.isNaN(days) ? undefined : days);
+                        const createdDate = form.getValues('createdDate') ?? '';
+                        form.setValue('dueDate', addDays(createdDate, Number.isNaN(days) ? 0 : days));
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </div>
@@ -269,34 +326,32 @@ export const UpdateBasicInfoCard = ({
             )}
           />
 
-          {!isReceived && (
-            <FormField
-              control={form.control}
-              name="bankId"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-4">
-                  <FormLabel className="w-[200px] text-right">{t('invoices.fields.bank')}</FormLabel>
-                  <div className="flex flex-col">
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-[400px]">
-                          <SelectValue placeholder={t('invoices.placeholders.selectBank')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {sortedBanks.map((account) => (
-                          <SelectItem key={account.id} value={account.id}>
-                            {getBankAccountLabel(account)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-          )}
+          <FormField
+            control={form.control}
+            name="dueDate"
+            rules={{ required: t('validation.required', { field: t('invoices.fields.dueDate') }) }}
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-4">
+                <FormLabel className="w-[200px] text-right">{t('invoices.fields.dueDate')}</FormLabel>
+                <div className="flex flex-col">
+                  <FormControl>
+                    <Input
+                      type="date"
+                      className="w-[160px]"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
+                        const createdDate = form.getValues('createdDate') ?? '';
+                        form.setValue('paymentDays', daysBetween(createdDate, value));
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
         </div>
       </FormCard>
 

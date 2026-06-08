@@ -14,6 +14,7 @@ import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useCompanyGet } from '@/api/companies/companies';
 import { useAuth } from '@/contexts/AuthContext';
+import { daysBetween } from '@/lib/formatters';
 import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
@@ -27,6 +28,8 @@ import {
 
 export type UpdateInvoiceFormValues = UpdateInvoiceDto & {
   shouldClaimVat?: boolean;
+  /** Helper field – number of days until the due date. Not sent to the backend. */
+  paymentDays?: number;
 };
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -77,6 +80,7 @@ const getDefaultValues = (): UpdateInvoiceFormValues => ({
   createdDate: new Date().toISOString().split('T')[0],
   duzpDate: new Date().toISOString().split('T')[0],
   dueDate: new Date().toISOString().split('T')[0],
+  paymentDays: 0,
   items: [DEFAULT_ITEM],
 });
 
@@ -203,6 +207,7 @@ export function useUpdateInvoiceForm(id: string) {
       createdDate: invoice.createdDate,
       duzpDate: invoice.duzpDate,
       dueDate: invoice.dueDate,
+      paymentDays: daysBetween(invoice.createdDate ?? '', invoice.dueDate ?? ''),
       variableSymbol: invoice.variableSymbol ?? '',
       specificSymbol: invoice.specificSymbol ?? '',
       konstantSymbol: invoice.konstantSymbol ?? '',
@@ -266,6 +271,7 @@ export function useUpdateInvoiceForm(id: string) {
 
     const {
       shouldClaimVat,
+      paymentDays: _paymentDays,
       vatClaimType,
       vatClaimRatio,
       vatClaimMonth,

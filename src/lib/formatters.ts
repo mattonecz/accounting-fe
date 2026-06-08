@@ -40,3 +40,26 @@ export const formatMoney = (
 };
 
 export const getActiveLanguage = (): string => i18n.language ?? 'cs';
+
+/**
+ * Adds `days` to a `YYYY-MM-DD` date string and returns a `YYYY-MM-DD` string.
+ * Uses UTC arithmetic to avoid timezone-related off-by-one shifts.
+ */
+export const addDays = (date: string, days: number): string => {
+  if (!date) return '';
+  const [y, m, d] = date.slice(0, 10).split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().split('T')[0];
+};
+
+/**
+ * Number of whole days between two `YYYY-MM-DD` date strings (`to - from`).
+ * Returns 0 if either date is missing.
+ */
+export const daysBetween = (from: string, to: string): number => {
+  if (!from || !to) return 0;
+  const [fy, fm, fd] = from.slice(0, 10).split('-').map(Number);
+  const [ty, tm, td] = to.slice(0, 10).split('-').map(Number);
+  return Math.round(
+    (Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000,
+  );
+};

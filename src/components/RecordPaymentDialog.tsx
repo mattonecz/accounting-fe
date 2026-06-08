@@ -238,7 +238,7 @@ export function RecordPaymentDialog({
                 <FormItem>
                   <FormLabel>{t('payments.fields.amount')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" inputMode="decimal" {...field} />
+                    <Input type="number" step="1" inputMode="decimal" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

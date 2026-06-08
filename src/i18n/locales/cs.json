@@ -205,7 +205,8 @@
       "vatRate": "DPH %",
       "status": "Stav",
       "quantity": "Množství",
-      "unitPrice": "Cena za jednotku"
+      "unitPrice": "Cena za jednotku",
+      "paymentDays": "Počet dní splatnosti"
     },
     "placeholders": {
       "number": "20250001",

@@ -535,7 +535,7 @@ const CreateSimpleInvoice = () => {
                           <FormControl>
                             <Input
                               type="number"
-                              step="0.01"
+                              step="1"
                               inputMode="decimal"
                               placeholder="0.00"
                               {...f}

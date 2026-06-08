@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UseFormReturn, UseFieldArrayReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -15,10 +16,11 @@ import type { InvoiceFormValues } from './useInvoiceForm';
 interface InvoiceItemsCardProps {
   form: UseFormReturn<InvoiceFormValues>;
   fieldArray: UseFieldArrayReturn<InvoiceFormValues, 'items'>;
-  formatMoney: (value?: number) => string;
   onRecalculate: () => void;
   isVatPayer: boolean;
 }
+
+const round2 = (value: number) => Math.round(value * 100) / 100;
 
 const handleNumericChange = (
   e: React.ChangeEvent<HTMLInputElement>,
@@ -29,10 +31,163 @@ const handleNumericChange = (
   onRecalculate();
 };
 
+interface InvoiceItemRowProps {
+  form: UseFormReturn<InvoiceFormValues>;
+  index: number;
+  isVatPayer: boolean;
+  onRecalculate: () => void;
+  onRemove: () => void;
+  canRemove: boolean;
+}
+
+const InvoiceItemRow = ({
+  form,
+  index,
+  isVatPayer,
+  onRecalculate,
+  onRemove,
+  canRemove,
+}: InvoiceItemRowProps) => {
+  const { t } = useTranslation();
+  // Raw text while the user edits the total directly; null means "derive it".
+  const [totalDraft, setTotalDraft] = useState<string | null>(null);
+
+  const quantity = form.watch(`items.${index}.quantity`) || 0;
+  const unitPrice = form.watch(`items.${index}.unitPrice`) || 0;
+  const vatRate = isVatPayer ? form.watch(`items.${index}.vatRate`) || 0 : 0;
+  const computedTotal = quantity * unitPrice * (1 + vatRate / 100);
+
+  // User typed a final (VAT-inclusive) total → back-calculate the unit price
+  // (price without VAT) using the currently selected VAT rate.
+  const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    setTotalDraft(raw);
+    const newTotal = parseFloat(raw) || 0;
+    const divisor = quantity * (1 + vatRate / 100);
+    const newUnitPrice = divisor > 0 ? round2(newTotal / divisor) : 0;
+    form.setValue(`items.${index}.unitPrice`, newUnitPrice);
+    onRecalculate();
+  };
+
+  const totalValue =
+    totalDraft ?? (computedTotal ? round2(computedTotal).toString() : '0');
+
+  return (
+    <div className="flex items-start gap-2">
+      <span className="text-sm font-medium w-8 h-10 flex items-center">{index + 1}.</span>
+
+      <FormField
+        control={form.control}
+        name={`items.${index}.name`}
+        rules={{ required: t('invoices.items.validation.descriptionRequired') }}
+        render={({ field }) => (
+          <FormItem className="flex-1">
+            <FormControl>
+              <Input placeholder={t('invoices.placeholders.itemDescription')} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name={`items.${index}.quantity`}
+        rules={{
+          required: t('invoices.items.validation.quantityRequired'),
+          min: { value: 0, message: t('validation.minZero') },
+        }}
+        render={({ field }) => (
+          <FormItem className="w-24">
+            <FormControl>
+              <Input
+                type="number"
+                {...field}
+                onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name={`items.${index}.unitPrice`}
+        rules={{
+          required: t('invoices.items.validation.priceRequired'),
+          validate: (value) =>
+            Number(value) > 0 || t('invoices.items.validation.priceGreaterThanZero'),
+        }}
+        render={({ field }) => (
+          <FormItem className="w-32">
+            <FormControl>
+              <Input
+                type="number"
+                step="1"
+                {...field}
+                onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {isVatPayer && (
+        <FormField
+          control={form.control}
+          name={`items.${index}.vatRate`}
+          rules={{
+            min: { value: 0, message: t('validation.minZero') },
+            max: { value: 100, message: t('validation.maxN', { max: 100 }) },
+          }}
+          render={({ field }) => (
+            <FormItem className="w-24">
+              <FormControl>
+                <Input
+                  type="number"
+                  step="1"
+                  {...field}
+                  onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+
+      <FormItem className="w-32">
+        <FormControl>
+          <Input
+            type="number"
+            step="1"
+            value={totalValue}
+            onChange={handleTotalChange}
+            onBlur={() => setTotalDraft(null)}
+          />
+        </FormControl>
+      </FormItem>
+
+      <div className="h-10 flex items-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          disabled={!canRemove}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export const InvoiceItemsCard = ({
   form,
   fieldArray,
-  formatMoney,
   onRecalculate,
   isVatPayer,
 }: InvoiceItemsCardProps) => {
@@ -77,114 +232,18 @@ export const InvoiceItemsCard = ({
         </div>
 
         {fields.map((field, index) => (
-          <div key={field.id} className="flex items-start gap-2">
-            <span className="text-sm font-medium w-8 h-10 flex items-center">{index + 1}.</span>
-
-            <FormField
-              control={form.control}
-              name={`items.${index}.name`}
-              rules={{ required: t('invoices.items.validation.descriptionRequired') }}
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <Input placeholder={t('invoices.placeholders.itemDescription')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name={`items.${index}.quantity`}
-              rules={{
-                required: t('invoices.items.validation.quantityRequired'),
-                min: { value: 0, message: t('validation.minZero') },
-              }}
-              render={({ field }) => (
-                <FormItem className="w-24">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name={`items.${index}.unitPrice`}
-              rules={{
-                required: t('invoices.items.validation.priceRequired'),
-                validate: (value) =>
-                  Number(value) > 0 ||
-                  t('invoices.items.validation.priceGreaterThanZero'),
-              }}
-              render={({ field }) => (
-                <FormItem className="w-32">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="1"
-                      {...field}
-                      onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {isVatPayer && (
-              <FormField
-                control={form.control}
-                name={`items.${index}.vatRate`}
-                rules={{
-                  min: { value: 0, message: t('validation.minZero') },
-                  max: { value: 100, message: t('validation.maxN', { max: 100 }) },
-                }}
-                render={({ field }) => (
-                  <FormItem className="w-24">
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="1"
-                        {...field}
-                        onChange={(e) => handleNumericChange(e, field.onChange, onRecalculate)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <div className="w-32 h-10 flex items-center">
-              <p className="font-medium">
-                {formatMoney(
-                  (form.watch(`items.${index}.quantity`) || 0) *
-                    (form.watch(`items.${index}.unitPrice`) || 0) *
-                    (1 + (isVatPayer ? (form.watch(`items.${index}.vatRate`) || 0) / 100 : 0)),
-                )}
-              </p>
-            </div>
-
-            <div className="h-10 flex items-center">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => { remove(index); onRecalculate(); }}
-                disabled={fields.length === 1}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <InvoiceItemRow
+            key={field.id}
+            form={form}
+            index={index}
+            isVatPayer={isVatPayer}
+            onRecalculate={onRecalculate}
+            onRemove={() => {
+              remove(index);
+              onRecalculate();
+            }}
+            canRemove={fields.length > 1}
+          />
         ))}
       </div>
     </FormCard>

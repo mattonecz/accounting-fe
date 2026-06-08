@@ -53,7 +53,6 @@ const CreateInvoice = () => {
           <InvoiceItemsCard
             form={form}
             fieldArray={fieldArray}
-            formatMoney={formatMoney}
             onRecalculate={calculateTotals}
             isVatPayer={isVatPayer}
           />
