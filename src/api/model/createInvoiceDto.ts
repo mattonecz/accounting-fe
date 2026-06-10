@@ -24,7 +24,8 @@ export interface CreateInvoiceDto {
   contactId?: string;
   /** Ad-hoc counterparty details for kind=SIMPLE when no contactId is used. Mutually exclusive with contactId. Requires at least `name`. */
   contact?: ContactSnapshotDto;
-  number: string;
+  /** Required for kind=INVOICE, optional for kind=SIMPLE. */
+  number?: string;
   /** Required for kind=INVOICE. */
   currency?: string;
   /** Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE. */

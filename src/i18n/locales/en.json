@@ -479,10 +479,10 @@
       "actions": {
         "cancel": "Cancel",
         "submit": "Create Document",
+        "submitAndNew": "Create and add another",
         "submitting": "Saving"
       },
       "validation": {
-        "numberRequired": "Document number is required",
         "createdDateRequired": "Issue date is required",
         "duzpDateRequired": "Tax date is required",
         "baseRequired": "Base amount is required",
@@ -492,6 +492,7 @@
         "vatRateRequired": "VAT rate is required",
         "totalWithVatRequired": "Total with VAT is required",
         "totalWithVatMin": "Total with VAT must be a positive number or zero",
+        "totalLimitExceeded": "Total with VAT on a simplified document must not exceed CZK 10,000",
         "companyNameRequired": "Company name is required"
       },
       "messages": {
@@ -524,11 +525,13 @@
     },
     "create": {
       "title": "Add Bank Account",
-      "trigger": "Add Account"
+      "trigger": "Add Account",
+      "description": "Add a new company bank account."
     },
     "edit": {
       "title": "Edit Bank Account",
-      "description": "Update the account name, identifier and currency."
+      "description": "Update the account name, identifier and currency.",
+      "notFound": "Bank account not found."
     },
     "defaultAccount": "Default account",
     "setAsDefault": "Set as default",
@@ -600,11 +603,13 @@
       "save": "Save Changes"
     },
     "create": {
-      "title": "Add New Contact"
+      "title": "Add New Contact",
+      "description": "Search the ARES registry or fill in the details manually."
     },
     "edit": {
       "title": "Edit Contact",
-      "description": "Update data for the selected contact."
+      "description": "Update data for the selected contact.",
+      "notFound": "Contact not found."
     },
     "messages": {
       "created": "Contact created successfully",

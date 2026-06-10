@@ -1,14 +1,13 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Pencil } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import type { ContactResponseDto } from '@/api/model';
 import { useListContacts } from '@/api/contacts/contacts';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
-import { CreateContactDialog } from './CreateContactDialog';
-import { EditContactDialog } from './EditContactDialog';
 import { ContactDetailDialog } from './ContactDetailDialog';
 
 const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
@@ -16,10 +15,9 @@ const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'ps
 
 export default function Contacts() {
   const { t } = useTranslation();
-  const [createOpen, setCreateOpen] = useState(false);
+  const navigate = useNavigate();
   const [selectedContact, setSelectedContact] = useState<ContactResponseDto | null>(null);
-  const [editingContact, setEditingContact] = useState<ContactResponseDto | null>(null);
-  const { data: contactsResponse, refetch: refetchContacts } = useListContacts();
+  const { data: contactsResponse } = useListContacts();
 
   const columns = [
     { header: t('contacts.columns.name'), cell: (c: ContactResponseDto) => <span className="font-medium">{c.name}</span> },
@@ -42,7 +40,7 @@ export default function Contacts() {
           className="gap-2"
           onClick={(e) => {
             e.stopPropagation();
-            setEditingContact(c);
+            navigate(`/contacts/${c.id}/edit`);
           }}
         >
           <Pencil className="h-4 w-4" />
@@ -58,11 +56,12 @@ export default function Contacts() {
         title={t('contacts.title')}
         description={t('contacts.description')}
         actions={
-          <CreateContactDialog
-            open={createOpen}
-            onOpenChange={setCreateOpen}
-            onSuccess={() => refetchContacts()}
-          />
+          <Button asChild className="gap-2">
+            <Link to="/contacts/create">
+              <Plus className="h-4 w-4" />
+              {t('contacts.actions.add')}
+            </Link>
+          </Button>
         }
       />
 
@@ -76,12 +75,6 @@ export default function Contacts() {
       <ContactDetailDialog
         contact={selectedContact}
         onClose={() => setSelectedContact(null)}
-      />
-
-      <EditContactDialog
-        contact={editingContact}
-        onClose={() => setEditingContact(null)}
-        onSuccess={() => refetchContacts()}
       />
     </PageLayout>
   );

@@ -10,7 +10,11 @@ import { AiChatDialog } from '@/components/AiChatDialog';
 import { SnackbarProvider } from 'notistack';
 import Dashboard from './pages/Dashboard';
 import Contacts from './pages/Contacts';
+import CreateContact from './pages/CreateContact';
+import UpdateContact from './pages/UpdateContact';
 import BankAccounts from './pages/BankAccounts';
+import CreateBankAccount from './pages/CreateBankAccount';
+import UpdateBankAccount from './pages/UpdateBankAccount';
 import IncomingInvoices from './pages/IncomingInvoices';
 import OutgoingInvoices from './pages/OutgoingInvoices';
 import CreateInvoice from './pages/CreateInvoice';
@@ -65,8 +69,24 @@ const App = () => (
                           <Route path="/" element={<Dashboard />} />
                           <Route path="/contacts" element={<Contacts />} />
                           <Route
+                            path="/contacts/create"
+                            element={<CreateContact />}
+                          />
+                          <Route
+                            path="/contacts/:id/edit"
+                            element={<UpdateContact />}
+                          />
+                          <Route
                             path="/bank-accounts"
                             element={<BankAccounts />}
+                          />
+                          <Route
+                            path="/bank-accounts/create"
+                            element={<CreateBankAccount />}
+                          />
+                          <Route
+                            path="/bank-accounts/:id/edit"
+                            element={<UpdateBankAccount />}
                           />
                           <Route
                             path="/incoming-invoices"

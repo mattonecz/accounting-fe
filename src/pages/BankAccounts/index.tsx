@@ -1,18 +1,17 @@
-import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { Plus } from 'lucide-react';
 import { useBankListByCompany, useBankSetDefault } from '@/api/bank/bank';
 import type { BankResponseDto } from '@/api/model';
+import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
-import { CreateBankDialog } from './CreateBankDialog';
-import { EditBankDialog } from './EditBankDialog';
 import { BankAccountCard } from './BankAccountCard';
 
 export default function BankAccounts() {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<BankResponseDto | null>(null);
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { data: bankAccounts, refetch: refetchBankAccounts } = useBankListByCompany();
   const { mutate: setDefaultBank } = useBankSetDefault();
@@ -44,11 +43,12 @@ export default function BankAccounts() {
         title={t('bankAccounts.title')}
         description={t('bankAccounts.description')}
         actions={
-          <CreateBankDialog
-            open={open}
-            onOpenChange={setOpen}
-            onSuccess={() => refetchBankAccounts()}
-          />
+          <Button asChild className="gap-2">
+            <Link to="/bank-accounts/create">
+              <Plus className="h-4 w-4" />
+              {t('bankAccounts.create.trigger')}
+            </Link>
+          </Button>
         }
       />
 
@@ -57,17 +57,11 @@ export default function BankAccounts() {
           <BankAccountCard
             key={account.id}
             account={account}
-            onEdit={setEditingAccount}
+            onEdit={(a) => navigate(`/bank-accounts/${a.id}/edit`)}
             onSetDefault={handleSetDefault}
           />
         ))}
       </div>
-
-      <EditBankDialog
-        account={editingAccount}
-        onClose={() => setEditingAccount(null)}
-        onSuccess={() => refetchBankAccounts()}
-      />
     </PageLayout>
   );
 }

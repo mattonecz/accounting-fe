@@ -480,10 +480,10 @@
       "actions": {
         "cancel": "Zrušit",
         "submit": "Vytvořit doklad",
+        "submitAndNew": "Vytvořit a přidat další",
         "submitting": "Ukládám"
       },
       "validation": {
-        "numberRequired": "Číslo dokladu je povinné",
         "createdDateRequired": "Datum vystavení je povinné",
         "duzpDateRequired": "Datum zdanitelného plnění je povinné",
         "baseRequired": "Základ je povinný",
@@ -493,6 +493,7 @@
         "vatRateRequired": "Sazba DPH je povinná",
         "totalWithVatRequired": "Celkem s DPH je povinné",
         "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula",
+        "totalLimitExceeded": "Celková částka s DPH nesmí u zjednodušeného dokladu překročit 10 000 Kč",
         "companyNameRequired": "Název firmy je povinný"
       },
       "messages": {
@@ -525,11 +526,13 @@
     },
     "create": {
       "title": "Přidat bankovní účet",
-      "trigger": "Přidat účet"
+      "trigger": "Přidat účet",
+      "description": "Přidejte nový firemní bankovní účet."
     },
     "edit": {
       "title": "Upravit bankovní účet",
-      "description": "Aktualizujte název účtu, identifikátor a měnu."
+      "description": "Aktualizujte název účtu, identifikátor a měnu.",
+      "notFound": "Bankovní účet nebyl nalezen."
     },
     "defaultAccount": "Výchozí účet",
     "setAsDefault": "Nastavit jako výchozí",
@@ -601,11 +604,13 @@
       "save": "Uložit změny"
     },
     "create": {
-      "title": "Přidat nový kontakt"
+      "title": "Přidat nový kontakt",
+      "description": "Vyhledejte firmu v ARES nebo vyplňte údaje ručně."
     },
     "edit": {
       "title": "Upravit kontakt",
-      "description": "Aktualizujte údaje vybraného kontaktu."
+      "description": "Aktualizujte údaje vybraného kontaktu.",
+      "notFound": "Kontakt nebyl nalezen."
     },
     "messages": {
       "created": "Kontakt byl úspěšně vytvořen",

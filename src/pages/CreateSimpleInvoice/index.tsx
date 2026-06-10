@@ -53,10 +53,13 @@ import { formatMoney } from '@/lib/formatters';
 const MANUAL = '__manual__';
 const DEFAULT_VAT_RATE = 21;
 const VAT_RATE_OPTIONS = [21, 15, 12, 0];
+// Legal limit for a simplified tax document (zjednodušený daňový doklad).
+const MAX_TOTAL_WITH_VAT = 10000;
 
 type SimpleInvoiceItem = {
   vatRate: number;
   base: number;
+  total: number;
 };
 
 type FormValues = {
@@ -87,7 +90,7 @@ const getDefaultFormValues = (): FormValues => ({
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
   duzpDate: new Date().toISOString().split('T')[0],
-  items: [{ vatRate: DEFAULT_VAT_RATE, base: 0 }],
+  items: [{ vatRate: DEFAULT_VAT_RATE, base: 0, total: 0 }],
   description: '',
   shouldClaimVat: true,
   vatClaimType: CreateInvoiceDtoVatClaimType.FULL,
@@ -113,7 +116,8 @@ const buildItemsFromReceipt = (
           : row.amount != null && rate > 0
             ? round2((Number(row.amount) * 100) / rate)
             : 0;
-      return { vatRate: rate, base: round2(base) };
+      const vat = row.amount != null ? Number(row.amount) : (base * rate) / 100;
+      return { vatRate: rate, base: round2(base), total: round2(base + vat) };
     });
   }
   const total = receipt.total ?? 0;
@@ -121,9 +125,15 @@ const buildItemsFromReceipt = (
   if (total > 0 && vat > 0 && total > vat) {
     const base = round2(total - vat);
     const derivedRate = base > 0 ? Math.round((vat / base) * 100) : 0;
-    return [{ vatRate: derivedRate, base }];
+    return [{ vatRate: derivedRate, base, total: round2(total) }];
   }
-  return [{ vatRate: DEFAULT_VAT_RATE, base: round2(total) }];
+  return [
+    {
+      vatRate: DEFAULT_VAT_RATE,
+      base: round2(total),
+      total: round2(total * (1 + DEFAULT_VAT_RATE / 100)),
+    },
+  ];
 };
 
 const buildDefaultsFromReceipt = (
@@ -147,12 +157,12 @@ const buildDefaultsFromReceipt = (
   };
 };
 
+// Base and total-with-VAT are kept in sync while editing; VAT is the
+// difference so the three displayed amounts always add up exactly.
 const computeLine = (item: SimpleInvoiceItem) => {
-  const base = Number(item.base) || 0;
-  const rate = Number(item.vatRate) || 0;
-  const vat = round2((base * rate) / 100);
-  const total = round2(base + vat);
-  return { base: round2(base), vat, total };
+  const base = round2(Number(item.base) || 0);
+  const total = round2(Number(item.total) || 0);
+  return { base, vat: round2(total - base), total };
 };
 
 const CreateSimpleInvoice = () => {
@@ -192,6 +202,25 @@ const CreateSimpleInvoice = () => {
   const companySelect = form.watch('companySelect');
   const isManual = companySelect === MANUAL;
 
+  // Mirror the selected contact's identifiers into the (disabled) company
+  // fields, and clear them when the user switches back to manual entry.
+  const prevCompanySelectRef = useRef(companySelect);
+  useEffect(() => {
+    if (prevCompanySelectRef.current === companySelect) return;
+    prevCompanySelectRef.current = companySelect;
+    if (companySelect === MANUAL) {
+      form.setValue('companyName', '');
+      form.setValue('companyIco', '');
+      form.setValue('companyDic', '');
+      return;
+    }
+    const contact = contacts.find((c) => c.id === companySelect);
+    if (!contact) return;
+    form.setValue('companyName', contact.name ?? '');
+    form.setValue('companyIco', contact.ico ?? '');
+    form.setValue('companyDic', contact.dic ?? '');
+  }, [companySelect, contacts, form]);
+
   const duzpDate = form.watch('duzpDate');
   useEffect(() => {
     if (!duzpDate) return;
@@ -210,6 +239,30 @@ const CreateSimpleInvoice = () => {
     name: 'items',
   });
 
+  // Remembers per row whether the user last typed the base or the total, so
+  // a VAT-rate change recomputes the other amount and keeps the typed one.
+  const lastEditedRef = useRef<Record<string, 'base' | 'total'>>({});
+
+  const syncLineFromBase = (index: number, base: number) => {
+    const rate = Number(form.getValues(`items.${index}.vatRate`)) || 0;
+    form.setValue(`items.${index}.total`, round2(base * (1 + rate / 100)));
+  };
+
+  const syncLineFromTotal = (index: number, total: number) => {
+    const rate = Number(form.getValues(`items.${index}.vatRate`)) || 0;
+    form.setValue(`items.${index}.base`, round2((total * 100) / (100 + rate)));
+  };
+
+  const handleRateChange = (index: number, fieldId: string, rate: number) => {
+    if (lastEditedRef.current[fieldId] === 'total') {
+      const total = Number(form.getValues(`items.${index}.total`)) || 0;
+      form.setValue(`items.${index}.base`, round2((total * 100) / (100 + rate)));
+    } else {
+      const base = Number(form.getValues(`items.${index}.base`)) || 0;
+      form.setValue(`items.${index}.total`, round2(base * (1 + rate / 100)));
+    }
+  };
+
   const watchedItems = form.watch('items') ?? [];
   const lineTotals = watchedItems.map(computeLine);
   const grandTotals = lineTotals.reduce(
@@ -223,6 +276,8 @@ const CreateSimpleInvoice = () => {
 
   const formatCzk = (value: number) => formatMoney(value, 'CZK', i18n.language);
 
+  const createAnotherRef = useRef(false);
+
   const createMutation = useInvoiceCreate({
     mutation: {
       onSuccess: async () => {
@@ -234,6 +289,14 @@ const CreateSimpleInvoice = () => {
             kind: InvoiceListByCompanyKind.SIMPLE,
           }),
         });
+        if (createAnotherRef.current) {
+          createAnotherRef.current = false;
+          form.reset(getDefaultFormValues());
+          prevCompanySelectRef.current = MANUAL;
+          lastEditedRef.current = {};
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
         navigate('/invoices/simple');
       },
       onError: () => {
@@ -286,24 +349,31 @@ const CreateSimpleInvoice = () => {
       };
     });
 
-    const totals = items.reduce(
-      (acc, line) => {
-        const base = line.total;
-        const vat = round2((base * (line.vatRate ?? 0)) / 100);
+    const totals = data.items.reduce(
+      (acc, item) => {
+        const line = computeLine(item);
         return {
-          total: round2(acc.total + base),
-          totalTax: round2(acc.totalTax + vat),
-          totalWithTax: round2(acc.totalWithTax + base + vat),
+          total: round2(acc.total + line.base),
+          totalTax: round2(acc.totalTax + line.vat),
+          totalWithTax: round2(acc.totalWithTax + line.total),
         };
       },
       { total: 0, totalTax: 0, totalWithTax: 0 },
     );
 
+    if (totals.totalWithTax > MAX_TOTAL_WITH_VAT) {
+      enqueueSnackbar(
+        t('simpleInvoices.create.validation.totalLimitExceeded'),
+        { variant: 'error' },
+      );
+      return;
+    }
+
     createMutation.mutate({
       data: {
         kind: CreateInvoiceDtoKind.SIMPLE,
         ...counterparty,
-        number: data.number,
+        number: data.number.trim() || undefined,
         createdDate: data.createdDate,
         duzpDate: data.duzpDate,
         items,
@@ -316,12 +386,7 @@ const CreateSimpleInvoice = () => {
     });
   };
 
-  const handleNumberChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    onChange: (value: number) => void,
-  ) => {
-    onChange(e.target.value === '' ? 0 : Number(e.target.value));
-  };
+  const parseAmount = (value: string) => (value === '' ? 0 : Number(value));
 
   return (
     <PageLayout className="space-y-4">
@@ -385,11 +450,6 @@ const CreateSimpleInvoice = () => {
                 name="number"
                 label={t('simpleInvoices.create.fields.number')}
                 placeholder="SI-2024-001"
-                rules={{
-                  required: t(
-                    'simpleInvoices.create.validation.numberRequired',
-                  ),
-                }}
               />
               <InputController
                 control={form.control}
@@ -401,6 +461,12 @@ const CreateSimpleInvoice = () => {
                   required: t(
                     'simpleInvoices.create.validation.createdDateRequired',
                   ),
+                }}
+                onChangeOverride={(e, onChange) => {
+                  onChange(e.target.value);
+                  if (!form.formState.dirtyFields.duzpDate) {
+                    form.setValue('duzpDate', e.target.value);
+                  }
                 }}
               />
               <InputController
@@ -450,6 +516,7 @@ const CreateSimpleInvoice = () => {
                   itemsFieldArray.append({
                     vatRate: DEFAULT_VAT_RATE,
                     base: 0,
+                    total: 0,
                   })
                 }
               >
@@ -490,9 +557,11 @@ const CreateSimpleInvoice = () => {
                             </FormLabel>
                             <Select
                               value={String(currentRate)}
-                              onValueChange={(value) =>
-                                f.onChange(Number(value))
-                              }
+                              onValueChange={(value) => {
+                                const rate = Number(value);
+                                f.onChange(rate);
+                                handleRateChange(index, field.id, rate);
+                              }}
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -539,9 +608,12 @@ const CreateSimpleInvoice = () => {
                               inputMode="decimal"
                               placeholder="0.00"
                               {...f}
-                              onChange={(e) =>
-                                handleNumberChange(e, f.onChange)
-                              }
+                              onChange={(e) => {
+                                const value = parseAmount(e.target.value);
+                                f.onChange(value);
+                                lastEditedRef.current[field.id] = 'base';
+                                syncLineFromBase(index, value);
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -558,14 +630,44 @@ const CreateSimpleInvoice = () => {
                       </p>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        {t('simpleInvoices.create.items.total')}
-                      </p>
-                      <p className="flex h-10 items-center rounded-md border border-dashed border-input bg-background px-3 text-sm font-medium tabular-nums">
-                        {formatCzk(line.total)}
-                      </p>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name={`items.${index}.total`}
+                      rules={{
+                        required: t(
+                          'simpleInvoices.create.validation.totalWithVatRequired',
+                        ),
+                        min: {
+                          value: 0,
+                          message: t(
+                            'simpleInvoices.create.validation.totalWithVatMin',
+                          ),
+                        },
+                      }}
+                      render={({ field: f }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className="text-xs">
+                            {t('simpleInvoices.create.items.total')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="1"
+                              inputMode="decimal"
+                              placeholder="0.00"
+                              {...f}
+                              onChange={(e) => {
+                                const value = parseAmount(e.target.value);
+                                f.onChange(value);
+                                lastEditedRef.current[field.id] = 'total';
+                                syncLineFromTotal(index, value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="col-span-2 flex justify-end sm:col-span-1 sm:items-end sm:pb-1">
                       <Button
@@ -604,10 +706,21 @@ const CreateSimpleInvoice = () => {
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {t('simpleInvoices.create.items.summaryTotal')}
                   </p>
-                  <p className="text-lg font-semibold tabular-nums">
+                  <p
+                    className={`text-lg font-semibold tabular-nums ${
+                      grandTotals.total > MAX_TOTAL_WITH_VAT
+                        ? 'text-destructive'
+                        : ''
+                    }`}
+                  >
                     {formatCzk(grandTotals.total)}
                   </p>
                 </div>
+                {grandTotals.total > MAX_TOTAL_WITH_VAT && (
+                  <p className="text-sm font-medium text-destructive sm:col-span-3">
+                    {t('simpleInvoices.create.validation.totalLimitExceeded')}
+                  </p>
+                )}
               </div>
             </div>
           </FormCard>
@@ -622,7 +735,23 @@ const CreateSimpleInvoice = () => {
             >
               {t('simpleInvoices.create.actions.cancel')}
             </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
+            <Button
+              type="submit"
+              variant="secondary"
+              disabled={createMutation.isPending}
+              onClick={() => {
+                createAnotherRef.current = true;
+              }}
+            >
+              {t('simpleInvoices.create.actions.submitAndNew')}
+            </Button>
+            <Button
+              type="submit"
+              disabled={createMutation.isPending}
+              onClick={() => {
+                createAnotherRef.current = false;
+              }}
+            >
               {createMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

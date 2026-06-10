@@ -20,7 +20,8 @@ import type { InvoiceResponseDtoVatClaimNote } from './invoiceResponseDtoVatClai
 
 export interface InvoiceResponseDto {
   id: string;
-  number: string;
+  /** Always present for kind=INVOICE, optional for kind=SIMPLE. */
+  number?: string;
   createdDate: string;
   duzpDate: string;
   dueDate?: string;

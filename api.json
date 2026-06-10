@@ -3025,7 +3025,8 @@
           },
           "number": {
             "type": "string",
-            "example": "20250001"
+            "example": "20250001",
+            "description": "Required for kind=INVOICE, optional for kind=SIMPLE."
           },
           "currency": {
             "type": "string",
@@ -3154,7 +3155,6 @@
           }
         },
         "required": [
-          "number",
           "createdDate",
           "duzpDate"
         ]
@@ -3301,7 +3301,8 @@
             "type": "string"
           },
           "number": {
-            "type": "string"
+            "type": "string",
+            "description": "Always present for kind=INVOICE, optional for kind=SIMPLE."
           },
           "createdDate": {
             "format": "date-time",
@@ -3449,7 +3450,6 @@
         },
         "required": [
           "id",
-          "number",
           "createdDate",
           "duzpDate",
           "total",
@@ -3636,7 +3636,9 @@
           },
           "number": {
             "type": "string",
-            "example": "20250001"
+            "example": "20250001",
+            "nullable": true,
+            "description": "Document number. Send null to clear it on kind=SIMPLE; cannot be cleared on kind=INVOICE."
           },
           "currency": {
             "type": "string",

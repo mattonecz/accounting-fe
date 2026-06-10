@@ -14,8 +14,14 @@ export const InvoicePdfRenderer = ({
 }: InvoicePdfRendererProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const triggered = useRef(false);
-  const { data } = useInvoiceGet(invoiceId);
+  const { data, isError } = useInvoiceGet(invoiceId);
   const invoice = data?.data;
+
+  // The endpoint returns 404 when the invoice is missing; unblock the caller
+  // so the renderer gets unmounted instead of waiting forever.
+  useEffect(() => {
+    if (isError) onDone();
+  }, [isError, onDone]);
 
   useEffect(() => {
     if (!invoice || triggered.current) return;

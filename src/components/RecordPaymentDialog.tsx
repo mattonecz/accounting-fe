@@ -136,7 +136,7 @@ export function RecordPaymentDialog({
       amount: getDefaultAmount(invoice),
       paymentDate: getTodayDate(),
       paymentMethod: getDefaultPaymentMethod(invoice),
-      reference: invoice.number,
+      reference: invoice.number ?? '',
     }),
     [invoice],
   );

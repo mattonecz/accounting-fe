@@ -24,7 +24,11 @@ export interface UpdateInvoiceDto {
   contactId?: string;
   /** Ad-hoc counterparty details for kind=SIMPLE invoices not linked to a Contact. Mutually exclusive with contactId. Cannot be used on an invoice that already has a contactId. Requires at least `name`. */
   contact?: ContactSnapshotDto;
-  number?: string;
+  /**
+   * Document number. Send null to clear it on kind=SIMPLE; cannot be cleared on kind=INVOICE.
+   * @nullable
+   */
+  number?: string | null;
   currency?: string;
   type?: UpdateInvoiceDtoType;
   vatMode?: UpdateInvoiceDtoVatMode;

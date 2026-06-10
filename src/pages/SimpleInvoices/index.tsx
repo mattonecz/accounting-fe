@@ -50,7 +50,7 @@ const SimpleInvoices = () => {
   const columns = [
     {
       header: t('simpleInvoices.columns.number'),
-      cell: (i: InvoiceResponseDto) => <span className="font-medium">{i.number}</span>,
+      cell: (i: InvoiceResponseDto) => <span className="font-medium">{i.number || '-'}</span>,
     },
     { header: t('simpleInvoices.columns.company'), cell: (i: InvoiceResponseDto) => i.contactSnapshot?.name || '-' },
     { header: t('invoices.fields.createdDate'), cell: (i: InvoiceResponseDto) => formatDate(i.createdDate, lang) },
