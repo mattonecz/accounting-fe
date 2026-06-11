@@ -32,33 +32,20 @@ const InvoiceDetail = () => {
     await generateInvoicePdf(invoiceRef.current, `faktura-${invoice.number}.pdf`);
   };
 
-  if (!id) {
-    return (
-      <PageLayout>
-        <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>
-      </PageLayout>
-    );
-  }
+  const renderContent = () => {
+    if (!id) {
+      return <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>;
+    }
+    if (isLoading) {
+      return <p className="text-muted-foreground">{t('invoices.detail.loading')}</p>;
+    }
+    if (isError || !invoice) {
+      return <p className="text-destructive">{t('invoices.detail.error')}</p>;
+    }
 
-  if (isLoading) {
     return (
-      <PageLayout>
-        <p className="text-muted-foreground">{t('invoices.detail.loading')}</p>
-      </PageLayout>
-    );
-  }
-
-  if (isError || !invoice) {
-    return (
-      <PageLayout>
-        <p className="text-destructive">{t('invoices.detail.error')}</p>
-      </PageLayout>
-    );
-  }
-
-  return (
-    <PageLayout className="bg-slate-50/40">
-      <style>
+      <>
+        <style>
         {`@media print {
           @page { size: A4; margin: 12mm; }
           body { background: white !important; }
@@ -67,37 +54,40 @@ const InvoiceDetail = () => {
           #invoice-print-root { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
           .invoice-sheet { box-shadow: none !important; width: auto !important; min-height: auto !important; }
         }`}
-      </style>
+        </style>
 
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">
-            {t('invoices.detail.backLabel')}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t('invoices.detail.backNumber', { number: invoice.number })}
-          </p>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('invoices.detail.backLabel')}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t('invoices.detail.backNumber', { number: invoice.number })}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <InvoiceHeroSection
-        invoice={invoice}
-        currency={currency}
-        paidAmount={paidAmount}
-        remainingAmount={remainingAmount}
-        onDownloadPdf={handleDownloadPdf}
-      />
+        <InvoiceHeroSection
+          invoice={invoice}
+          currency={currency}
+          paidAmount={paidAmount}
+          remainingAmount={remainingAmount}
+          onDownloadPdf={handleDownloadPdf}
+        />
 
-      <InvoiceInfoCards invoice={invoice} />
-      <InvoiceItemsTable invoice={invoice} currency={currency} />
-      <PaymentsCard payments={payments} currency={currency} />
-      <StatusHistoryCard statusHistory={invoice.statusHistory} />
-      <InvoicePrintDocument invoice={invoice} invoiceRef={invoiceRef} />
-    </PageLayout>
-  );
+        <InvoiceInfoCards invoice={invoice} />
+        <InvoiceItemsTable invoice={invoice} currency={currency} />
+        <PaymentsCard payments={payments} currency={currency} />
+        <StatusHistoryCard statusHistory={invoice.statusHistory} />
+        <InvoicePrintDocument invoice={invoice} invoiceRef={invoiceRef} />
+      </>
+    );
+  };
+
+  return <PageLayout className="bg-slate-50/40">{renderContent()}</PageLayout>;
 };
 
 export default InvoiceDetail;

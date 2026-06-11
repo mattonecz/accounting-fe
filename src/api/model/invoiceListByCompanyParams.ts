@@ -14,6 +14,10 @@ export type InvoiceListByCompanyParams = {
  */
 kind?: InvoiceListByCompanyKind;
 /**
+ * Filter by contact (external party) UUID
+ */
+contactId?: string;
+/**
  * Filter by invoice type - RECEIVED or ISSUED
  */
 type?: InvoiceListByCompanyType;

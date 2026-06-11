@@ -439,6 +439,37 @@
         ]
       }
     },
+    "/contacts/{id}/stats": {
+      "get": {
+        "operationId": "getContactStats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get contact invoice statistics",
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
     "/contacts/{id}": {
       "get": {
         "operationId": "getContact",
@@ -890,6 +921,15 @@
                 "INVOICE",
                 "SIMPLE"
               ]
+            }
+          },
+          {
+            "name": "contactId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by contact (external party) UUID",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -2264,6 +2304,68 @@
           "id"
         ]
       },
+      "ContactInvoiceStatsDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "Number of invoices (statuses ISSUED and PAID)"
+          },
+          "totalWithTax": {
+            "type": "number",
+            "description": "Sum of totalWithTax across counted invoices"
+          },
+          "averageWithTax": {
+            "type": "number",
+            "description": "Average totalWithTax across counted invoices"
+          },
+          "unpaidCount": {
+            "type": "number",
+            "description": "Number of unpaid invoices (status ISSUED)"
+          },
+          "unpaidTotalWithTax": {
+            "type": "number",
+            "description": "Sum of totalWithTax across unpaid invoices"
+          },
+          "overdueCount": {
+            "type": "number",
+            "description": "Number of unpaid invoices past their due date"
+          },
+          "firstInvoiceDate": {
+            "format": "date",
+            "type": "string",
+            "nullable": true
+          },
+          "lastInvoiceDate": {
+            "format": "date",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "count",
+          "totalWithTax",
+          "averageWithTax",
+          "unpaidCount",
+          "unpaidTotalWithTax",
+          "overdueCount"
+        ]
+      },
+      "ContactStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "$ref": "#/components/schemas/ContactInvoiceStatsDto"
+          },
+          "received": {
+            "$ref": "#/components/schemas/ContactInvoiceStatsDto"
+          }
+        },
+        "required": [
+          "issued",
+          "received"
+        ]
+      },
       "ContactSearchDto": {
         "type": "object",
         "properties": {
@@ -3169,16 +3271,16 @@
             "type": "string"
           },
           "quantity": {
-            "type": "string"
+            "type": "number"
           },
           "unitPrice": {
-            "type": "string"
+            "type": "number"
           },
           "total": {
-            "type": "string"
+            "type": "number"
           },
           "vatRate": {
-            "type": "string"
+            "type": "number"
           },
           "createdAt": {
             "format": "date-time",
@@ -3213,7 +3315,7 @@
             ]
           },
           "amount": {
-            "type": "string"
+            "type": "number"
           },
           "currency": {
             "type": "string"
@@ -3229,7 +3331,7 @@
             "type": "string"
           },
           "exchangeRate": {
-            "type": "string"
+            "type": "number"
           }
         },
         "required": [
@@ -3901,8 +4003,8 @@
             ]
           },
           "amount": {
-            "type": "string",
-            "example": "1500.00"
+            "type": "number",
+            "example": 1500
           },
           "currency": {
             "type": "string",
@@ -3920,8 +4022,8 @@
             "type": "string"
           },
           "exchangeRate": {
-            "type": "string",
-            "example": "24.865400"
+            "type": "number",
+            "example": 24.8654
           }
         },
         "required": [
@@ -3952,8 +4054,8 @@
             ]
           },
           "amount": {
-            "type": "string",
-            "example": "1500.00"
+            "type": "number",
+            "example": 1500
           },
           "currency": {
             "type": "string",
@@ -3971,8 +4073,8 @@
             "type": "string"
           },
           "exchangeRate": {
-            "type": "string",
-            "example": "24.865400"
+            "type": "number",
+            "example": 24.8654
           }
         },
         "required": [

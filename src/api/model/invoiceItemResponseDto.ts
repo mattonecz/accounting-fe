@@ -9,9 +9,9 @@
 export interface InvoiceItemResponseDto {
   id: string;
   name: string;
-  quantity: string;
-  unitPrice: string;
-  total: string;
-  vatRate?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  vatRate?: number;
   createdAt: string;
 }

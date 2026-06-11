@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { useListContacts } from '@/api/contacts/contacts';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
-import { ContactDetailDialog } from './ContactDetailDialog';
 
 const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
   [contact.street, contact.psc, contact.city, contact.country].filter(Boolean).join(', ');
@@ -16,7 +14,6 @@ const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'ps
 export default function Contacts() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [selectedContact, setSelectedContact] = useState<ContactResponseDto | null>(null);
   const { data: contactsResponse } = useListContacts();
 
   const columns = [
@@ -69,12 +66,7 @@ export default function Contacts() {
         title={t('contacts.allContacts')}
         columns={columns}
         data={contactsResponse?.data}
-        onRowClick={setSelectedContact}
-      />
-
-      <ContactDetailDialog
-        contact={selectedContact}
-        onClose={() => setSelectedContact(null)}
+        onRowClick={(contact) => navigate(`/contacts/${contact.id}`)}
       />
     </PageLayout>
   );

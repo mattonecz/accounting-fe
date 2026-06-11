@@ -33,6 +33,7 @@ import type {
 
 import type {
   ContactResponseDto,
+  ContactStatsResponseDto,
   CreateContactDto,
   FindContactsByNameParams,
   UpdateContactDto
@@ -334,6 +335,95 @@ export function useFindContactsByName<TData = Awaited<ReturnType<typeof findCont
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getFindContactsByNameQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Get contact invoice statistics
+ */
+export const getContactStats = (
+    id: string, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<ContactStatsResponseDto>> => {
+    
+    
+    return axios.default.get(
+      `/contacts/${id}/stats`,options
+    );
+  }
+
+
+
+
+export const getGetContactStatsQueryKey = (id?: string,) => {
+    return [
+    `/contacts/${id}/stats`
+    ] as const;
+    }
+
+    
+export const getGetContactStatsQueryOptions = <TData = Awaited<ReturnType<typeof getContactStats>>, TError = AxiosError<ContactStatsResponseDto>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContactStatsQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContactStats>>> = ({ signal }) => getContactStats(id, { signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetContactStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getContactStats>>>
+export type GetContactStatsQueryError = AxiosError<ContactStatsResponseDto>
+
+
+export function useGetContactStats<TData = Awaited<ReturnType<typeof getContactStats>>, TError = AxiosError<ContactStatsResponseDto>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactStats>>,
+          TError,
+          Awaited<ReturnType<typeof getContactStats>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactStats<TData = Awaited<ReturnType<typeof getContactStats>>, TError = AxiosError<ContactStatsResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactStats>>,
+          TError,
+          Awaited<ReturnType<typeof getContactStats>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactStats<TData = Awaited<ReturnType<typeof getContactStats>>, TError = AxiosError<ContactStatsResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get contact invoice statistics
+ */
+
+export function useGetContactStats<TData = Awaited<ReturnType<typeof getContactStats>>, TError = AxiosError<ContactStatsResponseDto>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactStats>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetContactStatsQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

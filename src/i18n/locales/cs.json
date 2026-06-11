@@ -13,7 +13,12 @@
     "errorLoad": "Nepodařilo se načíst",
     "refresh": "Obnovit",
     "detail": "Detail",
-    "notSelected": "Nevybráno"
+    "notSelected": "Nevybráno",
+    "pagination": {
+      "previous": "Předchozí",
+      "next": "Další",
+      "pageOf": "Strana {{page}} z {{totalPages}}"
+    }
   },
   "validation": {
     "required": "{{field}} je povinné",
@@ -570,6 +575,7 @@
       "street": "Ulice",
       "psc": "PSČ",
       "email": "E-mail",
+      "phone": "Telefon",
       "description": "Popis"
     },
     "placeholders": {
@@ -585,12 +591,31 @@
     },
     "detail": {
       "description": "Kontaktní údaje a informace o registraci firmy.",
-      "ico": "IČO",
-      "dic": "DIČ",
       "address": "Adresa",
-      "city": "Město",
-      "country": "Stát",
-      "email": "E-mail"
+      "infoTitle": "Informace o kontaktu",
+      "invalidId": "Neplatné ID kontaktu.",
+      "loading": "Načítám kontakt...",
+      "error": "Kontakt se nepodařilo načíst.",
+      "stats": {
+        "issuedTitle": "Vydané faktury",
+        "receivedTitle": "Přijaté faktury",
+        "count": "Počet faktur",
+        "totalWithTax": "Celkem s DPH",
+        "averageWithTax": "Průměr s DPH",
+        "unpaid": "Neuhrazeno",
+        "overdue": "Po splatnosti",
+        "firstInvoice": "První faktura",
+        "lastInvoice": "Poslední faktura",
+        "loading": "Načítám statistiky...",
+        "error": "Statistiky se nepodařilo načíst."
+      },
+      "invoices": {
+        "title": "Faktury kontaktu",
+        "empty": "Tento kontakt zatím nemá žádné faktury.",
+        "typeColumn": "Typ",
+        "typeIssued": "Vydaná",
+        "typeReceived": "Přijatá"
+      }
     },
     "validation": {
       "nameRequired": "Název je povinný",

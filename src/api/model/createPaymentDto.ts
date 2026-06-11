@@ -11,10 +11,10 @@ export interface CreatePaymentDto {
   /** UUID of the related invoice */
   invoiceId: string;
   paymentMethod: CreatePaymentDtoPaymentMethod;
-  amount: string;
+  amount: number;
   currency?: string;
   paymentDate: string;
   reference?: string;
   note?: string;
-  exchangeRate?: string;
+  exchangeRate?: number;
 }

@@ -11,10 +11,10 @@ export interface PaymentResponseDto {
   id: string;
   invoiceId: string;
   paymentMethod: PaymentResponseDtoPaymentMethod;
-  amount: string;
+  amount: number;
   currency?: string;
   paymentDate: string;
   reference?: string;
   note?: string;
-  exchangeRate?: string;
+  exchangeRate?: number;
 }

@@ -10,6 +10,7 @@ import { AiChatDialog } from '@/components/AiChatDialog';
 import { SnackbarProvider } from 'notistack';
 import Dashboard from './pages/Dashboard';
 import Contacts from './pages/Contacts';
+import ContactDetail from './pages/ContactDetail';
 import CreateContact from './pages/CreateContact';
 import UpdateContact from './pages/UpdateContact';
 import BankAccounts from './pages/BankAccounts';
@@ -75,6 +76,10 @@ const App = () => (
                           <Route
                             path="/contacts/:id/edit"
                             element={<UpdateContact />}
+                          />
+                          <Route
+                            path="/contacts/:id"
+                            element={<ContactDetail />}
                           />
                           <Route
                             path="/bank-accounts"

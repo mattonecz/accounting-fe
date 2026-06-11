@@ -164,7 +164,7 @@ export function RecordPaymentDialog({
       {
         data: {
           invoiceId: invoice.id,
-          amount: values.amount,
+          amount: Number(values.amount),
           paymentDate: values.paymentDate,
           paymentMethod: values.paymentMethod,
           reference: values.reference,

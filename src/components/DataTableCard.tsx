@@ -26,6 +26,7 @@ interface DataTableCardProps<T> {
   errorMessage?: string;
   onRowClick?: (row: T) => void;
   rowClassName?: string;
+  footer?: React.ReactNode;
 }
 
 export function DataTableCard<T>({
@@ -39,6 +40,7 @@ export function DataTableCard<T>({
   errorMessage = 'Nepodařilo se načíst data.',
   onRowClick,
   rowClassName,
+  footer,
 }: DataTableCardProps<T>) {
   const colSpan = columns.length;
 
@@ -108,6 +110,7 @@ export function DataTableCard<T>({
             )}
           </TableBody>
         </Table>
+        {footer && <div className="px-4 pt-4 sm:px-0">{footer}</div>}
       </CardContent>
     </Card>
   );

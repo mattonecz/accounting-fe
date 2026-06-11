@@ -13,7 +13,12 @@
     "errorLoad": "Failed to load",
     "refresh": "Refresh",
     "detail": "Detail",
-    "notSelected": "Not selected"
+    "notSelected": "Not selected",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {{page}} of {{totalPages}}"
+    }
   },
   "validation": {
     "required": "{{field}} is required",
@@ -569,6 +574,7 @@
       "street": "Street",
       "psc": "ZIP Code",
       "email": "Email",
+      "phone": "Phone",
       "description": "Description"
     },
     "placeholders": {
@@ -584,12 +590,31 @@
     },
     "detail": {
       "description": "Contact details and registered company information.",
-      "ico": "ICO",
-      "dic": "DIC",
       "address": "Address",
-      "city": "City",
-      "country": "Country",
-      "email": "Email"
+      "infoTitle": "Contact Information",
+      "invalidId": "Invalid contact ID.",
+      "loading": "Loading contact...",
+      "error": "Failed to load contact.",
+      "stats": {
+        "issuedTitle": "Issued Invoices",
+        "receivedTitle": "Received Invoices",
+        "count": "Invoice count",
+        "totalWithTax": "Total incl. VAT",
+        "averageWithTax": "Average incl. VAT",
+        "unpaid": "Unpaid",
+        "overdue": "Overdue",
+        "firstInvoice": "First invoice",
+        "lastInvoice": "Last invoice",
+        "loading": "Loading statistics...",
+        "error": "Failed to load statistics."
+      },
+      "invoices": {
+        "title": "Contact Invoices",
+        "empty": "This contact has no invoices yet.",
+        "typeColumn": "Type",
+        "typeIssued": "Issued",
+        "typeReceived": "Received"
+      }
     },
     "validation": {
       "nameRequired": "Name is required",
