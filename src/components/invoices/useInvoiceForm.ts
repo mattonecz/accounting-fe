@@ -17,6 +17,8 @@ export type InvoiceFormValues = CreateInvoiceDto & {
   shouldClaimVat?: boolean;
   /** Helper field – number of days until the due date. Not sent to the backend. */
   paymentDays?: number;
+  /** Helper field – when true, `paidDate` is sent and the invoice is created as PAID. */
+  isPaid?: boolean;
 };
 import { useListContacts } from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
@@ -84,6 +86,7 @@ export const useInvoiceForm = () => {
       duzpDate: today,
       dueDate: addDays(today, defaultPaymentDays),
       paymentDays: defaultPaymentDays,
+      isPaid: false,
       items: [
         {
           name: '',
@@ -201,6 +204,7 @@ export const useInvoiceForm = () => {
       bankId,
       bankSnapshot,
       shouldClaimVat,
+      isPaid,
       paymentDays: _paymentDays,
       vatClaimType,
       vatClaimRatio,
@@ -246,12 +250,17 @@ export const useInvoiceForm = () => {
         }
       : {};
 
+    // A paid invoice only makes sense when issuing – drafts never carry paidDate.
+    const finalPaidDate =
+      mode === 'issued' && isPaid ? rest.paidDate : undefined;
+
     const invoicePayload: CreateInvoiceDto = {
       ...rest,
       vatMode: finalVatMode,
       items: finalItems,
       bankId: finalBankId,
       bankSnapshot: cleanedSnapshot,
+      paidDate: finalPaidDate,
       variableSymbol: trimOrUndefined(rest.variableSymbol),
       specificSymbol: trimOrUndefined(rest.specificSymbol),
       konstantSymbol: trimOrUndefined(rest.konstantSymbol),

@@ -23,6 +23,7 @@ export * from './createCompanyDtoCompanyType';
 export * from './createContactDto';
 export * from './createInvoiceDto';
 export * from './createInvoiceDtoKind';
+export * from './createInvoiceDtoPaidPaymentMethod';
 export * from './createInvoiceDtoStatus';
 export * from './createInvoiceDtoType';
 export * from './createInvoiceDtoVatClaimType';

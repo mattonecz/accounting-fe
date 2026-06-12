@@ -9,6 +9,13 @@ import { InputController } from '@/components/InputController';
 import { SelectController } from '@/components/SelectController';
 import { FormCard } from '@/components/FormCard';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form';
 import {
   Collapsible,
   CollapsibleContent,
@@ -76,6 +83,19 @@ export const InvoiceBasicInfoCard = ({
     onChange(value);
     const createdDate = form.getValues('createdDate') ?? '';
     form.setValue('paymentDays', daysBetween(createdDate, value));
+  };
+
+  const isPaid = form.watch('isPaid');
+
+  const handleIsPaidChange = (
+    checked: boolean,
+    onChange: (...event: unknown[]) => void,
+  ) => {
+    onChange(checked);
+    form.setValue(
+      'paidDate',
+      checked ? form.getValues('dueDate') : undefined,
+    );
   };
 
   const contactOptions = sortedContacts.map((c) => ({ value: c.id, label: c.name ?? '-' }));
@@ -212,6 +232,37 @@ export const InvoiceBasicInfoCard = ({
             rules={{ required: t('validation.required', { field: t('invoices.fields.dueDate') }) }}
             onChangeOverride={handleDueDateChange}
           />
+
+          <FormField
+            control={form.control}
+            name="isPaid"
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-4">
+                <FormLabel className="w-[200px] text-right">
+                  {t('invoices.fields.isPaid')}
+                </FormLabel>
+                <FormControl>
+                  <Checkbox
+                    checked={!!field.value}
+                    onCheckedChange={(checked) =>
+                      handleIsPaidChange(checked === true, field.onChange)
+                    }
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {isPaid && (
+            <InputController
+              control={form.control}
+              name="paidDate"
+              label={t('invoices.fields.paidDate')}
+              type="date"
+              className="w-[160px]"
+              rules={{ required: t('validation.required', { field: t('invoices.fields.paidDate') }) }}
+            />
+          )}
         </div>
       </FormCard>
 

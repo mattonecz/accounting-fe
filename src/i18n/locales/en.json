@@ -210,7 +210,9 @@
       "status": "Status",
       "quantity": "Quantity",
       "unitPrice": "Unit Price",
-      "paymentDays": "Payment term (days)"
+      "paymentDays": "Payment term (days)",
+      "isPaid": "Paid",
+      "paidDate": "Payment Date"
     },
     "placeholders": {
       "number": "20250001",

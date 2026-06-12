@@ -211,7 +211,9 @@
       "status": "Stav",
       "quantity": "Množství",
       "unitPrice": "Cena za jednotku",
-      "paymentDays": "Počet dní splatnosti"
+      "paymentDays": "Počet dní splatnosti",
+      "isPaid": "Zaplacená",
+      "paidDate": "Datum zaplacení"
     },
     "placeholders": {
       "number": "20250001",

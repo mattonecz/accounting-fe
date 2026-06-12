@@ -3165,6 +3165,22 @@
             "example": "ISSUED",
             "description": "Invoice status. Defaults to ISSUED when omitted."
           },
+          "paidDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2025-06-25",
+            "description": "Date the invoice was already paid. When set, the invoice is created with status PAID and a full-amount payment with this date is recorded."
+          },
+          "paidPaymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ],
+            "description": "Payment method of the recorded payment when paidDate is set. Defaults to BANK_TRANSFER."
+          },
           "exchangeRate": {
             "type": "number",
             "example": 24.85
