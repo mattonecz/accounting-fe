@@ -14,6 +14,7 @@ import type { InvoiceResponseDto } from '@/api/model';
 import { InvoiceListByCompanyKind } from '@/api/model';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
+import { UploadReceiptButton } from '@/components/UploadReceiptButton';
 import { DataTableCard } from '@/components/DataTableCard';
 import { formatDate, formatMoney } from '@/lib/formatters';
 
@@ -87,6 +88,7 @@ const SimpleInvoices = () => {
               <RefreshCcw className="mr-2 h-4 w-4" />
               {t('common.refresh')}
             </Button>
+            <UploadReceiptButton />
             <Button className="gap-2" onClick={() => navigate('/invoices/simple/create')}>
               <Plus className="h-4 w-4" />
               {t('simpleInvoices.actions.create')}

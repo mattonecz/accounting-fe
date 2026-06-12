@@ -1,13 +1,11 @@
-import { useEffect, useRef } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Loader2, Plus } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
-import { PageHeader } from '@/components/PageHeader';
-import { FormCard } from '@/components/FormCard';
 import {
   Form,
   FormControl,
@@ -17,6 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -24,11 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { InputController } from '@/components/InputController';
-import { SelectController } from '@/components/SelectController';
-import { InvoiceVatClaimCard } from '@/components/invoices/InvoiceVatClaimCard';
+import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { useListContacts } from '@/api/contacts/contacts';
 import {
   getInvoiceListByCompanyQueryKey,
@@ -39,7 +41,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import type {
   ContactResponseDto,
   ContactSnapshotDto,
-  CreateInvoiceDto,
   InvoiceItemDto,
   ReceiptParseDataDto,
 } from '@/api/model';
@@ -49,21 +50,23 @@ import {
   InvoiceListByCompanyKind,
 } from '@/api/model';
 import { formatMoney } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 
 const MANUAL = '__manual__';
 const DEFAULT_VAT_RATE = 21;
-const VAT_RATE_OPTIONS = [21, 15, 12, 0];
+// One fixed row per current Czech VAT rate — the user only types totals.
+const DEFAULT_RATES = [21, 12, 0];
 // Legal limit for a simplified tax document (zjednodušený daňový doklad).
 const MAX_TOTAL_WITH_VAT = 10000;
 
-type SimpleInvoiceItem = {
+type RateRowValue = {
   vatRate: number;
-  base: number;
-  total: number;
+  /** Total incl. VAT as typed; empty string means no amount for this rate. */
+  total: string;
 };
 
 type FormValues = {
-  // counterparty
+  // counterparty (optional)
   companySelect: string;
   companyName: string;
   companyIco: string;
@@ -72,15 +75,18 @@ type FormValues = {
   number: string;
   createdDate: string;
   duzpDate: string;
-  items: SimpleInvoiceItem[];
+  rates: RateRowValue[];
   description: string;
   // VAT claim
-  shouldClaimVat?: boolean;
-  vatClaimType?: CreateInvoiceDtoVatClaimType;
-  vatClaimRatio?: number;
-  vatClaimMonth?: string;
-  vatClaimNote?: string;
+  shouldClaimVat: boolean;
+  vatClaimType: CreateInvoiceDtoVatClaimType;
+  /** Kept as the typed string; parsed to number on submit. */
+  vatClaimRatio: string;
+  vatClaimMonth: string;
 };
+
+const getDefaultRates = (): RateRowValue[] =>
+  DEFAULT_RATES.map((vatRate) => ({ vatRate, total: '' }));
 
 const getDefaultFormValues = (): FormValues => ({
   companySelect: MANUAL,
@@ -90,25 +96,35 @@ const getDefaultFormValues = (): FormValues => ({
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
   duzpDate: new Date().toISOString().split('T')[0],
-  items: [{ vatRate: DEFAULT_VAT_RATE, base: 0, total: 0 }],
+  rates: getDefaultRates(),
   description: '',
   shouldClaimVat: true,
   vatClaimType: CreateInvoiceDtoVatClaimType.FULL,
-  vatClaimRatio: undefined,
+  vatClaimRatio: '',
   vatClaimMonth: new Date().toISOString().slice(0, 7),
-  vatClaimNote: '',
 });
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-const buildItemsFromReceipt = (
+// Base is derived from the typed total so the three amounts always add up.
+const computeLine = (row: RateRowValue) => {
+  const total = round2(Number(row.total) || 0);
+  const base = round2((total * 100) / (100 + row.vatRate));
+  return { base, vat: round2(total - base), total };
+};
+
+const buildRatesFromReceipt = (
   receipt: ReceiptParseDataDto,
-): SimpleInvoiceItem[] => {
+): RateRowValue[] => {
+  const totals = new Map<number, number>(DEFAULT_RATES.map((r) => [r, 0]));
+  const addTotal = (rate: number, total: number) =>
+    totals.set(rate, round2((totals.get(rate) ?? 0) + total));
+
   const breakdown = receipt.vatBreakdown ?? [];
   if (breakdown.length > 0) {
-    return breakdown.map((row) => {
+    for (const row of breakdown) {
       const rate = Number(row.rate) || 0;
       const base =
         row.base != null
@@ -117,53 +133,49 @@ const buildItemsFromReceipt = (
             ? round2((Number(row.amount) * 100) / rate)
             : 0;
       const vat = row.amount != null ? Number(row.amount) : (base * rate) / 100;
-      return { vatRate: rate, base: round2(base), total: round2(base + vat) };
-    });
+      addTotal(rate, round2(base + vat));
+    }
+  } else {
+    const total = receipt.total ?? 0;
+    const vat = receipt.vat ?? 0;
+    if (total > 0 && vat > 0 && total > vat) {
+      const base = round2(total - vat);
+      const derivedRate = base > 0 ? Math.round((vat / base) * 100) : 0;
+      addTotal(derivedRate, round2(total));
+    } else if (total > 0) {
+      addTotal(DEFAULT_VAT_RATE, round2(total * (1 + DEFAULT_VAT_RATE / 100)));
+    }
   }
-  const total = receipt.total ?? 0;
-  const vat = receipt.vat ?? 0;
-  if (total > 0 && vat > 0 && total > vat) {
-    const base = round2(total - vat);
-    const derivedRate = base > 0 ? Math.round((vat / base) * 100) : 0;
-    return [{ vatRate: derivedRate, base, total: round2(total) }];
-  }
-  return [
-    {
-      vatRate: DEFAULT_VAT_RATE,
-      base: round2(total),
-      total: round2(total * (1 + DEFAULT_VAT_RATE / 100)),
-    },
-  ];
+
+  return [...totals.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([vatRate, total]) => ({
+      vatRate,
+      total: total > 0 ? String(total) : '',
+    }));
 };
 
-const buildDefaultsFromReceipt = (
-  receipt: ReceiptParseDataDto,
-): FormValues => {
+const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
   const base = getDefaultFormValues();
-  const date = receipt.date && ISO_DATE_RE.test(receipt.date)
-    ? receipt.date
-    : base.createdDate;
-  const vendor = receipt.vendor?.trim() ?? '';
-  const number = receipt.documentNumber?.trim() ?? '';
+  const date =
+    receipt.date && ISO_DATE_RE.test(receipt.date)
+      ? receipt.date
+      : base.createdDate;
   return {
     ...base,
-    companySelect: MANUAL,
-    companyName: vendor,
-    number,
+    companyName: receipt.vendor?.trim() ?? '',
+    number: receipt.documentNumber?.trim() ?? '',
     createdDate: date,
     duzpDate: date,
-    items: buildItemsFromReceipt(receipt),
+    rates: buildRatesFromReceipt(receipt),
+    description: receipt.description?.trim() ?? '',
     vatClaimMonth: date.slice(0, 7),
   };
 };
 
-// Base and total-with-VAT are kept in sync while editing; VAT is the
-// difference so the three displayed amounts always add up exactly.
-const computeLine = (item: SimpleInvoiceItem) => {
-  const base = round2(Number(item.base) || 0);
-  const total = round2(Number(item.total) || 0);
-  return { base, vat: round2(total - base), total };
-};
+const labelClass = 'text-[11px] font-semibold text-foreground/80';
+
+const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
 
 const CreateSimpleInvoice = () => {
   const { t, i18n } = useTranslation();
@@ -182,6 +194,10 @@ const CreateSimpleInvoice = () => {
       : getDefaultFormValues(),
   });
 
+  const [companyOpen, setCompanyOpen] = useState(
+    () => !!receiptFromState?.vendor?.trim(),
+  );
+
   const prefillAppliedRef = useRef(false);
   useEffect(() => {
     if (prefillAppliedRef.current || !receiptFromState) return;
@@ -194,10 +210,11 @@ const CreateSimpleInvoice = () => {
   const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const isVatPayer = !!companyResponse?.data?.vatPayer;
 
-  const { data: contacts = [], isLoading: isContactsLoading } =
-    useListContacts<ContactResponseDto[]>({
-      query: { select: (response) => response.data },
-    });
+  const { data: contacts = [], isLoading: isContactsLoading } = useListContacts<
+    ContactResponseDto[]
+  >({
+    query: { select: (response) => response.data },
+  });
 
   const companySelect = form.watch('companySelect');
   const isManual = companySelect === MANUAL;
@@ -234,37 +251,8 @@ const CreateSimpleInvoice = () => {
     ...contacts.map((contact) => ({ value: contact.id, label: contact.name })),
   ];
 
-  const itemsFieldArray = useFieldArray({
-    control: form.control,
-    name: 'items',
-  });
-
-  // Remembers per row whether the user last typed the base or the total, so
-  // a VAT-rate change recomputes the other amount and keeps the typed one.
-  const lastEditedRef = useRef<Record<string, 'base' | 'total'>>({});
-
-  const syncLineFromBase = (index: number, base: number) => {
-    const rate = Number(form.getValues(`items.${index}.vatRate`)) || 0;
-    form.setValue(`items.${index}.total`, round2(base * (1 + rate / 100)));
-  };
-
-  const syncLineFromTotal = (index: number, total: number) => {
-    const rate = Number(form.getValues(`items.${index}.vatRate`)) || 0;
-    form.setValue(`items.${index}.base`, round2((total * 100) / (100 + rate)));
-  };
-
-  const handleRateChange = (index: number, fieldId: string, rate: number) => {
-    if (lastEditedRef.current[fieldId] === 'total') {
-      const total = Number(form.getValues(`items.${index}.total`)) || 0;
-      form.setValue(`items.${index}.base`, round2((total * 100) / (100 + rate)));
-    } else {
-      const base = Number(form.getValues(`items.${index}.base`)) || 0;
-      form.setValue(`items.${index}.total`, round2(base * (1 + rate / 100)));
-    }
-  };
-
-  const watchedItems = form.watch('items') ?? [];
-  const lineTotals = watchedItems.map(computeLine);
+  const watchedRates = form.watch('rates') ?? [];
+  const lineTotals = watchedRates.map(computeLine);
   const grandTotals = lineTotals.reduce(
     (acc, line) => ({
       base: round2(acc.base + line.base),
@@ -273,8 +261,15 @@ const CreateSimpleInvoice = () => {
     }),
     { base: 0, vat: 0, total: 0 },
   );
+  const overLimit = grandTotals.total > MAX_TOTAL_WITH_VAT;
 
   const formatCzk = (value: number) => formatMoney(value, 'CZK', i18n.language);
+  const numberFormat = new Intl.NumberFormat(i18n.language, {
+    maximumFractionDigits: 2,
+  });
+
+  const shouldClaimVat = form.watch('shouldClaimVat');
+  const vatClaimType = form.watch('vatClaimType');
 
   const createAnotherRef = useRef(false);
 
@@ -293,7 +288,7 @@ const CreateSimpleInvoice = () => {
           createAnotherRef.current = false;
           form.reset(getDefaultFormValues());
           prevCompanySelectRef.current = MANUAL;
-          lastEditedRef.current = {};
+          setCompanyOpen(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
@@ -308,66 +303,60 @@ const CreateSimpleInvoice = () => {
   });
 
   const onSubmit = (data: FormValues) => {
-    const counterparty = isManual
-      ? {
-          contact: {
-            name: data.companyName.trim(),
-            ico: data.companyIco.trim() || undefined,
-            dic: data.companyDic.trim() || undefined,
-          } satisfies ContactSnapshotDto,
-        }
-      : { contactId: data.companySelect };
+    const lines = data.rates
+      .map((row) => ({ rate: row.vatRate, ...computeLine(row) }))
+      .filter((line) => line.total > 0);
 
-    const sendVatClaim = isVatPayer && data.shouldClaimVat === true;
-    const vatClaimFields: Pick<
-      CreateInvoiceDto,
-      'vatClaimType' | 'vatClaimRatio' | 'vatClaimMonth' | 'vatClaimNote'
-    > = sendVatClaim
-      ? {
-          vatClaimType: data.vatClaimType,
-          vatClaimRatio:
-            data.vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL &&
-            data.vatClaimRatio != null
-              ? Number(data.vatClaimRatio)
-              : undefined,
-          vatClaimMonth: data.vatClaimMonth
-            ? `${data.vatClaimMonth.slice(0, 7)}-01`
-            : undefined,
-          vatClaimNote: data.vatClaimNote?.trim() || undefined,
-        }
-      : {};
+    if (lines.length === 0) {
+      enqueueSnackbar(t('simpleInvoices.create.validation.amountRequired'), {
+        variant: 'error',
+      });
+      return;
+    }
 
-    const items: InvoiceItemDto[] = data.items.map((item) => {
-      const { base } = computeLine(item);
-      const rate = Number(item.vatRate) || 0;
-      return {
-        name: t('simpleInvoices.create.items.lineName', { rate }),
-        quantity: 1,
-        unitPrice: base,
-        total: base,
-        vatRate: rate,
-      };
-    });
-
-    const totals = data.items.reduce(
-      (acc, item) => {
-        const line = computeLine(item);
-        return {
-          total: round2(acc.total + line.base),
-          totalTax: round2(acc.totalTax + line.vat),
-          totalWithTax: round2(acc.totalWithTax + line.total),
-        };
-      },
+    const totals = lines.reduce(
+      (acc, line) => ({
+        total: round2(acc.total + line.base),
+        totalTax: round2(acc.totalTax + line.vat),
+        totalWithTax: round2(acc.totalWithTax + line.total),
+      }),
       { total: 0, totalTax: 0, totalWithTax: 0 },
     );
 
     if (totals.totalWithTax > MAX_TOTAL_WITH_VAT) {
       enqueueSnackbar(
         t('simpleInvoices.create.validation.totalLimitExceeded'),
-        { variant: 'error' },
+        {
+          variant: 'error',
+        },
       );
       return;
     }
+
+    const items: InvoiceItemDto[] = lines.map((line) => ({
+      name: t('simpleInvoices.create.rates.lineName', { rate: line.rate }),
+      quantity: 1,
+      unitPrice: line.base,
+      total: line.base,
+      vatRate: line.rate,
+    }));
+
+    // Counterparty is optional on a simplified receipt — send it only when
+    // a contact is selected or a manual name was entered.
+    const manualName = data.companyName.trim();
+    const counterparty = !isManual
+      ? { contactId: data.companySelect }
+      : manualName
+        ? {
+            contact: {
+              name: manualName,
+              ico: data.companyIco.trim() || undefined,
+              dic: data.companyDic.trim() || undefined,
+            } satisfies ContactSnapshotDto,
+          }
+        : {};
+
+    const sendVatClaim = isVatPayer && data.shouldClaimVat;
 
     createMutation.mutate({
       data: {
@@ -380,121 +369,138 @@ const CreateSimpleInvoice = () => {
         total: totals.total,
         totalTax: totals.totalTax,
         totalWithTax: totals.totalWithTax,
-        description: data.description?.trim() || undefined,
-        ...vatClaimFields,
+        description: data.description.trim(),
+        ...(sendVatClaim
+          ? {
+              vatClaimType: data.vatClaimType,
+              vatClaimRatio:
+                data.vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL &&
+                data.vatClaimRatio.trim() !== ''
+                  ? Number(data.vatClaimRatio)
+                  : undefined,
+              vatClaimMonth: data.vatClaimMonth
+                ? `${data.vatClaimMonth.slice(0, 7)}-01`
+                : undefined,
+            }
+          : {}),
       },
     });
   };
 
-  const parseAmount = (value: string) => (value === '' ? 0 : Number(value));
+  const isPending = createMutation.isPending;
+
+  const submitButtons = (
+    <>
+      <Button
+        type="submit"
+        variant="outline"
+        size="sm"
+        disabled={isPending}
+        onClick={() => {
+          createAnotherRef.current = true;
+        }}
+      >
+        {t('simpleInvoices.create.actions.saveAndNew')}
+      </Button>
+      <Button
+        type="submit"
+        size="sm"
+        className="gap-1.5"
+        disabled={isPending}
+        onClick={() => {
+          createAnotherRef.current = false;
+        }}
+      >
+        {isPending ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('simpleInvoices.create.actions.submitting')}
+          </>
+        ) : (
+          <>
+            <Check className="h-4 w-4" />
+            {t('simpleInvoices.create.actions.save')}
+          </>
+        )}
+      </Button>
+    </>
+  );
 
   return (
-    <PageLayout className="space-y-4">
-      <PageHeader
-        title={t('simpleInvoices.create.title')}
-        description={t('simpleInvoices.create.description')}
-        backButton
-      />
-
+    <PageLayout>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormCard
-            title={t('simpleInvoices.create.companySection')}
-            titleClassName="text-center"
-          >
-            <div className="mx-auto max-w-3xl space-y-4">
-              <SelectController
-                control={form.control}
-                name="companySelect"
-                label={t('simpleInvoices.create.fields.companySelect')}
-                placeholder={t(
-                  'simpleInvoices.create.placeholders.companySelect',
-                )}
-                options={companyOptions}
-                disabled={isContactsLoading}
-              />
-              <InputController
-                control={form.control}
-                name="companyName"
-                label={t('simpleInvoices.create.fields.companyName')}
-                disabled={!isManual}
-                rules={{
-                  validate: (value: unknown) =>
-                    !isManual ||
-                    !!String(value ?? '').trim() ||
-                    t('simpleInvoices.create.validation.companyNameRequired'),
-                }}
-              />
-              <InputController
-                control={form.control}
-                name="companyIco"
-                label={t('simpleInvoices.create.fields.companyIco')}
-                disabled={!isManual}
-              />
-              <InputController
-                control={form.control}
-                name="companyDic"
-                label={t('simpleInvoices.create.fields.companyDic')}
-                disabled={!isManual}
-              />
+        {/* Intentionally narrow — it's a simple form. */}
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mx-auto max-w-[760px] space-y-4"
+        >
+          {/* Header */}
+          <div className="space-y-1">
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="h-auto gap-1 p-0 text-xs text-muted-foreground"
+              onClick={() => navigate('/invoices/simple')}
+            >
+              <ArrowLeft className="h-3 w-3" />
+              {t('simpleInvoices.create.back')}
+            </Button>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  {t('simpleInvoices.create.title')}
+                </h1>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {t('simpleInvoices.create.description')}
+                </p>
+              </div>
             </div>
-          </FormCard>
+          </div>
 
-          <FormCard
-            title={t('simpleInvoices.create.documentSection')}
-            titleClassName="text-center"
-          >
-            <div className="mx-auto max-w-3xl space-y-4">
-              <InputController
-                control={form.control}
-                name="number"
-                label={t('simpleInvoices.create.fields.number')}
-                placeholder="SI-2024-001"
-              />
-              <InputController
-                control={form.control}
-                name="createdDate"
-                label={t('simpleInvoices.create.fields.createdDate')}
-                type="date"
-                className="w-[160px]"
-                rules={{
-                  required: t(
-                    'simpleInvoices.create.validation.createdDateRequired',
-                  ),
-                }}
-                onChangeOverride={(e, onChange) => {
-                  onChange(e.target.value);
-                  if (!form.formState.dirtyFields.duzpDate) {
-                    form.setValue('duzpDate', e.target.value);
-                  }
-                }}
-              />
-              <InputController
-                control={form.control}
-                name="duzpDate"
-                label={t('simpleInvoices.create.fields.duzpDate')}
-                type="date"
-                className="w-[160px]"
-                rules={{
-                  required: t(
-                    'simpleInvoices.create.validation.duzpDateRequired',
-                  ),
-                }}
-              />
+          {/* Main card: description + dates + amounts */}
+          <Card className="border-border/60 p-5 shadow-sm">
+            <FormField
+              control={form.control}
+              name="description"
+              rules={{
+                validate: (value) =>
+                  !!value.trim() ||
+                  t('simpleInvoices.create.validation.descriptionRequired'),
+              }}
+              render={({ field }) => (
+                <FormItem className="space-y-1.5">
+                  <FormLabel className={labelClass}>
+                    {t('simpleInvoices.create.fields.description')}
+                    <RequiredMark />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder={t(
+                        'simpleInvoices.create.placeholders.description',
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <FormField
                 control={form.control}
-                name="description"
+                name="number"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>
-                      {t('simpleInvoices.create.fields.note')}
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className={labelClass}>
+                      {t('simpleInvoices.create.fields.number')}
                     </FormLabel>
                     <FormControl>
-                      <Textarea
+                      <Input
                         {...field}
                         placeholder={t(
-                          'simpleInvoices.create.placeholders.note',
+                          'simpleInvoices.create.placeholders.number',
                         )}
                       />
                     </FormControl>
@@ -502,265 +508,467 @@ const CreateSimpleInvoice = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="createdDate"
+                rules={{
+                  required: t(
+                    'simpleInvoices.create.validation.createdDateRequired',
+                  ),
+                }}
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className={labelClass}>
+                      {t('simpleInvoices.create.fields.createdDate')}
+                      <RequiredMark />
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        className="tabular-nums"
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          if (!form.formState.dirtyFields.duzpDate) {
+                            form.setValue('duzpDate', e.target.value);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="duzpDate"
+                rules={{
+                  required: t(
+                    'simpleInvoices.create.validation.duzpDateRequired',
+                  ),
+                }}
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className={labelClass}>
+                      {t('simpleInvoices.create.fields.duzpDate')}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" className="tabular-nums" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </FormCard>
 
-          <FormCard
-            title={t('simpleInvoices.create.itemsSection')}
-            actions={
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  itemsFieldArray.append({
-                    vatRate: DEFAULT_VAT_RATE,
-                    base: 0,
-                    total: 0,
-                  })
-                }
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t('simpleInvoices.create.items.addRate')}
-              </Button>
-            }
-          >
-            <div className="space-y-3">
-              {itemsFieldArray.fields.map((field, index) => {
-                const line = lineTotals[index] ?? { vat: 0, total: 0 };
+            {/* Amounts per VAT rate */}
+            <p className={cn(labelClass, 'mb-1.5 mt-5')}>
+              {t('simpleInvoices.create.rates.title')}
+              <RequiredMark />
+            </p>
+            <div className="overflow-hidden rounded-lg border">
+              <div className="grid grid-cols-[72px_1fr_1fr_1fr] items-center gap-3 border-b bg-muted/50 px-3.5 py-2 sm:grid-cols-[90px_1fr_1fr_1fr]">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('simpleInvoices.create.rates.rate')}
+                </span>
+                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('simpleInvoices.create.rates.totalWithVat')}
+                </span>
+                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('simpleInvoices.create.rates.base')}
+                </span>
+                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t('simpleInvoices.create.rates.vat')}
+                </span>
+              </div>
+              {watchedRates.map((row, index) => {
+                const line = lineTotals[index] ?? { base: 0, vat: 0, total: 0 };
+                const isEmpty = line.total <= 0;
                 return (
                   <div
-                    key={field.id}
-                    className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/30 p-3 sm:grid-cols-[130px_1fr_1fr_1fr_auto] sm:items-end sm:gap-2"
+                    key={row.vatRate}
+                    className="grid grid-cols-[72px_1fr_1fr_1fr] items-center gap-3 border-b px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[90px_1fr_1fr_1fr]"
                   >
+                    <span
+                      className={cn(
+                        'text-sm font-semibold tabular-nums',
+                        isEmpty && 'text-muted-foreground/70',
+                      )}
+                    >
+                      {row.vatRate} %
+                    </span>
                     <FormField
                       control={form.control}
-                      name={`items.${index}.vatRate`}
+                      name={`rates.${index}.total`}
                       rules={{
-                        required: t(
-                          'simpleInvoices.create.validation.vatRateRequired',
-                        ),
+                        validate: (value) =>
+                          value === '' ||
+                          Number(value) >= 0 ||
+                          t('simpleInvoices.create.validation.totalMin'),
                       }}
-                      render={({ field: f }) => {
-                        const currentRate = Number(f.value ?? DEFAULT_VAT_RATE);
-                        const rateOptions = VAT_RATE_OPTIONS.includes(
-                          currentRate,
-                        )
-                          ? VAT_RATE_OPTIONS
-                          : [...VAT_RATE_OPTIONS, currentRate].sort(
-                              (a, b) => b - a,
-                            );
-                        return (
-                          <FormItem className="space-y-1.5">
-                            <FormLabel className="text-xs">
-                              {t('simpleInvoices.create.items.vatRate')}
-                            </FormLabel>
-                            <Select
-                              value={String(currentRate)}
-                              onValueChange={(value) => {
-                                const rate = Number(value);
-                                f.onChange(rate);
-                                handleRateChange(index, field.id, rate);
-                              }}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {rateOptions.map((rate) => (
-                                  <SelectItem key={rate} value={String(rate)}>
-                                    {rate}%
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.base`}
-                      rules={{
-                        required: t(
-                          'simpleInvoices.create.validation.baseRequired',
-                        ),
-                        min: {
-                          value: 0,
-                          message: t(
-                            'simpleInvoices.create.validation.baseMin',
-                          ),
-                        },
-                      }}
-                      render={({ field: f }) => (
-                        <FormItem className="space-y-1.5">
-                          <FormLabel className="text-xs">
-                            {t('simpleInvoices.create.items.base')}
-                          </FormLabel>
+                      render={({ field }) => (
+                        <FormItem className="space-y-1">
                           <FormControl>
                             <Input
+                              {...field}
                               type="number"
-                              step="1"
                               inputMode="decimal"
-                              placeholder="0.00"
-                              {...f}
-                              onChange={(e) => {
-                                const value = parseAmount(e.target.value);
-                                f.onChange(value);
-                                lastEditedRef.current[field.id] = 'base';
-                                syncLineFromBase(index, value);
-                              }}
+                              step="any"
+                              min={0}
+                              placeholder="0"
+                              className={cn(
+                                'h-8 text-right text-sm tabular-nums',
+                                isEmpty && 'border-dashed',
+                              )}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    <div className="space-y-1.5">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        {t('simpleInvoices.create.items.vat')}
-                      </p>
-                      <p className="flex h-10 items-center rounded-md border border-dashed border-input bg-background px-3 text-sm tabular-nums">
-                        {formatCzk(line.vat)}
-                      </p>
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.total`}
-                      rules={{
-                        required: t(
-                          'simpleInvoices.create.validation.totalWithVatRequired',
-                        ),
-                        min: {
-                          value: 0,
-                          message: t(
-                            'simpleInvoices.create.validation.totalWithVatMin',
-                          ),
-                        },
-                      }}
-                      render={({ field: f }) => (
-                        <FormItem className="space-y-1.5">
-                          <FormLabel className="text-xs">
-                            {t('simpleInvoices.create.items.total')}
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              step="1"
-                              inputMode="decimal"
-                              placeholder="0.00"
-                              {...f}
-                              onChange={(e) => {
-                                const value = parseAmount(e.target.value);
-                                f.onChange(value);
-                                lastEditedRef.current[field.id] = 'total';
-                                syncLineFromTotal(index, value);
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="col-span-2 flex justify-end sm:col-span-1 sm:items-end sm:pb-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label={t('simpleInvoices.create.items.remove')}
-                        onClick={() => itemsFieldArray.remove(index)}
-                        disabled={itemsFieldArray.fields.length === 1}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <span className="text-right text-xs tabular-nums text-muted-foreground">
+                      {isEmpty ? '—' : numberFormat.format(line.base)}
+                    </span>
+                    <span className="text-right text-xs tabular-nums text-muted-foreground">
+                      {isEmpty ? '—' : numberFormat.format(line.vat)}
+                    </span>
                   </div>
                 );
               })}
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground/80">
+              {t('simpleInvoices.create.rates.hint')}
+            </p>
 
-              <div className="grid gap-2 rounded-lg border bg-secondary/40 p-4 sm:grid-cols-3">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {t('simpleInvoices.create.items.summaryBase')}
-                  </p>
-                  <p className="text-lg font-semibold tabular-nums">
-                    {formatCzk(grandTotals.base)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {t('simpleInvoices.create.items.summaryVat')}
-                  </p>
-                  <p className="text-lg font-semibold tabular-nums">
-                    {formatCzk(grandTotals.vat)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {t('simpleInvoices.create.items.summaryTotal')}
-                  </p>
-                  <p
-                    className={`text-lg font-semibold tabular-nums ${
-                      grandTotals.total > MAX_TOTAL_WITH_VAT
-                        ? 'text-destructive'
-                        : ''
-                    }`}
-                  >
-                    {formatCzk(grandTotals.total)}
-                  </p>
-                </div>
-                {grandTotals.total > MAX_TOTAL_WITH_VAT && (
-                  <p className="text-sm font-medium text-destructive sm:col-span-3">
-                    {t('simpleInvoices.create.validation.totalLimitExceeded')}
-                  </p>
-                )}
+            {/* Total */}
+            <div className="mt-4 flex items-baseline justify-between border-t pt-3.5">
+              <span className="text-sm font-semibold">
+                {t('simpleInvoices.create.total.label')}
+              </span>
+              <div className="text-right">
+                <p
+                  className={cn(
+                    'text-2xl font-bold tracking-tight tabular-nums',
+                    overLimit && 'text-destructive',
+                  )}
+                >
+                  {formatCzk(grandTotals.total)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('simpleInvoices.create.total.vatIncluded', {
+                    amount: formatCzk(grandTotals.vat),
+                  })}
+                </p>
               </div>
             </div>
-          </FormCard>
+            {overLimit && (
+              <p className="mt-2 text-right text-xs font-medium text-destructive">
+                {t('simpleInvoices.create.validation.totalLimitExceeded')}
+              </p>
+            )}
+          </Card>
 
-          {isVatPayer && <InvoiceVatClaimCard form={form} />}
+          {/* Optional company — collapsed by default */}
+          <Collapsible open={companyOpen} onOpenChange={setCompanyOpen}>
+            <Card className="border-border/60 p-0 shadow-sm">
+              <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
+                <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
+                  <Plus className="h-2.5 w-2.5" />
+                </span>
+                <span className="flex-1">
+                  <span className="block text-[13px] font-medium">
+                    {t('simpleInvoices.create.company.add')}
+                  </span>
+                  <span className="block text-xs text-muted-foreground/80">
+                    {t('simpleInvoices.create.company.subtitle')}
+                  </span>
+                </span>
+                <ChevronDown
+                  className={cn(
+                    'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
+                    companyOpen && 'rotate-180',
+                  )}
+                />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="space-y-4 px-5 pb-5 pt-1">
+                  <FormField
+                    control={form.control}
+                    name="companySelect"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className={labelClass}>
+                          {t('simpleInvoices.create.fields.companySelect')}
+                        </FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isContactsLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={t(
+                                  'simpleInvoices.create.placeholders.companySelect',
+                                )}
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {companyOptions.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="companyName"
+                    rules={{
+                      validate: (value) => {
+                        if (!isManual) return true;
+                        const hasIdentifiers =
+                          !!form.getValues('companyIco').trim() ||
+                          !!form.getValues('companyDic').trim();
+                        return (
+                          !hasIdentifiers ||
+                          !!value.trim() ||
+                          t(
+                            'simpleInvoices.create.validation.companyNameRequired',
+                          )
+                        );
+                      },
+                    }}
+                    render={({ field }) => (
+                      <FormItem className="space-y-1.5">
+                        <FormLabel className={labelClass}>
+                          {t('simpleInvoices.create.fields.companyName')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} disabled={!isManual} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="companyIco"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className={labelClass}>
+                            {t('simpleInvoices.create.fields.companyIco')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={!isManual} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="companyDic"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className={labelClass}>
+                            {t('simpleInvoices.create.fields.companyDic')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={!isManual} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
-          <div className="flex justify-end gap-2">
+          {/* VAT return & control report */}
+          {isVatPayer && (
+            <Card className="border-border/60 p-5 shadow-sm">
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('simpleInvoices.create.vatClaim.section')}
+              </p>
+
+              <FormField
+                control={form.control}
+                name="shouldClaimVat"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between space-y-0">
+                    <div>
+                      <FormLabel className="text-[13px] font-medium">
+                        {t('simpleInvoices.create.vatClaim.claim')}
+                      </FormLabel>
+                      <p className="text-xs text-muted-foreground/80">
+                        {t('simpleInvoices.create.vatClaim.claimDescription')}
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {shouldClaimVat && (
+                <>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="vatClaimType"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className={labelClass}>
+                            {t('invoices.vatClaim.claimType.label')}
+                          </FormLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem
+                                value={CreateInvoiceDtoVatClaimType.FULL}
+                              >
+                                {t('invoices.vatClaim.claimType.options.FULL')}
+                              </SelectItem>
+                              <SelectItem
+                                value={CreateInvoiceDtoVatClaimType.PARTIAL}
+                              >
+                                {t(
+                                  'invoices.vatClaim.claimType.options.PARTIAL',
+                                )}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL && (
+                      <FormField
+                        control={form.control}
+                        name="vatClaimRatio"
+                        rules={{
+                          validate: (value) => {
+                            if (
+                              vatClaimType !==
+                              CreateInvoiceDtoVatClaimType.PARTIAL
+                            ) {
+                              return true;
+                            }
+                            if (value.trim() === '') {
+                              return t(
+                                'invoices.vatClaim.validation.ratioRequired',
+                              );
+                            }
+                            const ratio = Number(value);
+                            return (
+                              (Number.isFinite(ratio) &&
+                                ratio > 0 &&
+                                ratio < 1) ||
+                              t('invoices.vatClaim.validation.ratioRange')
+                            );
+                          },
+                        }}
+                        render={({ field }) => (
+                          <FormItem className="space-y-1.5">
+                            <FormLabel className={labelClass}>
+                              {t('invoices.vatClaim.claimRatio.label')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                inputMode="decimal"
+                                step="0.01"
+                                min={0}
+                                max={1}
+                                placeholder={t(
+                                  'invoices.vatClaim.claimRatio.placeholder',
+                                )}
+                                className="tabular-nums"
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground/80">
+                              {t('invoices.vatClaim.claimRatio.hint')}
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="vatClaimMonth"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className={labelClass}>
+                            {t('simpleInvoices.create.vatClaim.period')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="month"
+                              className="tabular-nums"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="space-y-1.5">
+                      <Label className={labelClass}>
+                        {t('simpleInvoices.create.vatClaim.khSection')}
+                      </Label>
+                      {/* The section is fixed for simplified receipts — shown for context only. */}
+                      <p className="flex h-10 items-center rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground">
+                        {t('simpleInvoices.create.vatClaim.khValue')}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground/80">
+                    {t('simpleInvoices.create.vatClaim.hint')}
+                  </p>
+                </>
+              )}
+            </Card>
+          )}
+
+          {/* Footer actions */}
+          <div className="flex items-center justify-between gap-2 pb-8">
             <Button
               type="button"
               variant="outline"
+              size="sm"
+              disabled={isPending}
               onClick={() => navigate('/invoices/simple')}
             >
               {t('simpleInvoices.create.actions.cancel')}
             </Button>
-            <Button
-              type="submit"
-              variant="secondary"
-              disabled={createMutation.isPending}
-              onClick={() => {
-                createAnotherRef.current = true;
-              }}
-            >
-              {t('simpleInvoices.create.actions.submitAndNew')}
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              onClick={() => {
-                createAnotherRef.current = false;
-              }}
-            >
-              {createMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('simpleInvoices.create.actions.submitting')}
-                </>
-              ) : (
-                t('simpleInvoices.create.actions.submit')
-              )}
-            </Button>
+            <div className="flex gap-2">{submitButtons}</div>
           </div>
         </form>
       </Form>

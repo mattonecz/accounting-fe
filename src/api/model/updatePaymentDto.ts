@@ -12,6 +12,8 @@ export interface UpdatePaymentDto {
   id: string;
   /** UUID of the related invoice */
   invoiceId?: string;
+  /** UUID of the company bank account the payment went through */
+  bankId?: string;
   paymentMethod?: UpdatePaymentDtoPaymentMethod;
   amount?: number;
   currency?: string;

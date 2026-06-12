@@ -4,6 +4,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Sidebar, MobileTopBar } from '@/components/Sidebar';
+import { Topbar } from '@/components/Topbar';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AiChatDialog } from '@/components/AiChatDialog';
@@ -61,12 +62,12 @@ const App = () => (
                 path="/*"
                 element={
                   <ProtectedRoute requireCompany>
-                    <div className="flex min-h-screen bg-background justify-center">
-                      <div className="flex w-full max-w-[1200px] border-x shadow-lg">
-                        <Sidebar />
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <MobileTopBar />
-                          <Routes>
+                    <div className="flex min-h-screen bg-background">
+                      <Sidebar />
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <MobileTopBar />
+                        <Topbar />
+                        <Routes>
                           <Route path="/" element={<Dashboard />} />
                           <Route path="/contacts" element={<Contacts />} />
                           <Route
@@ -145,7 +146,6 @@ const App = () => (
                           />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
-                        </div>
                       </div>
                       <AiChatDialog />
                     </div>

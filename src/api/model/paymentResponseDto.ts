@@ -10,6 +10,7 @@ import type { PaymentResponseDtoPaymentMethod } from './paymentResponseDtoPaymen
 export interface PaymentResponseDto {
   id: string;
   invoiceId: string;
+  bankId?: string;
   paymentMethod: PaymentResponseDtoPaymentMethod;
   amount: number;
   currency?: string;

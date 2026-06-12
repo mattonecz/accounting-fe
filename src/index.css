@@ -8,43 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 10% 98%;
-    --foreground: 220 13% 13%;
+    /* Warm paper palette (wireframe design F) */
+    --background: 60 9% 98%;
+    --foreground: 30 4% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 13%;
+    --card-foreground: 30 4% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 13%;
+    --popover-foreground: 30 4% 11%;
 
-    --primary: 220 90% 56%;
+    /* Ink — primary actions are dark buttons */
+    --primary: 30 4% 11%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 96%;
-    --secondary-foreground: 220 13% 13%;
+    --secondary: 45 22% 93%;
+    --secondary-foreground: 30 4% 11%;
 
-    --muted: 220 15% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 45 22% 93%;
+    --muted-foreground: 37 4% 44%;
 
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
+    /* Subtle hover surface (was a loud green) */
+    --accent: 45 22% 93%;
+    --accent-foreground: 30 4% 11%;
 
-    --success: 142 76% 36%;
+    /* Brand blue-violet — logo, active nav, charts, focus */
+    --brand: 222 54% 53%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 217 100% 95%;
+
+    --success: 137 45% 36%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 40 62% 51%;
     --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 2 50% 53%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 220 90% 56%;
+    --border: 40 11% 83%;
+    --input: 40 11% 83%;
+    --ring: 222 54% 53%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 0 0% 100%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 
@@ -80,8 +88,12 @@ All colors MUST be HSL.
     --muted: 220 15% 15%;
     --muted-foreground: 220 10% 65%;
 
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 15% 15%;
+    --accent-foreground: 220 10% 95%;
+
+    --brand: 222 54% 60%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 222 30% 20%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;

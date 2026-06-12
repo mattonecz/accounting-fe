@@ -43,6 +43,15 @@
     "sectionReports": "Reports",
     "sectionMessages": "Data Messages"
   },
+  "topbar": {
+    "search": "Search…"
+  },
+  "receiptUpload": {
+    "button": "Upload receipt",
+    "processing": "Processing receipt…",
+    "success": "Receipt processed. Review the prefilled data.",
+    "error": "Failed to process the receipt."
+  },
   "auth": {
     "title": "FreelanceBooks",
     "tagline": "Manage your freelance finances with ease",
@@ -445,62 +454,65 @@
       "create": "New Document"
     },
     "create": {
-      "title": "Create Simple Invoice",
-      "description": "Fill in the details to create a new simplified document.",
-      "companySection": "Company",
-      "documentSection": "Document details",
-      "itemsSection": "VAT rates",
+      "title": "New simplified receipt",
+      "description": "For receipts up to CZK 10,000 incl. VAT. Just a description, date and amounts.",
+      "back": "Back to receipts",
       "manualOption": "Enter manually",
       "fields": {
-        "number": "Document Number",
-        "contact": "Company",
+        "description": "Description",
+        "number": "Document number",
+        "createdDate": "Issue date",
+        "duzpDate": "Taxable supply date (DUZP)",
         "companySelect": "Company",
         "companyName": "Company name",
         "companyIco": "Company ID",
-        "companyDic": "VAT ID",
-        "createdDate": "Issue Date",
-        "duzpDate": "Tax Date",
-        "base": "Base",
-        "vat": "VAT",
-        "totalWithVat": "Total with VAT",
-        "note": "Note"
-      },
-      "items": {
-        "addRate": "Add rate",
-        "remove": "Remove rate",
-        "vatRate": "VAT rate",
-        "base": "Base",
-        "vat": "VAT",
-        "total": "Total with VAT",
-        "lineName": "Supply at {{rate}}% VAT",
-        "summaryBase": "Total base",
-        "summaryVat": "Total VAT",
-        "summaryTotal": "Total with VAT"
+        "companyDic": "VAT ID"
       },
       "placeholders": {
-        "contact": "Select contact",
-        "contactLoading": "Loading contacts...",
-        "companySelect": "Select company",
-        "note": "Additional document information..."
+        "description": "e.g. Office supplies – Alza",
+        "number": "Optional",
+        "companySelect": "Select company"
+      },
+      "rates": {
+        "title": "Amounts by VAT rate",
+        "rate": "Rate",
+        "totalWithVat": "Total incl. VAT",
+        "base": "Base",
+        "vat": "VAT",
+        "hint": "Enter the amount incl. VAT – base and tax are computed.",
+        "lineName": "Supply at {{rate}}% VAT"
+      },
+      "total": {
+        "label": "Total",
+        "vatIncluded": "incl. VAT {{amount}}"
+      },
+      "company": {
+        "add": "Add company",
+        "subtitle": "Optional – supplier ID, VAT ID and name"
+      },
+      "vatClaim": {
+        "section": "VAT return & control report",
+        "claim": "Claim VAT deduction",
+        "claimDescription": "The receipt enters the VAT return",
+        "period": "Period",
+        "khSection": "Control report section",
+        "khValue": "B.3 – received supplies under CZK 10,000",
+        "hint": "Defaults follow the document type – usually no need to change."
       },
       "actions": {
         "cancel": "Cancel",
-        "submit": "Create Document",
-        "submitAndNew": "Create and add another",
-        "submitting": "Saving"
+        "save": "Save receipt",
+        "saveAndNew": "Save & new",
+        "submitting": "Saving…"
       },
       "validation": {
+        "descriptionRequired": "Description is required",
         "createdDateRequired": "Issue date is required",
-        "duzpDateRequired": "Tax date is required",
-        "baseRequired": "Base amount is required",
-        "baseMin": "Base amount must be a positive number or zero",
-        "vatRequired": "VAT is required",
-        "vatMin": "VAT must be a positive number or zero",
-        "vatRateRequired": "VAT rate is required",
-        "totalWithVatRequired": "Total with VAT is required",
-        "totalWithVatMin": "Total with VAT must be a positive number or zero",
+        "duzpDateRequired": "Taxable supply date is required",
+        "amountRequired": "Enter at least one amount",
+        "totalMin": "Amount must be a positive number or zero",
         "totalLimitExceeded": "Total with VAT on a simplified document must not exceed CZK 10,000",
-        "companyNameRequired": "Company name is required"
+        "companyNameRequired": "Add the company name when filling in the company or VAT ID"
       },
       "messages": {
         "created": "Simple invoice created successfully.",
@@ -1058,24 +1070,66 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Welcome back! Here's your financial overview.",
-    "cards": {
-      "income": "Total Income",
-      "expenses": "Total Expenses",
-      "balance": "Net Balance",
-      "fromLastMonth": "{{percent}}% from last month",
-      "recentIncoming": "Recent Incoming Invoices",
-      "recentOutgoing": "Recent Outgoing Invoices",
-      "recentIncomingDesc": "Latest invoices you received.",
-      "recentOutgoingDesc": "Latest invoices you issued."
+    "greeting": {
+      "morning": "Good morning, {{name}}.",
+      "afternoon": "Good afternoon, {{name}}.",
+      "evening": "Good evening, {{name}}.",
+      "waiting_one": "{{count}} thing waiting for you.",
+      "waiting_other": "{{count}} things waiting for you."
+    },
+    "actions": {
+      "newInvoice": "New invoice",
+      "newExpense": "New expense",
+      "addReceipt": "Add receipt",
+      "newContact": "New contact"
+    },
+    "hero": {
+      "availableCash": "Available cash",
+      "inAccounts": "In accounts",
+      "expected30d": "+ Expected (30d)",
+      "obligations": "− Obligations"
+    },
+    "cashflow": {
+      "title": "Cash flow · 12 months",
+      "income": "Income",
+      "expenses": "Expenses"
+    },
+    "queue": {
+      "title": "Action queue",
+      "subtitle": "What needs your attention",
+      "items_one": "{{count}} item",
+      "items_other": "{{count}} items",
+      "tags": {
+        "overdue": "Overdue",
+        "draft": "Draft",
+        "tax": "Tax"
+      },
+      "overdueMeta_one": "{{count}} day overdue · {{amount}}",
+      "overdueMeta_other": "{{count}} days overdue · {{amount}}",
+      "draftMeta_one": "{{count}} item · {{amount}} · ready",
+      "draftMeta_other": "{{count}} items · {{amount}} · ready",
+      "taxMeta_one": "Due in {{count}} day · {{amount}}",
+      "taxMeta_other": "Due in {{count}} days · {{amount}}",
+      "vatQ2": "VAT · Q2 2026",
+      "actionRemind": "Remind",
+      "actionPaid": "Paid",
+      "actionSend": "Send",
+      "actionEdit": "Edit",
+      "actionPrepare": "Prepare",
+      "emptyTitle": "All caught up",
+      "emptyDesc": "No overdue, no drafts, no deadlines."
+    },
+    "latest": {
+      "title": "Latest invoices",
+      "viewAll": "View all →",
+      "loading": "Loading…",
+      "loadError": "Unable to load invoices.",
+      "noActivity": "No activity yet"
     },
     "status": {
       "paid": "Paid",
       "pending": "Pending"
-    },
-    "loading": "Loading {{title}}...",
-    "loadError": "Unable to load {{title}}.",
-    "noData": "No records yet."
+    }
   },
   "onboarding": {
     "title": "Profile Setup",

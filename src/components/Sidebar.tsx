@@ -6,7 +6,6 @@ import {
   Building2,
   FileText,
   FileInput,
-  Wallet,
   LogOut,
   Calculator,
   Receipt,
@@ -42,16 +41,32 @@ const SidebarNavigation = ({ onNavigate }: { onNavigate?: () => void }) => {
     {
       label: t('nav.sectionBilling'),
       items: [
-        { name: t('nav.invoicesIssued'), href: '/outgoing-invoices', icon: FileInput },
-        { name: t('nav.invoicesReceived'), href: '/incoming-invoices', icon: FileText },
-        { name: t('nav.simpleInvoices'), href: '/invoices/simple', icon: Receipt },
+        {
+          name: t('nav.invoicesIssued'),
+          href: '/outgoing-invoices',
+          icon: FileInput,
+        },
+        {
+          name: t('nav.invoicesReceived'),
+          href: '/incoming-invoices',
+          icon: FileText,
+        },
+        {
+          name: t('nav.simpleInvoices'),
+          href: '/invoices/simple',
+          icon: Receipt,
+        },
       ],
     },
     {
       label: t('nav.sectionData'),
       items: [
         { name: t('nav.contacts'), href: '/contacts', icon: Users },
-        { name: t('nav.bankAccounts'), href: '/bank-accounts', icon: Building2 },
+        {
+          name: t('nav.bankAccounts'),
+          href: '/bank-accounts',
+          icon: Building2,
+        },
       ],
     },
     {
@@ -82,41 +97,50 @@ const SidebarNavigation = ({ onNavigate }: { onNavigate?: () => void }) => {
 
   return (
     <>
-      <div className="flex h-16 shrink-0 items-center border-b px-6">
-        <Wallet className="mr-3 h-6 w-6 text-primary" />
-        <h1 className="text-xl font-bold text-foreground">FreelanceBooks</h1>
+      <div className="flex h-16 shrink-0 items-center gap-2.5 px-6">
+        <span className="h-[18px] w-[18px] shrink-0 rounded bg-brand" />
+        <h1 className="text-[15px] font-bold tracking-tight text-foreground">
+          FreelanceBooks
+        </h1>
       </div>
-      <nav className="flex-1 space-y-4 overflow-y-auto p-4">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3.5 pb-4">
         {navigationGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="px-2.5 pb-1.5 pt-3.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/80">
               {group.label}
             </p>
-            {group.items.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => onNavigate?.()}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => onNavigate?.()}
+                    className={cn(
+                      'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors',
+                      isActive
+                        ? 'bg-muted font-semibold text-foreground'
+                        : 'text-foreground/70 hover:bg-muted/60 hover:text-foreground',
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        'h-4 w-4 shrink-0',
+                        isActive ? 'text-brand' : 'text-muted-foreground',
+                      )}
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         ))}
       </nav>
-      <div className="shrink-0 border-t border-border p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="truncate text-sm text-muted-foreground">
+      <div className="shrink-0 border-t p-3.5">
+        <div className="mb-2.5 flex items-center justify-between">
+          <span className="truncate text-xs text-muted-foreground">
             {user?.name || user?.email}
           </span>
           <SettingsMenu />
@@ -124,7 +148,8 @@ const SidebarNavigation = ({ onNavigate }: { onNavigate?: () => void }) => {
         <Button
           onClick={handleLogout}
           variant="outline"
-          className="w-full justify-start gap-2"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground"
         >
           <LogOut className="h-4 w-4" />
           {t('nav.logout')}
@@ -135,7 +160,7 @@ const SidebarNavigation = ({ onNavigate }: { onNavigate?: () => void }) => {
 };
 
 export const Sidebar = () => (
-  <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:flex">
+  <aside className="sticky top-0 hidden h-screen w-60 max-w-[240px] shrink-0 flex-col border-r bg-card md:flex">
     <SidebarNavigation />
   </aside>
 );
@@ -158,14 +183,14 @@ export const MobileTopBar = () => {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="flex w-72 flex-col p-0 sm:max-w-xs"
+          className="flex w-60 max-w-[240px] flex-col p-0"
         >
           <SheetTitle className="sr-only">FreelanceBooks</SheetTitle>
           <SidebarNavigation onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
-      <div className="flex items-center">
-        <Wallet className="mr-2 h-5 w-5 text-primary" />
+      <div className="flex items-center gap-2">
+        <span className="h-4 w-4 rounded bg-brand" />
         <span className="text-base font-semibold text-foreground">
           FreelanceBooks
         </span>

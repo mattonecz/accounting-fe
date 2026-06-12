@@ -43,6 +43,15 @@
     "sectionReports": "Přehledy",
     "sectionMessages": "Datové zprávy"
   },
+  "topbar": {
+    "search": "Hledat…"
+  },
+  "receiptUpload": {
+    "button": "Nahrát účtenku",
+    "processing": "Zpracovávám účtenku…",
+    "success": "Účtenka byla vytěžena. Zkontrolujte předvyplněné údaje.",
+    "error": "Zpracování účtenky se nepodařilo."
+  },
   "auth": {
     "title": "FreelanceBooks",
     "tagline": "Spravujte své freelance finance snadno",
@@ -446,62 +455,65 @@
       "create": "Nový doklad"
     },
     "create": {
-      "title": "Vytvořit zjednodušený doklad",
-      "description": "Vyplňte údaje pro vytvoření nového zjednodušeného dokladu.",
-      "companySection": "Firma",
-      "documentSection": "Údaje dokladu",
-      "itemsSection": "Sazby DPH",
+      "title": "Nový zjednodušený doklad",
+      "description": "Pro doklady do 10 000 Kč vč. DPH. Stačí popis, datum a částky.",
+      "back": "Zpět na doklady",
       "manualOption": "Zadat ručně",
       "fields": {
+        "description": "Popis dokladu",
         "number": "Číslo dokladu",
-        "contact": "Firma",
+        "createdDate": "Datum vystavení",
+        "duzpDate": "Datum zdanitelného plnění (DUZP)",
         "companySelect": "Firma",
         "companyName": "Název firmy",
         "companyIco": "IČO",
-        "companyDic": "DIČ",
-        "createdDate": "Datum vystavení",
-        "duzpDate": "Datum zdanitelného plnění",
-        "base": "Základ",
-        "vat": "DPH",
-        "totalWithVat": "Celkem s DPH",
-        "note": "Poznámka"
-      },
-      "items": {
-        "addRate": "Přidat sazbu",
-        "remove": "Odebrat sazbu",
-        "vatRate": "Sazba DPH",
-        "base": "Základ",
-        "vat": "DPH",
-        "total": "Celkem s DPH",
-        "lineName": "Plnění {{rate}}% DPH",
-        "summaryBase": "Základ celkem",
-        "summaryVat": "DPH celkem",
-        "summaryTotal": "Celkem s DPH"
+        "companyDic": "DIČ"
       },
       "placeholders": {
-        "contact": "Vyberte kontakt",
-        "contactLoading": "Načítám kontakty...",
-        "companySelect": "Vyberte firmu",
-        "note": "Doplňující informace k dokladu..."
+        "description": "např. Kancelářské potřeby – Alza",
+        "number": "Nepovinné",
+        "companySelect": "Vyberte firmu"
+      },
+      "rates": {
+        "title": "Částky podle sazby DPH",
+        "rate": "Sazba",
+        "totalWithVat": "Celkem s DPH",
+        "base": "Základ",
+        "vat": "DPH",
+        "hint": "Zadejte částku s DPH – základ a daň dopočítáme.",
+        "lineName": "Plnění {{rate}}% DPH"
+      },
+      "total": {
+        "label": "Celkem",
+        "vatIncluded": "z toho DPH {{amount}}"
+      },
+      "company": {
+        "add": "Přidat firmu",
+        "subtitle": "Nepovinné – IČO, DIČ a název dodavatele"
+      },
+      "vatClaim": {
+        "section": "Uplatnění v DPH a kontrolním hlášení",
+        "claim": "Uplatnit odpočet DPH",
+        "claimDescription": "Doklad vstoupí do přiznání DPH",
+        "period": "Období",
+        "khSection": "Sekce kontrolního hlášení",
+        "khValue": "B.3 – přijatá plnění do 10 000 Kč",
+        "hint": "Výchozí hodnoty podle typu dokladu – většinou není třeba měnit."
       },
       "actions": {
         "cancel": "Zrušit",
-        "submit": "Vytvořit doklad",
-        "submitAndNew": "Vytvořit a přidat další",
-        "submitting": "Ukládám"
+        "save": "Uložit doklad",
+        "saveAndNew": "Uložit a nový",
+        "submitting": "Ukládám…"
       },
       "validation": {
+        "descriptionRequired": "Popis dokladu je povinný",
         "createdDateRequired": "Datum vystavení je povinné",
         "duzpDateRequired": "Datum zdanitelného plnění je povinné",
-        "baseRequired": "Základ je povinný",
-        "baseMin": "Základ musí být kladné číslo nebo nula",
-        "vatRequired": "DPH je povinné",
-        "vatMin": "DPH musí být kladné číslo nebo nula",
-        "vatRateRequired": "Sazba DPH je povinná",
-        "totalWithVatRequired": "Celkem s DPH je povinné",
-        "totalWithVatMin": "Celkem s DPH musí být kladné číslo nebo nula",
+        "amountRequired": "Zadejte alespoň jednu částku",
+        "totalMin": "Částka musí být kladné číslo nebo nula",
         "totalLimitExceeded": "Celková částka s DPH nesmí u zjednodušeného dokladu překročit 10 000 Kč",
-        "companyNameRequired": "Název firmy je povinný"
+        "companyNameRequired": "Při vyplnění IČO nebo DIČ doplňte i název firmy"
       },
       "messages": {
         "created": "Zjednodušený doklad byl vytvořen.",
@@ -1059,24 +1071,76 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Vítejte zpět! Přehled vašich financí.",
-    "cards": {
-      "income": "Celkové příjmy",
-      "expenses": "Celkové výdaje",
-      "balance": "Čistý zůstatek",
-      "fromLastMonth": "{{percent}}% oproti minulému měsíci",
-      "recentIncoming": "Nedávné přijaté faktury",
-      "recentOutgoing": "Nedávné vydané faktury",
-      "recentIncomingDesc": "Poslední přijaté faktury.",
-      "recentOutgoingDesc": "Poslední vydané faktury."
+    "greeting": {
+      "morning": "Dobré ráno, {{name}}.",
+      "afternoon": "Dobré odpoledne, {{name}}.",
+      "evening": "Dobrý večer, {{name}}.",
+      "waiting_one": "Čeká na vás {{count}} věc.",
+      "waiting_few": "Čekají na vás {{count}} věci.",
+      "waiting_many": "Čeká na vás {{count}} věcí.",
+      "waiting_other": "Čeká na vás {{count}} věcí."
+    },
+    "actions": {
+      "newInvoice": "Nová faktura",
+      "newExpense": "Nový výdaj",
+      "addReceipt": "Přidat doklad",
+      "newContact": "Nový kontakt"
+    },
+    "hero": {
+      "availableCash": "Dostupné prostředky",
+      "inAccounts": "Na účtech",
+      "expected30d": "+ Očekávané (30 d)",
+      "obligations": "− Závazky"
+    },
+    "cashflow": {
+      "title": "Cash flow · 12 měsíců",
+      "income": "Příjmy",
+      "expenses": "Výdaje"
+    },
+    "queue": {
+      "title": "Fronta akcí",
+      "subtitle": "Co je třeba vyřídit",
+      "items_one": "{{count}} položka",
+      "items_few": "{{count}} položky",
+      "items_many": "{{count}} položek",
+      "items_other": "{{count}} položek",
+      "tags": {
+        "overdue": "Po splatnosti",
+        "draft": "Koncept",
+        "tax": "Daň"
+      },
+      "overdueMeta_one": "{{count}} den po splatnosti · {{amount}}",
+      "overdueMeta_few": "{{count}} dny po splatnosti · {{amount}}",
+      "overdueMeta_many": "{{count}} dní po splatnosti · {{amount}}",
+      "overdueMeta_other": "{{count}} dní po splatnosti · {{amount}}",
+      "draftMeta_one": "{{count}} položka · {{amount}} · připraveno",
+      "draftMeta_few": "{{count}} položky · {{amount}} · připraveno",
+      "draftMeta_many": "{{count}} položek · {{amount}} · připraveno",
+      "draftMeta_other": "{{count}} položek · {{amount}} · připraveno",
+      "taxMeta_one": "Termín za {{count}} den · {{amount}}",
+      "taxMeta_few": "Termín za {{count}} dny · {{amount}}",
+      "taxMeta_many": "Termín za {{count}} dní · {{amount}}",
+      "taxMeta_other": "Termín za {{count}} dní · {{amount}}",
+      "vatQ2": "DPH · 2. čtvrtletí 2026",
+      "actionRemind": "Upomínka",
+      "actionPaid": "Zaplaceno",
+      "actionSend": "Odeslat",
+      "actionEdit": "Upravit",
+      "actionPrepare": "Připravit",
+      "emptyTitle": "Máte vše vyřízeno",
+      "emptyDesc": "Žádné po splatnosti, žádné koncepty, žádné termíny."
+    },
+    "latest": {
+      "title": "Nejnovější faktury",
+      "viewAll": "Zobrazit vše →",
+      "loading": "Načítám…",
+      "loadError": "Nepodařilo se načíst faktury.",
+      "noActivity": "Žádná aktivita"
     },
     "status": {
       "paid": "Uhrazena",
       "pending": "Čeká"
-    },
-    "loading": "Načítám {{title}}...",
-    "loadError": "Nepodařilo se načíst {{title}}.",
-    "noData": "Zatím žádné záznamy."
+    }
   },
   "onboarding": {
     "title": "Nastavení profilu",

@@ -11,6 +11,11 @@ export interface ReceiptParseDataDto {
   /** @nullable */
   vendor: string | null;
   /**
+   * LLM-generated short label usable as the invoice description (e.g. "Restaurace - U Fleku", "Alza - notebook")
+   * @nullable
+   */
+  description: string | null;
+  /**
    * Invoice / receipt / document number as printed
    * @nullable
    */

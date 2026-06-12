@@ -10,6 +10,8 @@ import type { CreatePaymentDtoPaymentMethod } from './createPaymentDtoPaymentMet
 export interface CreatePaymentDto {
   /** UUID of the related invoice */
   invoiceId: string;
+  /** UUID of the company bank account the payment went through */
+  bankId?: string;
   paymentMethod: CreatePaymentDtoPaymentMethod;
   amount: number;
   currency?: string;

@@ -3321,6 +3321,9 @@
           "invoiceId": {
             "type": "string"
           },
+          "bankId": {
+            "type": "string"
+          },
           "paymentMethod": {
             "type": "string",
             "enum": [
@@ -4009,6 +4012,10 @@
             "type": "string",
             "description": "UUID of the related invoice"
           },
+          "bankId": {
+            "type": "string",
+            "description": "UUID of the company bank account the payment went through"
+          },
           "paymentMethod": {
             "type": "string",
             "enum": [
@@ -4059,6 +4066,10 @@
           "invoiceId": {
             "type": "string",
             "description": "UUID of the related invoice"
+          },
+          "bankId": {
+            "type": "string",
+            "description": "UUID of the company bank account the payment went through"
           },
           "paymentMethod": {
             "type": "string",
@@ -4128,6 +4139,11 @@
             "type": "string",
             "nullable": true
           },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "LLM-generated short label usable as the invoice description (e.g. \"Restaurace - U Fleku\", \"Alza - notebook\")"
+          },
           "documentNumber": {
             "type": "string",
             "nullable": true,
@@ -4161,6 +4177,7 @@
         },
         "required": [
           "vendor",
+          "description",
           "documentNumber",
           "total",
           "vat",
