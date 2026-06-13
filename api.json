@@ -946,6 +946,105 @@
             }
           },
           {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search across invoice number and counterparty company name (case-insensitive, partial match)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by invoice status. OVERDUE matches ISSUED invoices past their due date.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "ISSUED",
+                "OVERDUE",
+                "PAID",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "createdDateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter by issue date (createdDate) - range start, inclusive",
+            "schema": {
+              "format": "date",
+              "example": "2025-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdDateTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter by issue date (createdDate) - range end, inclusive",
+            "schema": {
+              "format": "date",
+              "example": "2025-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "amountFrom",
+            "required": false,
+            "in": "query",
+            "description": "Filter by amount (totalWithTax) - minimum, inclusive",
+            "schema": {
+              "example": 1000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "amountTo",
+            "required": false,
+            "in": "query",
+            "description": "Filter by amount (totalWithTax) - maximum, inclusive",
+            "schema": {
+              "example": 5000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by (default: createdDate)",
+            "schema": {
+              "default": "createdDate",
+              "type": "string",
+              "enum": [
+                "createdDate",
+                "duzpDate",
+                "dueDate",
+                "number",
+                "totalWithTax",
+                "status"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction (default: DESC)",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
             "name": "page",
             "required": false,
             "in": "query",
@@ -4139,6 +4238,16 @@
             "type": "string",
             "nullable": true
           },
+          "ico": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor's company registration number (IČO)"
+          },
+          "dic": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor's tax identification number / VAT ID (DIČ)"
+          },
           "description": {
             "type": "string",
             "nullable": true,
@@ -4177,6 +4286,8 @@
         },
         "required": [
           "vendor",
+          "ico",
+          "dic",
           "description",
           "documentNumber",
           "total",

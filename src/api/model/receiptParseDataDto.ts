@@ -11,6 +11,16 @@ export interface ReceiptParseDataDto {
   /** @nullable */
   vendor: string | null;
   /**
+   * Vendor's company registration number (IČO)
+   * @nullable
+   */
+  ico: string | null;
+  /**
+   * Vendor's tax identification number / VAT ID (DIČ)
+   * @nullable
+   */
+  dic: string | null;
+  /**
    * LLM-generated short label usable as the invoice description (e.g. "Restaurace - U Fleku", "Alza - notebook")
    * @nullable
    */

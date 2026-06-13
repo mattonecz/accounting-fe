@@ -92,9 +92,23 @@
   },
   "invoices": {
     "create": {
-      "title": "Vytvořit fakturu",
-      "titleReceived": "Vytvořit přijatou fakturu",
-      "description": "Vyplňte údaje pro vytvoření nové faktury"
+      "title": "Nová faktura",
+      "titleReceived": "Nová přijatá faktura",
+      "description": "Číslo přidělujeme automaticky. Většina polí je předvyplněná z nastavení.",
+      "descriptionReceived": "Vyplňte údaje z faktury dodavatele.",
+      "backIssued": "Zpět na faktury vydané",
+      "backReceived": "Zpět na faktury přijaté",
+      "metaHint": "Měna se řídí účtem. Variabilní symbol = číslo faktury.",
+      "dueDays": "+{{days}} dní",
+      "symbols": {
+        "title": "Platební symboly a poznámka",
+        "subtitle": "Nepovinné – konstantní/specifický symbol, poznámka na faktuře"
+      },
+      "status": {
+        "section": "Stav a evidence",
+        "markPaid": "Označit jako zaplacenou",
+        "markPaidDesc": "Nová faktura je standardně nezaplacená – zapněte, pokud už máte úhradu."
+      }
     },
     "update": {
       "title": "Upravit fakturu",
@@ -189,8 +203,26 @@
       "error": "Nepodařilo se načíst faktury.",
       "titleIssued": "Faktury vydané",
       "titleReceived": "Faktury přijaté",
-      "descriptionIssued": "Sledujte faktury vydané",
-      "descriptionReceived": "Sledujte faktury přijaté"
+      "descriptionIssued": "Sledujte a spravujte vydané faktury.",
+      "descriptionReceived": "Sledujte a spravujte přijaté faktury.",
+      "annotationIssued": "Faktury vydané",
+      "annotationReceived": "Faktury přijaté",
+      "searchPlaceholder": "Hledat podle čísla nebo názvu…",
+      "noMatches": "Žádné faktury neodpovídají filtru.",
+      "showing": "Zobrazeno {{count}} z {{total}}",
+      "summary": {
+        "totalIssued": "Vystaveno celkem",
+        "totalReceived": "Přijato celkem",
+        "paid": "Uhrazeno",
+        "pending": "K úhradě",
+        "overdue": "Po splatnosti"
+      },
+      "tabs": {
+        "all": "Vše",
+        "pending": "K úhradě",
+        "overdue": "Po splatnosti",
+        "paid": "Uhrazené"
+      }
     },
     "fields": {
       "number": "Číslo faktury",
@@ -268,7 +300,8 @@
       "title": "Souhrn faktury",
       "subtotal": "Mezisoučet",
       "total": "Částka celkem",
-      "totalTax": "DPH celkem"
+      "totalTax": "DPH celkem",
+      "totalDue": "Celkem k úhradě"
     },
     "items": {
       "title": "Položky faktury",
@@ -337,6 +370,7 @@
     "vatClaim": {
       "title": "DPH / Kontrolní hlášení",
       "shouldClaim": "Uplatnit odpočet DPH",
+      "shouldClaimDescription": "Faktura vstoupí do přiznání DPH a kontrolního hlášení.",
       "claimType": {
         "label": "Typ odpočtu",
         "options": {

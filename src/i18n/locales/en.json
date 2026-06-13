@@ -92,9 +92,23 @@
   },
   "invoices": {
     "create": {
-      "title": "Create Invoice",
-      "titleReceived": "Create Received Invoice",
-      "description": "Fill in the details to create a new invoice"
+      "title": "New invoice",
+      "titleReceived": "New received invoice",
+      "description": "The number is assigned automatically. Most fields are pre-filled from your settings.",
+      "descriptionReceived": "Fill in the details from the supplier's invoice.",
+      "backIssued": "Back to outgoing invoices",
+      "backReceived": "Back to incoming invoices",
+      "metaHint": "Currency follows the account. Variable symbol = invoice number.",
+      "dueDays": "+{{days}} days",
+      "symbols": {
+        "title": "Payment symbols & note",
+        "subtitle": "Optional — constant/specific symbol, invoice note"
+      },
+      "status": {
+        "section": "Status & bookkeeping",
+        "markPaid": "Mark as paid",
+        "markPaidDesc": "A new invoice is unpaid by default — turn on if it's already settled."
+      }
     },
     "update": {
       "title": "Edit Invoice",
@@ -188,8 +202,26 @@
       "error": "Failed to load invoices.",
       "titleIssued": "Issued Invoices",
       "titleReceived": "Received Invoices",
-      "descriptionIssued": "Track your issued invoices",
-      "descriptionReceived": "Track your received invoices"
+      "descriptionIssued": "Track and manage your outgoing invoices.",
+      "descriptionReceived": "Track and manage your received invoices.",
+      "annotationIssued": "Outgoing",
+      "annotationReceived": "Incoming",
+      "searchPlaceholder": "Search by number or name…",
+      "noMatches": "No invoices match the filter.",
+      "showing": "Showing {{count}} of {{total}}",
+      "summary": {
+        "totalIssued": "Issued total",
+        "totalReceived": "Received total",
+        "paid": "Paid",
+        "pending": "Outstanding",
+        "overdue": "Overdue"
+      },
+      "tabs": {
+        "all": "All",
+        "pending": "Outstanding",
+        "overdue": "Overdue",
+        "paid": "Paid"
+      }
     },
     "fields": {
       "number": "Invoice Number",
@@ -267,7 +299,8 @@
       "title": "Invoice Summary",
       "subtotal": "Subtotal",
       "total": "Total Amount",
-      "totalTax": "Total VAT"
+      "totalTax": "Total VAT",
+      "totalDue": "Total due"
     },
     "items": {
       "title": "Invoice Items",
@@ -336,6 +369,7 @@
     "vatClaim": {
       "title": "VAT deduction",
       "shouldClaim": "Claim VAT deduction",
+      "shouldClaimDescription": "The invoice enters the VAT return and control statement.",
       "claimType": {
         "label": "Deduction type",
         "options": {

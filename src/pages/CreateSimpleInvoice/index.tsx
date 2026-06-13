@@ -164,6 +164,8 @@ const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
   return {
     ...base,
     companyName: receipt.vendor?.trim() ?? '',
+    companyIco: receipt.ico?.trim() ?? '',
+    companyDic: receipt.dic?.trim() ?? '',
     number: receipt.documentNumber?.trim() ?? '',
     createdDate: date,
     duzpDate: date,
@@ -195,7 +197,12 @@ const CreateSimpleInvoice = () => {
   });
 
   const [companyOpen, setCompanyOpen] = useState(
-    () => !!receiptFromState?.vendor?.trim(),
+    () =>
+      !!(
+        receiptFromState?.vendor?.trim() ||
+        receiptFromState?.ico?.trim() ||
+        receiptFromState?.dic?.trim()
+      ),
   );
 
   const prefillAppliedRef = useRef(false);

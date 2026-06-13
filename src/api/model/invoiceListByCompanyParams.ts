@@ -7,6 +7,9 @@
  */
 import type { InvoiceListByCompanyKind } from './invoiceListByCompanyKind';
 import type { InvoiceListByCompanyType } from './invoiceListByCompanyType';
+import type { InvoiceListByCompanyStatus } from './invoiceListByCompanyStatus';
+import type { InvoiceListByCompanySortBy } from './invoiceListByCompanySortBy';
+import type { InvoiceListByCompanySortOrder } from './invoiceListByCompanySortOrder';
 
 export type InvoiceListByCompanyParams = {
 /**
@@ -21,6 +24,38 @@ contactId?: string;
  * Filter by invoice type - RECEIVED or ISSUED
  */
 type?: InvoiceListByCompanyType;
+/**
+ * Free-text search across invoice number and counterparty company name (case-insensitive, partial match)
+ */
+search?: string;
+/**
+ * Filter by invoice status. OVERDUE matches ISSUED invoices past their due date.
+ */
+status?: InvoiceListByCompanyStatus;
+/**
+ * Filter by issue date (createdDate) - range start, inclusive
+ */
+createdDateFrom?: string;
+/**
+ * Filter by issue date (createdDate) - range end, inclusive
+ */
+createdDateTo?: string;
+/**
+ * Filter by amount (totalWithTax) - minimum, inclusive
+ */
+amountFrom?: number;
+/**
+ * Filter by amount (totalWithTax) - maximum, inclusive
+ */
+amountTo?: number;
+/**
+ * Column to sort by (default: createdDate)
+ */
+sortBy?: InvoiceListByCompanySortBy;
+/**
+ * Sort direction (default: DESC)
+ */
+sortOrder?: InvoiceListByCompanySortOrder;
 /**
  * Page number (default: 1)
  * @minimum 1
