@@ -3168,6 +3168,11 @@
             "type": "number",
             "example": 2
           },
+          "unit": {
+            "type": "string",
+            "example": "ks",
+            "description": "Unit of measure (e.g. ks, hod, kg)"
+          },
           "unitPrice": {
             "type": "number",
             "example": 100
@@ -3387,6 +3392,9 @@
           },
           "quantity": {
             "type": "number"
+          },
+          "unit": {
+            "type": "string"
           },
           "unitPrice": {
             "type": "number"

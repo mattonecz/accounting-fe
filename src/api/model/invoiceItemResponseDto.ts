@@ -10,6 +10,7 @@ export interface InvoiceItemResponseDto {
   id: string;
   name: string;
   quantity: number;
+  unit?: string;
   unitPrice: number;
   total: number;
   vatRate?: number;

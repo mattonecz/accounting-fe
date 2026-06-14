@@ -108,6 +108,26 @@
         "section": "Stav a evidence",
         "markPaid": "Označit jako zaplacenou",
         "markPaidDesc": "Nová faktura je standardně nezaplacená – zapněte, pokud už máte úhradu."
+      },
+      "received": {
+        "metaHint": "Datum plnění (DUZP) je standardně shodné s datem vystavení.",
+        "ratesTitle": "Částky podle sazby DPH",
+        "rateLineName": "Plnění {{rate}} % DPH",
+        "totalAmount": "Celková částka",
+        "baseTotal": "Základ celkem",
+        "vatTotal": "DPH celkem",
+        "totalDue": "Celkem k úhradě",
+        "paidOn": "Datum úhrady",
+        "unpaid": "nezaplaceno",
+        "vatClaimSection": "Uplatnění v DPH a kontrolním hlášení",
+        "claimRatioLabel": "Poměr odpočtu (%)",
+        "claimRatioPlaceholder": "50",
+        "claimRatioHint": "Hodnota v procentech (např. 50 = 50 %)",
+        "claimRatioRange": "Procento musí být v intervalu (0, 100)",
+        "amountRequired": "Zadejte alespoň jednu částku",
+        "saveAndNew": "Uložit a nová",
+        "save": "Uložit fakturu",
+        "submitting": "Ukládám…"
       }
     },
     "update": {
@@ -120,6 +140,8 @@
     "detail": {
       "backLabel": "Detail faktury",
       "backNumber": "Faktura {{number}}",
+      "backOutgoing": "Zpět na faktury vydané",
+      "backIncoming": "Zpět na faktury přijaté",
       "invalidId": "Neplatné ID faktury.",
       "loading": "Načítám fakturu...",
       "error": "Fakturu se nepodařilo načíst.",
@@ -162,8 +184,11 @@
         "ks": "KS"
       },
       "payments": {
+        "title": "Platba",
+        "received": "Přijaté platby",
         "heading_one": "Platba",
         "heading_other": "Platby",
+        "add": "Přidat platbu",
         "empty": "K této faktuře zatím nejsou evidované žádné platby."
       },
       "statusHistory": {
@@ -252,9 +277,11 @@
       "status": "Stav",
       "quantity": "Množství",
       "unitPrice": "Cena za jednotku",
+      "unit": "Jednotka",
       "paymentDays": "Počet dní splatnosti",
       "isPaid": "Zaplacená",
-      "paidDate": "Datum zaplacení"
+      "paidDate": "Datum zaplacení",
+      "paymentMethod": "Platební metoda"
     },
     "placeholders": {
       "number": "20250001",
@@ -275,6 +302,7 @@
       "note": "Zobrazí se na faktuře",
       "internalNote": "Není viditelná pro protistranu",
       "itemDescription": "Popis položky",
+      "itemUnit": "ks, hod…",
       "selectStatus": "Vyberte stav"
     },
     "statuses": {
@@ -299,6 +327,7 @@
     "summary": {
       "title": "Souhrn faktury",
       "subtotal": "Mezisoučet",
+      "taxBase": "Základ daně",
       "total": "Částka celkem",
       "totalTax": "DPH celkem",
       "totalDue": "Celkem k úhradě"

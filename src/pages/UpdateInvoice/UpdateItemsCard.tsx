@@ -111,6 +111,22 @@ const UpdateItemRow = ({
 
       <FormField
         control={form.control}
+        name={`items.${index}.unit`}
+        render={({ field }) => (
+          <FormItem className="w-20">
+            <FormControl>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                placeholder={t('invoices.placeholders.itemUnit')}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name={`items.${index}.unitPrice`}
         rules={{
           required: t('invoices.items.validation.priceRequired'),
@@ -216,6 +232,9 @@ export const UpdateItemsCard = ({
           </span>
           <span className="w-24 text-sm font-medium text-muted-foreground">
             {t('invoices.fields.quantity')}
+          </span>
+          <span className="w-20 text-sm font-medium text-muted-foreground">
+            {t('invoices.fields.unit')}
           </span>
           <span className="w-32 text-sm font-medium text-muted-foreground">
             {t('invoices.fields.unitPrice')}

@@ -9,6 +9,8 @@
 export interface InvoiceItemDto {
   name: string;
   quantity: number;
+  /** Unit of measure (e.g. ks, hod, kg) */
+  unit?: string;
   unitPrice: number;
   total: number;
   /** VAT rate % */

@@ -108,6 +108,26 @@
         "section": "Status & bookkeeping",
         "markPaid": "Mark as paid",
         "markPaidDesc": "A new invoice is unpaid by default — turn on if it's already settled."
+      },
+      "received": {
+        "metaHint": "The taxable date (DUZP) defaults to the issue date.",
+        "ratesTitle": "Amounts by VAT rate",
+        "rateLineName": "{{rate}}% VAT supply",
+        "totalAmount": "Total amount",
+        "baseTotal": "Base total",
+        "vatTotal": "VAT total",
+        "totalDue": "Total due",
+        "paidOn": "Paid on",
+        "unpaid": "unpaid",
+        "vatClaimSection": "VAT return & control report",
+        "claimRatioLabel": "Deduction ratio (%)",
+        "claimRatioPlaceholder": "50",
+        "claimRatioHint": "Value in percent (e.g. 50 = 50%)",
+        "claimRatioRange": "Percent must be between 0 and 100",
+        "amountRequired": "Enter at least one amount",
+        "saveAndNew": "Save & new",
+        "save": "Save invoice",
+        "submitting": "Saving…"
       }
     },
     "update": {
@@ -120,6 +140,8 @@
     "detail": {
       "backLabel": "Invoice Detail",
       "backNumber": "Invoice {{number}}",
+      "backOutgoing": "Back to outgoing invoices",
+      "backIncoming": "Back to incoming invoices",
       "invalidId": "Invalid invoice ID.",
       "loading": "Loading invoice...",
       "error": "Failed to load invoice.",
@@ -162,8 +184,11 @@
         "ks": "KS"
       },
       "payments": {
+        "title": "Payment",
+        "received": "Received payments",
         "heading_one": "Payment",
         "heading_other": "Payments",
+        "add": "Add payment",
         "empty": "No payments recorded for this invoice yet."
       },
       "statusHistory": {
@@ -251,9 +276,11 @@
       "status": "Status",
       "quantity": "Quantity",
       "unitPrice": "Unit Price",
+      "unit": "Unit",
       "paymentDays": "Payment term (days)",
       "isPaid": "Paid",
-      "paidDate": "Payment Date"
+      "paidDate": "Payment Date",
+      "paymentMethod": "Payment Method"
     },
     "placeholders": {
       "number": "20250001",
@@ -274,6 +301,7 @@
       "note": "Will appear on the invoice",
       "internalNote": "Not visible to the counterparty",
       "itemDescription": "Item description",
+      "itemUnit": "pcs, hrs…",
       "selectStatus": "Select status"
     },
     "statuses": {
@@ -298,6 +326,7 @@
     "summary": {
       "title": "Invoice Summary",
       "subtotal": "Subtotal",
+      "taxBase": "Tax base",
       "total": "Total Amount",
       "totalTax": "Total VAT",
       "totalDue": "Total due"

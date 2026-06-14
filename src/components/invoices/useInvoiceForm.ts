@@ -6,6 +6,7 @@ import i18n from '@/i18n';
 import { addDays } from '@/lib/formatters';
 import {
   CreateInvoiceDto,
+  CreateInvoiceDtoPaidPaymentMethod,
   CreateInvoiceDtoStatus,
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatClaimType,
@@ -87,6 +88,7 @@ export const useInvoiceForm = () => {
       dueDate: addDays(today, defaultPaymentDays),
       paymentDays: defaultPaymentDays,
       isPaid: false,
+      paidPaymentMethod: CreateInvoiceDtoPaidPaymentMethod.BANK_TRANSFER,
       items: [
         {
           name: '',
@@ -156,6 +158,17 @@ export const useInvoiceForm = () => {
     }
   }, [invoiceNumber, form, isReceived]);
 
+  // Variable symbol defaults to the invoice number and trails it until the user
+  // edits it. Issued invoices only — a received VS comes from the supplier.
+  const invoiceNumberValue = form.watch('number');
+  useEffect(() => {
+    if (isReceived) return;
+    if (form.formState.dirtyFields.variableSymbol) return;
+    if (invoiceNumberValue) {
+      form.setValue('variableSymbol', invoiceNumberValue);
+    }
+  }, [invoiceNumberValue, form, isReceived]);
+
   useEffect(() => {
     if (isReceived) return;
     const selectedBankId = form.getValues('bankId');
@@ -224,6 +237,7 @@ export const useInvoiceForm = () => {
 
     const finalItems = (rest.items ?? []).map((item) => ({
       ...item,
+      unit: trimOrUndefined(item.unit),
       vatRate: isVatPayer ? item.vatRate : undefined,
     }));
 
@@ -261,6 +275,8 @@ export const useInvoiceForm = () => {
       bankId: finalBankId,
       bankSnapshot: cleanedSnapshot,
       paidDate: finalPaidDate,
+      // Only meaningful for a recorded payment, i.e. when paidDate is set.
+      paidPaymentMethod: finalPaidDate ? rest.paidPaymentMethod : undefined,
       variableSymbol: trimOrUndefined(rest.variableSymbol),
       specificSymbol: trimOrUndefined(rest.specificSymbol),
       konstantSymbol: trimOrUndefined(rest.konstantSymbol),

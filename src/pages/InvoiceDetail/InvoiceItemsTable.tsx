@@ -1,15 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import type { InvoiceResponseDto } from '@/api/model';
+import { cn } from '@/lib/utils';
+import { DetailCard, SectionLabel } from './primitives';
 import { formatMoney } from './utils';
 import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
 
@@ -18,57 +10,143 @@ interface InvoiceItemsTableProps {
   currency: string;
 }
 
+const GRID = 'minmax(0,1fr) 70px 120px 60px 150px';
+
+const TotalRow = ({
+  label,
+  value,
+  muted,
+  grand,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+  grand?: boolean;
+}) => (
+  <div
+    className={cn(
+      'flex items-baseline justify-end gap-6 px-4',
+      grand && 'mt-1.5 border-t border-border pt-2.5',
+    )}
+  >
+    <span
+      className={cn(
+        'text-right text-xs',
+        grand ? 'font-semibold text-foreground' : 'text-muted-foreground',
+      )}
+    >
+      {label}
+    </span>
+    <span
+      className={cn(
+        'w-[150px] text-right tabular-nums',
+        grand
+          ? 'text-lg font-bold tracking-tight text-foreground'
+          : muted
+            ? 'text-sm text-muted-foreground'
+            : 'text-sm font-medium text-foreground',
+      )}
+    >
+      {value}
+    </span>
+  </div>
+);
+
 export const InvoiceItemsTable = ({ invoice, currency }: InvoiceItemsTableProps) => {
   const { t } = useTranslation();
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('invoices.sections.items')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('invoices.detail.items.columns.item')}</TableHead>
-              <TableHead className="text-right">{t('invoices.fields.quantity')}</TableHead>
-              <TableHead className="text-right">{t('invoices.fields.unitPrice')}</TableHead>
-              <TableHead className="text-right">{t('invoices.fields.vatRate')}</TableHead>
-              <TableHead className="text-right">{t('invoices.list.columns.amount')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoice.items.map((item, index) => {
-              const quantity = toNumber(item.quantity);
-              const unitPrice = toNumber(item.unitPrice);
-              const vatRate = toNumber(item.vatRate);
-              const total = quantity * unitPrice * (1 + vatRate / 100);
+  const taxBase = toNumber(invoice.total);
+  const totalTax = toNumber(invoice.totalTax);
+  const totalWithTax = toNumber(invoice.totalWithTax);
 
-              return (
-                <TableRow key={`${item.name}-${index}`}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell className="text-right">{quantity}</TableCell>
-                  <TableCell className="text-right">{formatMoney(unitPrice, currency)}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="outline">{vatRate}%</Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatMoney(total, currency)}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-            <TableRow>
-              <TableCell colSpan={4} className="text-lg font-semibold">
-                {t('invoices.summary.total')}
-              </TableCell>
-              <TableCell className="text-right text-lg font-semibold">
-                {formatMoney(toNumber(invoice.totalWithTax), currency)}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+  // VAT broken down per rate, mirroring the wireframe's "DPH 21 %" line(s).
+  const vatByRate = new Map<number, number>();
+  invoice.items.forEach((item) => {
+    const rate = toNumber(item.vatRate);
+    if (rate <= 0) return;
+    const base = toNumber(item.quantity) * toNumber(item.unitPrice);
+    vatByRate.set(rate, (vatByRate.get(rate) ?? 0) + base * (rate / 100));
+  });
+  const vatRows = [...vatByRate.entries()].sort(([a], [b]) => b - a);
+  const hasVat = totalTax > 0;
+
+  return (
+    <DetailCard>
+      <SectionLabel className="mb-3.5">{t('invoices.detail.items.title')}</SectionLabel>
+
+      <div className="overflow-hidden rounded-lg border border-border/70">
+        <div
+          className="grid gap-3 border-b border-border/70 bg-muted/40 px-4 py-2.5"
+          style={{ gridTemplateColumns: GRID }}
+        >
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('invoices.detail.items.columns.item')}
+          </span>
+          <span className="text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('invoices.fields.quantity')}
+          </span>
+          <span className="text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('invoices.fields.unitPrice')}
+          </span>
+          <span className="text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('invoices.detail.items.columns.vat')}
+          </span>
+          <span className="text-right text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('invoices.list.columns.amount')}
+          </span>
+        </div>
+
+        {invoice.items.map((item, index) => {
+          const quantity = toNumber(item.quantity);
+          const unitPrice = toNumber(item.unitPrice);
+          const vatRate = toNumber(item.vatRate);
+          const total = quantity * unitPrice * (1 + vatRate / 100);
+
+          return (
+            <div
+              key={item.id ?? `${item.name}-${index}`}
+              className="grid items-center gap-3 border-b border-border/60 px-4 py-3 last:border-b-0"
+              style={{ gridTemplateColumns: GRID }}
+            >
+              <span className="text-sm font-medium text-foreground">{item.name}</span>
+              <span className="text-right text-sm tabular-nums text-foreground">
+                {quantity}
+                {item.unit ? ` ${item.unit}` : ''}
+              </span>
+              <span className="text-right text-sm tabular-nums text-foreground">
+                {formatMoney(unitPrice, currency)}
+              </span>
+              <span className="text-right text-xs tabular-nums text-muted-foreground">
+                {vatRate}%
+              </span>
+              <span className="text-right text-sm font-semibold tabular-nums text-foreground">
+                {formatMoney(total, currency)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 space-y-1.5">
+        {hasVat && (
+          <>
+            <TotalRow label={t('invoices.summary.taxBase')} value={formatMoney(taxBase, currency)} />
+            {vatRows.map(([rate, tax]) => (
+              <TotalRow
+                key={rate}
+                label={`${t('invoices.detail.items.columns.vat')} ${rate}%`}
+                value={formatMoney(tax, currency)}
+                muted
+              />
+            ))}
+          </>
+        )}
+        <TotalRow
+          label={t('invoices.summary.total')}
+          value={formatMoney(totalWithTax, currency)}
+          grand
+        />
+      </div>
+    </DetailCard>
   );
 };

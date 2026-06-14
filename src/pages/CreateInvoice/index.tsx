@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Control,
   FieldPath,
@@ -34,7 +34,12 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useInvoiceForm, type InvoiceFormValues } from '@/components/invoices/useInvoiceForm';
-import { CreateInvoiceDtoVatClaimType, CreateInvoiceDtoVatMode } from '@/api/model';
+import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
+import {
+  CreateInvoiceDtoPaidPaymentMethod,
+  CreateInvoiceDtoVatClaimType,
+  CreateInvoiceDtoVatMode,
+} from '@/api/model';
 import { addDays, daysBetween } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
@@ -272,6 +277,23 @@ const InvoiceItemRow = ({
 
       <FormField
         control={form.control}
+        name={`items.${index}.unit`}
+        render={({ field }) => (
+          <FormItem className="space-y-1">
+            <FormControl>
+              <Input
+                {...field}
+                value={(field.value as string | undefined) ?? ''}
+                placeholder={t('invoices.placeholders.itemUnit')}
+                className="h-8 text-sm"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name={`items.${index}.unitPrice`}
         rules={{
           required: t('invoices.items.validation.priceRequired'),
@@ -341,7 +363,7 @@ const InvoiceItemRow = ({
   );
 };
 
-const CreateInvoice = () => {
+const CreateIssuedInvoice = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const {
@@ -384,6 +406,12 @@ const CreateInvoice = () => {
       label: t('invoices.vatModes.REVERSE_CHARGE'),
     },
   ];
+  const paymentMethodOptions = Object.values(
+    CreateInvoiceDtoPaidPaymentMethod,
+  ).map((method) => ({
+    value: method,
+    label: t(`invoices.paymentMethods.${method}`),
+  }));
 
   const defaultItem = {
     name: '',
@@ -394,8 +422,8 @@ const CreateInvoice = () => {
   };
 
   const gridTemplate = isVatPayer
-    ? '20px minmax(0,1fr) 64px 92px 56px 104px 28px'
-    : '20px minmax(0,1fr) 64px 92px 104px 28px';
+    ? '20px minmax(0,1fr) 64px 56px 92px 56px 104px 28px'
+    : '20px minmax(0,1fr) 64px 56px 92px 104px 28px';
 
   // Issue date drives the tax date and the due date (via the payment term).
   const handleCreatedDateChange = (
@@ -588,6 +616,13 @@ const CreateInvoice = () => {
                     : undefined
                 }
               />
+              <SelectField
+                control={form.control}
+                name="paidPaymentMethod"
+                label={t('invoices.fields.paymentMethod')}
+                placeholder={t('payments.placeholders.selectMethod')}
+                options={paymentMethodOptions}
+              />
               {!isReceived && (
                 <SelectField
                   control={form.control}
@@ -763,6 +798,9 @@ const CreateInvoice = () => {
                 </span>
                 <span className={cn(colHeadClass, 'text-right')}>
                   {t('invoices.fields.quantity')}
+                </span>
+                <span className={colHeadClass}>
+                  {t('invoices.fields.unit')}
                 </span>
                 <span className={cn(colHeadClass, 'text-right')}>
                   {t('invoices.fields.unitPrice')}
@@ -1023,6 +1061,17 @@ const CreateInvoice = () => {
         </form>
       </Form>
     </PageLayout>
+  );
+};
+
+// Received invoices use a distinct layout (amounts by VAT rate, no line items),
+// so delegate to the dedicated page; the issued form stays here.
+const CreateInvoice = () => {
+  const [searchParams] = useSearchParams();
+  return searchParams.get('type') === 'received' ? (
+    <CreateIncomingInvoice />
+  ) : (
+    <CreateIssuedInvoice />
   );
 };
 

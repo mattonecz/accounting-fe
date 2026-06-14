@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -133,9 +133,14 @@ export function useUpdateInvoiceForm(id: string) {
   const queryClient = useQueryClient();
 
   const { data: invoiceResponse, isLoading, isError } = useInvoiceGet(id || '');
-  const { data: contacts } = useListContacts();
-  const { data: banks } = useBankListByCompany();
+  const { data: contacts, isError: contactsError } = useListContacts();
+  const { data: banks, isError: banksError } = useBankListByCompany();
   const { activeCompanyId } = useAuth();
+
+  // The contact/bank fields are resolved by looking up the loaded lists, so the
+  // prefill must wait until those lists have settled (loaded or errored) — the
+  // invoice itself is usually cached and arrives first.
+  const listsReady = (!!contacts || contactsError) && (!!banks || banksError);
   const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const { mutate: updateInvoice, isPending: isUpdatingInvoice } =
     useInvoiceUpdate();
@@ -171,9 +176,14 @@ export function useUpdateInvoiceForm(id: string) {
     [contacts?.data],
   );
 
+  const prefilledId = useRef<string | null>(null);
+
   useEffect(() => {
     const invoice = invoiceResponse?.data;
-    if (!invoice) return;
+    if (!invoice || !listsReady) return;
+    // Prefill once per invoice; later background refetches must not clobber edits.
+    if (prefilledId.current === invoice.id) return;
+    prefilledId.current = invoice.id;
 
     const invoiceType =
       (invoice.type as UpdateInvoiceDtoType) || UpdateInvoiceDtoType.ISSUED;
@@ -218,6 +228,7 @@ export function useUpdateInvoiceForm(id: string) {
         ? invoice.items.map((item) => ({
             name: item.name,
             quantity: toNumber(item.quantity),
+            unit: item.unit ?? '',
             unitPrice: toNumber(item.unitPrice),
             vatRate: item.vatRate != null ? toNumber(item.vatRate) : undefined,
             total: toNumber(item.total),
@@ -242,7 +253,7 @@ export function useUpdateInvoiceForm(id: string) {
           ? String(invoice.vatClaimNote)
           : '',
     });
-  }, [form, invoiceResponse?.data, sortedBanks, sortedContacts]);
+  }, [form, invoiceResponse?.data, listsReady, sortedBanks, sortedContacts]);
 
   useEffect(() => {
     if (selectedCurrency === 'CZK') {
@@ -291,6 +302,7 @@ export function useUpdateInvoiceForm(id: string) {
 
     const finalItems = rest.items?.map((item) => ({
       ...item,
+      unit: trimOrUndefined(item.unit),
       vatRate: isVatPayer ? item.vatRate : undefined,
     }));
 
@@ -364,7 +376,9 @@ export function useUpdateInvoiceForm(id: string) {
   return {
     form,
     fields,
-    isLoading,
+    // Keep the page in its loading state until the lookup lists are ready, so the
+    // form is never shown with the contact/bank fields momentarily unresolved.
+    isLoading: isLoading || !listsReady,
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
