@@ -6,7 +6,7 @@ import i18n from '@/i18n';
 import { addDays } from '@/lib/formatters';
 import {
   CreateInvoiceDto,
-  CreateInvoiceDtoPaidPaymentMethod,
+  CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoStatus,
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatClaimType,
@@ -88,7 +88,7 @@ export const useInvoiceForm = () => {
       dueDate: addDays(today, defaultPaymentDays),
       paymentDays: defaultPaymentDays,
       isPaid: false,
-      paidPaymentMethod: CreateInvoiceDtoPaidPaymentMethod.BANK_TRANSFER,
+      paymentMethod: CreateInvoiceDtoPaymentMethod.BANK_TRANSFER,
       items: [
         {
           name: '',
@@ -275,8 +275,6 @@ export const useInvoiceForm = () => {
       bankId: finalBankId,
       bankSnapshot: cleanedSnapshot,
       paidDate: finalPaidDate,
-      // Only meaningful for a recorded payment, i.e. when paidDate is set.
-      paidPaymentMethod: finalPaidDate ? rest.paidPaymentMethod : undefined,
       variableSymbol: trimOrUndefined(rest.variableSymbol),
       specificSymbol: trimOrUndefined(rest.specificSymbol),
       konstantSymbol: trimOrUndefined(rest.konstantSymbol),

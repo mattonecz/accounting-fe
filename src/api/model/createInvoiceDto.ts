@@ -11,8 +11,8 @@ import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { CreateInvoiceDtoType } from './createInvoiceDtoType';
 import type { CreateInvoiceDtoVatMode } from './createInvoiceDtoVatMode';
 import type { CreateInvoiceDtoStatus } from './createInvoiceDtoStatus';
-import type { CreateInvoiceDtoPaidPaymentMethod } from './createInvoiceDtoPaidPaymentMethod';
 import type { InvoiceItemDto } from './invoiceItemDto';
+import type { CreateInvoiceDtoPaymentMethod } from './createInvoiceDtoPaymentMethod';
 import type { CreateInvoiceDtoVatClaimType } from './createInvoiceDtoVatClaimType';
 
 export interface CreateInvoiceDto {
@@ -37,8 +37,6 @@ export interface CreateInvoiceDto {
   status?: CreateInvoiceDtoStatus;
   /** Date the invoice was already paid. When set, the invoice is created with status PAID and a full-amount payment with this date is recorded. */
   paidDate?: string;
-  /** Payment method of the recorded payment when paidDate is set. Defaults to BANK_TRANSFER. */
-  paidPaymentMethod?: CreateInvoiceDtoPaidPaymentMethod;
   exchangeRate?: number;
   createdDate: string;
   duzpDate: string;
@@ -55,6 +53,8 @@ export interface CreateInvoiceDto {
   variableSymbol?: string;
   specificSymbol?: string;
   konstantSymbol?: string;
+  /** Payment method (forma úhrady). Defaults to BANK_TRANSFER. */
+  paymentMethod?: CreateInvoiceDtoPaymentMethod;
   /** Public note shown on the invoice. */
   note?: string;
   /** Internal note, not shown to the counterparty. */

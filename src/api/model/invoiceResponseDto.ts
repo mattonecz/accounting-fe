@@ -9,6 +9,7 @@ import type { InvoiceResponseDtoVatMode } from './invoiceResponseDtoVatMode';
 import type { InvoiceResponseDtoStatus } from './invoiceResponseDtoStatus';
 import type { InvoiceResponseDtoKind } from './invoiceResponseDtoKind';
 import type { InvoiceItemResponseDto } from './invoiceItemResponseDto';
+import type { InvoiceResponseDtoPaymentMethod } from './invoiceResponseDtoPaymentMethod';
 import type { ContactSnapshotDto } from './contactSnapshotDto';
 import type { InvoiceBankAccountSnapshotDto } from './invoiceBankAccountSnapshotDto';
 import type { PaymentResponseDto } from './paymentResponseDto';
@@ -42,6 +43,7 @@ export interface InvoiceResponseDto {
   variableSymbol?: string;
   specificSymbol?: string;
   konstantSymbol?: string;
+  paymentMethod: InvoiceResponseDtoPaymentMethod;
   note?: string;
   internalNote?: string;
   originalNumber?: string;

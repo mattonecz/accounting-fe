@@ -36,7 +36,7 @@ import { Switch } from '@/components/ui/switch';
 import { useInvoiceForm, type InvoiceFormValues } from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
 import {
-  CreateInvoiceDtoPaidPaymentMethod,
+  CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoVatClaimType,
   CreateInvoiceDtoVatMode,
 } from '@/api/model';
@@ -48,6 +48,9 @@ const sectionLabelClass =
   'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
 const colHeadClass =
   'text-[9px] font-semibold uppercase tracking-wider text-muted-foreground';
+// Borderless cells so each row reads like a line of text until focused.
+const cellInputClass =
+  'h-9 rounded-md border-0 bg-transparent px-1.5 text-sm shadow-none transition-colors hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:ring-0 focus-visible:ring-offset-0';
 
 type FieldName = FieldPath<InvoiceFormValues>;
 type FieldRules = UseControllerProps<InvoiceFormValues, FieldName>['rules'];
@@ -246,10 +249,10 @@ const InvoiceItemRow = ({
               <Input
                 {...field}
                 placeholder={t('invoices.placeholders.itemDescription')}
-                className="h-8 text-sm"
+                className={cn(cellInputClass, 'placeholder:italic')}
               />
             </FormControl>
-            <FormMessage className="text-[11px]" />
+            <FormMessage className="px-1.5 text-[11px]" />
           </FormItem>
         )}
       />
@@ -267,7 +270,7 @@ const InvoiceItemRow = ({
               <Input
                 type="number"
                 {...field}
-                className="h-8 text-right text-sm tabular-nums"
+                className={cn(cellInputClass, 'text-right tabular-nums')}
                 onChange={(e) => handleNumericChange(e, field.onChange)}
               />
             </FormControl>
@@ -285,7 +288,7 @@ const InvoiceItemRow = ({
                 {...field}
                 value={(field.value as string | undefined) ?? ''}
                 placeholder={t('invoices.placeholders.itemUnit')}
-                className="h-8 text-sm"
+                className={cellInputClass}
               />
             </FormControl>
           </FormItem>
@@ -308,7 +311,7 @@ const InvoiceItemRow = ({
                 type="number"
                 step="1"
                 {...field}
-                className="h-8 text-right text-sm tabular-nums"
+                className={cn(cellInputClass, 'text-right tabular-nums')}
                 onChange={(e) => handleNumericChange(e, field.onChange)}
               />
             </FormControl>
@@ -331,7 +334,7 @@ const InvoiceItemRow = ({
                   type="number"
                   step="1"
                   {...field}
-                  className="h-8 text-right text-sm tabular-nums"
+                  className={cn(cellInputClass, 'text-right tabular-nums')}
                   onChange={(e) => handleNumericChange(e, field.onChange)}
                 />
               </FormControl>
@@ -346,7 +349,7 @@ const InvoiceItemRow = ({
         value={totalValue}
         onChange={handleTotalChange}
         onBlur={() => setTotalDraft(null)}
-        className="h-8 text-right text-sm font-medium tabular-nums"
+        className={cn(cellInputClass, 'text-right font-semibold tabular-nums')}
       />
 
       <Button
@@ -407,7 +410,7 @@ const CreateIssuedInvoice = () => {
     },
   ];
   const paymentMethodOptions = Object.values(
-    CreateInvoiceDtoPaidPaymentMethod,
+    CreateInvoiceDtoPaymentMethod,
   ).map((method) => ({
     value: method,
     label: t(`invoices.paymentMethods.${method}`),
@@ -618,7 +621,7 @@ const CreateIssuedInvoice = () => {
               />
               <SelectField
                 control={form.control}
-                name="paidPaymentMethod"
+                name="paymentMethod"
                 label={t('invoices.fields.paymentMethod')}
                 placeholder={t('payments.placeholders.selectMethod')}
                 options={paymentMethodOptions}

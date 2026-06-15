@@ -6,14 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * Payment method of the recorded payment when paidDate is set. Defaults to BANK_TRANSFER.
- */
-export type CreateInvoiceDtoPaidPaymentMethod = typeof CreateInvoiceDtoPaidPaymentMethod[keyof typeof CreateInvoiceDtoPaidPaymentMethod];
+export type InvoiceResponseDtoPaymentMethod = typeof InvoiceResponseDtoPaymentMethod[keyof typeof InvoiceResponseDtoPaymentMethod];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreateInvoiceDtoPaidPaymentMethod = {
+export const InvoiceResponseDtoPaymentMethod = {
   BANK_TRANSFER: 'BANK_TRANSFER',
   CASH: 'CASH',
   CARD: 'CARD',

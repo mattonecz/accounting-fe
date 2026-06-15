@@ -3275,16 +3275,6 @@
             "example": "2025-06-25",
             "description": "Date the invoice was already paid. When set, the invoice is created with status PAID and a full-amount payment with this date is recorded."
           },
-          "paidPaymentMethod": {
-            "type": "string",
-            "enum": [
-              "BANK_TRANSFER",
-              "CASH",
-              "CARD",
-              "OTHER"
-            ],
-            "description": "Payment method of the recorded payment when paidDate is set. Defaults to BANK_TRANSFER."
-          },
           "exchangeRate": {
             "type": "number",
             "example": 24.85
@@ -3338,6 +3328,16 @@
           "konstantSymbol": {
             "type": "string",
             "example": "0558"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ],
+            "description": "Payment method (forma úhrady). Defaults to BANK_TRANSFER."
           },
           "note": {
             "type": "string",
@@ -3613,6 +3613,15 @@
           "konstantSymbol": {
             "type": "string"
           },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
+          },
           "note": {
             "type": "string"
           },
@@ -3687,7 +3696,8 @@
           "kind",
           "totalWithTax",
           "items",
-          "companyId"
+          "companyId",
+          "paymentMethod"
         ]
       },
       "PaginatedInvoiceResponseDto": {
@@ -3933,6 +3943,15 @@
           },
           "konstantSymbol": {
             "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "note": {
             "type": "string"

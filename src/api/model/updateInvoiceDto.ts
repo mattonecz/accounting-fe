@@ -11,6 +11,7 @@ import type { UpdateInvoiceDtoType } from './updateInvoiceDtoType';
 import type { UpdateInvoiceDtoVatMode } from './updateInvoiceDtoVatMode';
 import type { UpdateInvoiceDtoStatus } from './updateInvoiceDtoStatus';
 import type { InvoiceItemDto } from './invoiceItemDto';
+import type { UpdateInvoiceDtoPaymentMethod } from './updateInvoiceDtoPaymentMethod';
 import type { UpdateInvoiceDtoVatClaimType } from './updateInvoiceDtoVatClaimType';
 import type { UpdateInvoiceDtoVatClaimStatus } from './updateInvoiceDtoVatClaimStatus';
 
@@ -42,6 +43,7 @@ export interface UpdateInvoiceDto {
   variableSymbol?: string;
   specificSymbol?: string;
   konstantSymbol?: string;
+  paymentMethod?: UpdateInvoiceDtoPaymentMethod;
   note?: string;
   internalNote?: string;
   originalNumber?: string;

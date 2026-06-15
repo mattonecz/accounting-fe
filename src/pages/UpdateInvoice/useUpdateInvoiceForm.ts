@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
   UpdateInvoiceDto,
+  UpdateInvoiceDtoPaymentMethod,
   UpdateInvoiceDtoStatus,
   UpdateInvoiceDtoType,
   UpdateInvoiceDtoVatClaimStatus,
@@ -81,23 +82,46 @@ const getDefaultValues = (): UpdateInvoiceFormValues => ({
   duzpDate: new Date().toISOString().split('T')[0],
   dueDate: new Date().toISOString().split('T')[0],
   paymentDays: 0,
+  paymentMethod: UpdateInvoiceDtoPaymentMethod.BANK_TRANSFER,
   items: [DEFAULT_ITEM],
 });
 
-const findMatchingContactId = (
+// Loose text compare: trim + case-insensitive, so trailing spaces or casing in
+// the snapshot don't defeat the match.
+const looseEqual = (a?: string, b?: string) =>
+  !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase();
+
+// Account/IČO compare: ignore all whitespace and case (IBANs and account
+// numbers are often stored with spaces in one place and without in another).
+const idEqual = (a?: string, b?: string) =>
+  !!a &&
+  !!b &&
+  a.replace(/\s+/g, '').toUpperCase() === b.replace(/\s+/g, '').toUpperCase();
+
+// Prefer the invoice's stored contactId; only fall back to matching the
+// snapshot when that id is missing or points at a contact no longer in the list
+// — otherwise the Select would render an empty value. Each strategy is tried
+// independently so a failed IČO match still falls through to a name match.
+const resolveContactId = (
   invoice: InvoiceResponseDto,
   contacts: Array<{ id: string; name: string; ico?: string }>,
 ) => {
+  if (invoice.contactId && contacts.some((c) => c.id === invoice.contactId)) {
+    return invoice.contactId;
+  }
   const snapshot = invoice.contactSnapshot;
-  return (
-    contacts.find((contact) => {
-      if (snapshot?.ico && contact.ico) return snapshot.ico === contact.ico;
-      return contact.name === snapshot?.name;
-    })?.id ?? ''
-  );
+  if (!snapshot) return '';
+  const byIco = snapshot.ico
+    ? contacts.find((c) => idEqual(c.ico, snapshot.ico))
+    : undefined;
+  if (byIco) return byIco.id;
+  const byName = contacts.find((c) => looseEqual(c.name, snapshot.name));
+  return byName?.id ?? '';
 };
 
-const findMatchingBankId = (
+// Same idea for the bank: trust the stored bankId first, then fall back to
+// matching the snapshot by IBAN, account number, and finally name.
+const resolveBankId = (
   invoice: InvoiceResponseDto,
   banks: Array<{
     id: string;
@@ -108,15 +132,21 @@ const findMatchingBankId = (
     currency?: string;
   }>,
 ) => {
+  if (invoice.bankId && banks.some((b) => b.id === invoice.bankId)) {
+    return invoice.bankId;
+  }
   const snapshot = invoice.bankSnapshot;
-  return (
-    banks.find((bank) => {
-      if (snapshot?.iban && bank.iban) return snapshot.iban === bank.iban;
-      if (snapshot?.number && bank.number)
-        return snapshot.number === bank.number;
-      return bank.name === snapshot?.name;
-    })?.id ?? ''
-  );
+  if (!snapshot) return '';
+  const byIban = snapshot.iban
+    ? banks.find((b) => idEqual(b.iban, snapshot.iban))
+    : undefined;
+  if (byIban) return byIban.id;
+  const byNumber = snapshot.number
+    ? banks.find((b) => idEqual(b.number, snapshot.number))
+    : undefined;
+  if (byNumber) return byNumber.id;
+  const byName = banks.find((b) => looseEqual(b.name, snapshot.name));
+  return byName?.id ?? '';
 };
 
 export const getbankSnapshotLabel = (account: {
@@ -177,6 +207,16 @@ export function useUpdateInvoiceForm(id: string) {
   );
 
   const prefilledId = useRef<string | null>(null);
+  // The form JSX is held back until this flips true, so every controlled Select
+  // mounts with its prefilled value already in place. A Radix Select only shows
+  // a value whose <SelectItem> it has seen; setting `contactId`/`bankId` via a
+  // post-mount reset (the item never having been rendered) leaves it blank.
+  const [isPrefilled, setIsPrefilled] = useState(false);
+
+  // A different invoice id means we must prefill again before showing the form.
+  useEffect(() => {
+    setIsPrefilled(false);
+  }, [id]);
 
   useEffect(() => {
     const invoice = invoiceResponse?.data;
@@ -191,10 +231,10 @@ export function useUpdateInvoiceForm(id: string) {
 
     form.reset({
       id: invoice.id,
-      contactId: findMatchingContactId(invoice, sortedContacts),
+      contactId: resolveContactId(invoice, sortedContacts),
       bankId: isReceived
         ? undefined
-        : findMatchingBankId(invoice, sortedBanks) || undefined,
+        : resolveBankId(invoice, sortedBanks) || undefined,
       bankSnapshot: isReceived
         ? {
             name: invoice.bankSnapshot?.name ?? '',
@@ -221,6 +261,9 @@ export function useUpdateInvoiceForm(id: string) {
       variableSymbol: invoice.variableSymbol ?? '',
       specificSymbol: invoice.specificSymbol ?? '',
       konstantSymbol: invoice.konstantSymbol ?? '',
+      paymentMethod:
+        (invoice.paymentMethod as UpdateInvoiceDtoPaymentMethod | undefined) ??
+        UpdateInvoiceDtoPaymentMethod.BANK_TRANSFER,
       note: invoice.note ?? '',
       internalNote: invoice.internalNote ?? '',
       originalNumber: invoice.originalNumber ?? '',
@@ -253,6 +296,7 @@ export function useUpdateInvoiceForm(id: string) {
           ? String(invoice.vatClaimNote)
           : '',
     });
+    setIsPrefilled(true);
   }, [form, invoiceResponse?.data, listsReady, sortedBanks, sortedContacts]);
 
   useEffect(() => {
@@ -376,9 +420,11 @@ export function useUpdateInvoiceForm(id: string) {
   return {
     form,
     fields,
-    // Keep the page in its loading state until the lookup lists are ready, so the
-    // form is never shown with the contact/bank fields momentarily unresolved.
-    isLoading: isLoading || !listsReady,
+    // Keep the page in its loading state until the lookup lists are ready AND the
+    // prefill has been applied, so the form (and its Selects) only mount once the
+    // contact/bank values are already in place. Errors take precedence so a failed
+    // load surfaces instead of spinning forever.
+    isLoading: !isError && (isLoading || !listsReady || !isPrefilled),
     isError,
     isUpdatingInvoice,
     isCzkCurrency,
