@@ -33,7 +33,7 @@ import {
 import { useWatch } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
 import { addDays, daysBetween } from '@/lib/formatters';
-import { getBankAccountLabel, type UpdateInvoiceFormValues } from './useUpdateInvoiceForm';
+import { getbankSnapshotLabel, type UpdateInvoiceFormValues } from './useUpdateInvoiceForm';
 
 interface UpdateBasicInfoCardProps {
   form: UseFormReturn<UpdateInvoiceFormValues>;
@@ -174,7 +174,7 @@ export const UpdateBasicInfoCard = ({
                       <SelectContent>
                         {sortedBanks.map((account) => (
                           <SelectItem key={account.id} value={account.id}>
-                            {getBankAccountLabel(account)}
+                            {getbankSnapshotLabel(account)}
                           </SelectItem>
                         ))}
                       </SelectContent>

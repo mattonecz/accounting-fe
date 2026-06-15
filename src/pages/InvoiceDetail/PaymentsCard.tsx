@@ -12,12 +12,16 @@ interface PaymentsCardProps {
   currency: string;
 }
 
-export const PaymentsCard = ({ invoice, payments, currency }: PaymentsCardProps) => {
+export const PaymentsCard = ({
+  invoice,
+  payments,
+  currency,
+}: PaymentsCardProps) => {
   const { t } = useTranslation();
   const [recordOpen, setRecordOpen] = useState(false);
 
   const isReceived = invoice.type === 'RECEIVED';
-  const bank = invoice.bankAccount;
+  const bank = invoice.bankSnapshot;
   const bankAccount = bank?.number || bank?.name;
   const hasPaymentDetails =
     !!bankAccount ||
@@ -29,7 +33,9 @@ export const PaymentsCard = ({ invoice, payments, currency }: PaymentsCardProps)
 
   return (
     <DetailCard>
-      <SectionLabel className="mb-4">{t('invoices.detail.payments.title')}</SectionLabel>
+      <SectionLabel className="mb-4">
+        {t('invoices.detail.payments.title')}
+      </SectionLabel>
 
       {hasPaymentDetails && (
         <div className="mb-5 grid gap-x-6 gap-y-4 border-b border-dashed border-border pb-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -46,10 +52,18 @@ export const PaymentsCard = ({ invoice, payments, currency }: PaymentsCardProps)
             />
           )}
           {bank?.iban && (
-            <MetaField label={t('invoices.detail.bank.iban')} value={bank.iban} mono />
+            <MetaField
+              label={t('invoices.detail.bank.iban')}
+              value={bank.iban}
+              mono
+            />
           )}
           {bank?.swift && (
-            <MetaField label={t('invoices.detail.bank.swift')} value={bank.swift} mono />
+            <MetaField
+              label={t('invoices.detail.bank.swift')}
+              value={bank.swift}
+              mono
+            />
           )}
           {invoice.variableSymbol && (
             <MetaField

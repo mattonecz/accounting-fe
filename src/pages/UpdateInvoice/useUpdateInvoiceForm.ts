@@ -108,7 +108,7 @@ const findMatchingBankId = (
     currency?: string;
   }>,
 ) => {
-  const snapshot = invoice.bankAccount;
+  const snapshot = invoice.bankSnapshot;
   return (
     banks.find((bank) => {
       if (snapshot?.iban && bank.iban) return snapshot.iban === bank.iban;
@@ -119,7 +119,7 @@ const findMatchingBankId = (
   );
 };
 
-export const getBankAccountLabel = (account: {
+export const getbankSnapshotLabel = (account: {
   name?: string;
   currency?: string;
   number?: string;
@@ -197,11 +197,11 @@ export function useUpdateInvoiceForm(id: string) {
         : findMatchingBankId(invoice, sortedBanks) || undefined,
       bankSnapshot: isReceived
         ? {
-            name: invoice.bankAccount?.name ?? '',
-            number: invoice.bankAccount?.number ?? '',
-            iban: invoice.bankAccount?.iban ?? '',
-            swift: invoice.bankAccount?.swift ?? '',
-            currency: invoice.bankAccount?.currency ?? '',
+            name: invoice.bankSnapshot?.name ?? '',
+            number: invoice.bankSnapshot?.number ?? '',
+            iban: invoice.bankSnapshot?.iban ?? '',
+            swift: invoice.bankSnapshot?.swift ?? '',
+            currency: invoice.bankSnapshot?.currency ?? '',
           }
         : undefined,
       number: invoice.number,

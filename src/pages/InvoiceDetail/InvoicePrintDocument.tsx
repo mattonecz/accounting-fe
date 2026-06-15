@@ -51,11 +51,11 @@ const contactToParty = (contact?: ContactSnapshotDto): Party => {
 
 // CZ "QR Platba" SPAYD payload — only built when we have an IBAN + amount to charge.
 const buildSpayd = (invoice: InvoiceResponseDto): string | null => {
-  const iban = invoice.bankAccount?.iban?.replace(/\s+/g, '').toUpperCase();
+  const iban = invoice.bankSnapshot?.iban?.replace(/\s+/g, '').toUpperCase();
   const amount = toNumber(invoice.totalWithTax);
   if (!iban || amount <= 0) return null;
 
-  const swift = invoice.bankAccount?.swift?.replace(/\s+/g, '').toUpperCase();
+  const swift = invoice.bankSnapshot?.swift?.replace(/\s+/g, '').toUpperCase();
   const acc = swift ? `${iban}+${swift}` : iban;
   const vs = (invoice.variableSymbol || invoice.number || '').replace(/\D/g, '');
   const msg = `FAKTURA ${invoice.number ?? ''}`.trim().slice(0, 60);
@@ -100,7 +100,7 @@ export const InvoicePrintDocument = ({
   const supplier = isReceived ? contactToParty(invoice.contactSnapshot) : companyToParty(company);
   const customer = isReceived ? companyToParty(company) : contactToParty(invoice.contactSnapshot);
 
-  const bank = invoice.bankAccount;
+  const bank = invoice.bankSnapshot;
   const variableSymbol = invoice.variableSymbol || invoice.number;
 
   // VAT recapitulation per rate (basis + tax), mirroring the on-screen detail table.

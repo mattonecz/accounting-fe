@@ -46,7 +46,7 @@ export interface InvoiceResponseDto {
   internalNote?: string;
   originalNumber?: string;
   contactSnapshot?: ContactSnapshotDto;
-  bankAccount?: InvoiceBankAccountSnapshotDto;
+  bankSnapshot?: InvoiceBankAccountSnapshotDto;
   payments?: PaymentResponseDto[];
   statusHistory?: InvoiceStatusHistoryItemDto[];
   /** @nullable */

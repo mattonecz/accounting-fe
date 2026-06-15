@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useInvoiceGet } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
-import { InvoicePrintDocument } from '@/pages/InvoiceDetail/InvoicePrintDocument';
 import { generateInvoicePdf } from '@/pages/InvoiceDetail/generatePdf';
 
 interface InvoicePdfRendererProps {
@@ -9,11 +8,13 @@ interface InvoicePdfRendererProps {
   onDone: () => void;
 }
 
+// Headless one-shot PDF download (e.g. from a list row): fetches the invoice +
+// supplier company, then builds the PDF straight from the data. No hidden DOM or
+// timing hacks — @react-pdf/renderer generates the QR image and vector PDF itself.
 export const InvoicePdfRenderer = ({
   invoiceId,
   onDone,
 }: InvoicePdfRendererProps) => {
-  const ref = useRef<HTMLDivElement | null>(null);
   const triggered = useRef(false);
   const { data, isError } = useInvoiceGet(invoiceId);
   const invoice = data?.data;
@@ -21,7 +22,7 @@ export const InvoicePdfRenderer = ({
     query: { enabled: !!invoice?.companyId },
   });
   const company = companyResponse?.data;
-  // Hold off rendering the PDF until the supplier company has resolved.
+  // Hold off until the supplier company has resolved.
   const companyReady = !invoice?.companyId || !!company;
 
   // The endpoint returns 404 when the invoice is missing; unblock the caller
@@ -34,20 +35,14 @@ export const InvoicePdfRenderer = ({
     if (!invoice || !companyReady || triggered.current) return;
     triggered.current = true;
 
-    // Small delay so the async-generated QR Platba image is rendered before capture.
-    const id = setTimeout(async () => {
+    void (async () => {
       try {
-        if (ref.current) {
-          await generateInvoicePdf(ref.current, `faktura-${invoice.number}.pdf`);
-        }
+        await generateInvoicePdf(invoice, company, `faktura-${invoice.number}.pdf`);
       } finally {
         onDone();
       }
-    }, 250);
+    })();
+  }, [invoice, company, companyReady, onDone]);
 
-    return () => clearTimeout(id);
-  }, [invoice, companyReady, onDone]);
-
-  if (!invoice) return null;
-  return <InvoicePrintDocument invoice={invoice} company={company} invoiceRef={ref} />;
+  return null;
 };

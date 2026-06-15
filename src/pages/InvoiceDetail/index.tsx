@@ -39,8 +39,8 @@ const InvoiceDetail = () => {
   const remainingAmount = Math.max((invoice?.totalWithTax ?? 0) - paidAmount, 0);
 
   const handleDownloadPdf = async () => {
-    if (!invoiceRef.current || !invoice) return;
-    await generateInvoicePdf(invoiceRef.current, `faktura-${invoice.number}.pdf`);
+    if (!invoice) return;
+    await generateInvoicePdf(invoice, company, `faktura-${invoice.number}.pdf`);
   };
 
   const renderContent = () => {
