@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type DataMessageDtoState = typeof DataMessageDtoState[keyof typeof DataMessageDtoState];
-
+export type DataMessageDtoState =
+  (typeof DataMessageDtoState)[keyof typeof DataMessageDtoState];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DataMessageDtoState = {

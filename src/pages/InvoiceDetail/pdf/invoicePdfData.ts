@@ -84,7 +84,9 @@ const companyToParty = (company?: CompanyResponseDto): PdfParty => {
   const line1 = [company?.street, houseLine].filter(Boolean).join(' ');
   const line2 = [company?.psc, company?.city].filter(Boolean).join(' ');
   const country =
-    company?.country && company.country.toUpperCase() !== 'CZ' ? company.country : undefined;
+    company?.country && company.country.toUpperCase() !== 'CZ'
+      ? company.country
+      : undefined;
   return {
     name: company?.companyName || company?.name || '—',
     ico: company?.ico,
@@ -97,7 +99,9 @@ const contactToParty = (contact?: ContactSnapshotDto): PdfParty => {
   const line1 = contact?.street;
   const line2 = [contact?.psc, contact?.city].filter(Boolean).join(' ');
   const country =
-    contact?.country && contact.country.toUpperCase() !== 'CZ' ? contact.country : undefined;
+    contact?.country && contact.country.toUpperCase() !== 'CZ'
+      ? contact.country
+      : undefined;
   return {
     name: contact?.name || '—',
     ico: contact?.ico,
@@ -114,7 +118,10 @@ const buildSpayd = (invoice: InvoiceResponseDto): string | null => {
 
   const swift = invoice.bankSnapshot?.swift?.replace(/\s+/g, '').toUpperCase();
   const acc = swift ? `${iban}+${swift}` : iban;
-  const vs = (invoice.variableSymbol || invoice.number || '').replace(/\D/g, '');
+  const vs = (invoice.variableSymbol || invoice.number || '').replace(
+    /\D/g,
+    '',
+  );
   const msg = `FAKTURA ${invoice.number ?? ''}`.trim().slice(0, 60);
 
   return [
@@ -137,8 +144,12 @@ export const buildInvoicePdfModel = (
   const isReceived = invoice.type === 'RECEIVED';
 
   // The party that issued the document goes top-left; the recipient top-right.
-  const supplier = isReceived ? contactToParty(invoice.contactSnapshot) : companyToParty(company);
-  const customer = isReceived ? companyToParty(company) : contactToParty(invoice.contactSnapshot);
+  const supplier = isReceived
+    ? contactToParty(invoice.contactSnapshot)
+    : companyToParty(company);
+  const customer = isReceived
+    ? companyToParty(company)
+    : contactToParty(invoice.contactSnapshot);
 
   const hasVat = toNumber(invoice.totalTax) > 0;
 
@@ -160,8 +171,12 @@ export const buildInvoicePdfModel = (
       vat: money(value.vat, currency),
     }));
 
-  const paidAmount = (invoice.payments ?? []).reduce((sum, p) => sum + toNumber(p.amount), 0);
-  const fullyPaid = paidAmount > 0 && paidAmount + 0.01 >= toNumber(invoice.totalWithTax);
+  const paidAmount = (invoice.payments ?? []).reduce(
+    (sum, p) => sum + toNumber(p.amount),
+    0,
+  );
+  const fullyPaid =
+    paidAmount > 0 && paidAmount + 0.01 >= toNumber(invoice.totalWithTax);
   const lastPaymentDate = (invoice.payments ?? [])
     .map((p) => p.paymentDate)
     .filter(Boolean)
@@ -172,7 +187,9 @@ export const buildInvoicePdfModel = (
     currency,
     hasVat,
     number: invoice.number || '',
-    supplierTagline: !isReceived ? company?.description || undefined : undefined,
+    supplierTagline: !isReceived
+      ? company?.description || undefined
+      : undefined,
     supplier,
     customer,
     bankNumber: invoice.bankSnapshot?.number,

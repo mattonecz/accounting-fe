@@ -13,7 +13,8 @@ export type TaxOfficeWorkplaceOption = {
 // Endpoint: https://adisspr.mfcr.cz/dpr/epo_ciselnik
 export const SPECIAL_TAX_OFFICE_CODE = '13';
 export const SPECIAL_TAX_OFFICE_WORKPLACE_CODE = '4000';
-export const SPECIAL_TAX_OFFICE_WORKPLACE_LABEL = 'Specializovaný finanční úřad';
+export const SPECIAL_TAX_OFFICE_WORKPLACE_LABEL =
+  'Specializovaný finanční úřad';
 
 const taxOfficeOptionTuples = [
   ['13', 'Specializovaný finanční úřad'],

@@ -9,7 +9,10 @@ import {
   useInvoiceSettingsGet,
   useInvoiceSettingsUpdate,
 } from '@/api/invoice-settings/invoice-settings';
-import type { InvoiceSettingsResponseDto, UpdateInvoiceSettingsDto } from '@/api/model';
+import type {
+  InvoiceSettingsResponseDto,
+  UpdateInvoiceSettingsDto,
+} from '@/api/model';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,7 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Form, FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { InputController } from '@/components/InputController';
@@ -34,12 +43,19 @@ interface FormValues {
   logoUrl: string;
 }
 
-const mapToForm = (settings?: InvoiceSettingsResponseDto | null): FormValues => ({
+const mapToForm = (
+  settings?: InvoiceSettingsResponseDto | null,
+): FormValues => ({
   invoicePrefix: settings?.invoicePrefix ?? '',
   invoiceNumberFormat: settings?.invoiceNumberFormat ?? '',
-  nextInvoiceNumber: settings?.nextInvoiceNumber != null ? String(settings.nextInvoiceNumber) : '',
-  dueDaysDefault: settings?.dueDaysDefault != null ? String(settings.dueDaysDefault) : '',
-  defaultVatRate: settings?.defaultVatRate != null ? String(settings.defaultVatRate) : '',
+  nextInvoiceNumber:
+    settings?.nextInvoiceNumber != null
+      ? String(settings.nextInvoiceNumber)
+      : '',
+  dueDaysDefault:
+    settings?.dueDaysDefault != null ? String(settings.dueDaysDefault) : '',
+  defaultVatRate:
+    settings?.defaultVatRate != null ? String(settings.defaultVatRate) : '',
   defaultHeaderText: settings?.defaultHeaderText ?? '',
   defaultFooterText: settings?.defaultFooterText ?? '',
   logoUrl: settings?.logoUrl ?? '',
@@ -67,8 +83,13 @@ export const InvoiceDefaultsForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
-  const { data: settingsResponse, isLoading, error } = useInvoiceSettingsGet({ query: { retry: false } });
-  const { mutate: updateSettings, isPending: isSaving } = useInvoiceSettingsUpdate();
+  const {
+    data: settingsResponse,
+    isLoading,
+    error,
+  } = useInvoiceSettingsGet({ query: { retry: false } });
+  const { mutate: updateSettings, isPending: isSaving } =
+    useInvoiceSettingsUpdate();
 
   const is404 = axios.isAxiosError(error) && error.response?.status === 404;
   const settings = settingsResponse?.data;
@@ -87,10 +108,14 @@ export const InvoiceDefaultsForm = () => {
         onSuccess: (response) => {
           queryClient.setQueryData(getInvoiceSettingsGetQueryKey(), response);
           reset(mapToForm(response.data));
-          enqueueSnackbar(t('settings.defaults.messages.saveSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('settings.defaults.messages.saveSuccess'), {
+            variant: 'success',
+          });
         },
         onError: () => {
-          enqueueSnackbar(t('settings.defaults.messages.saveError'), { variant: 'error' });
+          enqueueSnackbar(t('settings.defaults.messages.saveError'), {
+            variant: 'error',
+          });
         },
       },
     );
@@ -120,12 +145,18 @@ export const InvoiceDefaultsForm = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('settings.defaults.card.title')}</CardTitle>
-            <CardDescription>{t('settings.defaults.card.description')}</CardDescription>
+            <CardDescription>
+              {t('settings.defaults.card.description')}
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <FormLabel>{t('settings.defaults.fields.currency')}</FormLabel>
-              <Input value={settings?.currency ?? 'CZK'} disabled className="w-full" />
+              <Input
+                value={settings?.currency ?? 'CZK'}
+                disabled
+                className="w-full"
+              />
             </div>
 
             <InputController
@@ -168,11 +199,19 @@ export const InvoiceDefaultsForm = () => {
               name="defaultHeaderText"
               render={({ field, fieldState }) => (
                 <FormItem className="space-y-2 md:col-span-2">
-                  <FormLabel>{t('settings.defaults.fields.defaultHeaderText')}</FormLabel>
+                  <FormLabel>
+                    {t('settings.defaults.fields.defaultHeaderText')}
+                  </FormLabel>
                   <FormControl>
-                    <Textarea {...field} className="w-full resize-none" rows={3} />
+                    <Textarea
+                      {...field}
+                      className="w-full resize-none"
+                      rows={3}
+                    />
                   </FormControl>
-                  {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -181,11 +220,19 @@ export const InvoiceDefaultsForm = () => {
               name="defaultFooterText"
               render={({ field, fieldState }) => (
                 <FormItem className="space-y-2 md:col-span-2">
-                  <FormLabel>{t('settings.defaults.fields.defaultFooterText')}</FormLabel>
+                  <FormLabel>
+                    {t('settings.defaults.fields.defaultFooterText')}
+                  </FormLabel>
                   <FormControl>
-                    <Textarea {...field} className="w-full resize-none" rows={3} />
+                    <Textarea
+                      {...field}
+                      className="w-full resize-none"
+                      rows={3}
+                    />
                   </FormControl>
-                  {fieldState.error && <FormMessage>{fieldState.error.message}</FormMessage>}
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />

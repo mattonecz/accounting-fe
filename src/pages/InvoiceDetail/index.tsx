@@ -7,7 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, Download, MoreHorizontal, Pencil, Printer } from 'lucide-react';
+import {
+  ArrowLeft,
+  Download,
+  MoreHorizontal,
+  Pencil,
+  Printer,
+} from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useInvoiceGet } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
@@ -36,7 +42,10 @@ const InvoiceDetail = () => {
   const currency = invoice?.currency || 'CZK';
   const payments = invoice?.payments ?? [];
   const paidAmount = useMemo(() => getPaidAmount(invoice), [invoice]);
-  const remainingAmount = Math.max((invoice?.totalWithTax ?? 0) - paidAmount, 0);
+  const remainingAmount = Math.max(
+    (invoice?.totalWithTax ?? 0) - paidAmount,
+    0,
+  );
 
   const handleDownloadPdf = async () => {
     if (!invoice) return;
@@ -45,17 +54,27 @@ const InvoiceDetail = () => {
 
   const renderContent = () => {
     if (!id) {
-      return <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>;
+      return (
+        <p className="text-muted-foreground">
+          {t('invoices.detail.invalidId')}
+        </p>
+      );
     }
     if (isLoading) {
-      return <p className="text-muted-foreground">{t('invoices.detail.loading')}</p>;
+      return (
+        <p className="text-muted-foreground">{t('invoices.detail.loading')}</p>
+      );
     }
     if (isError || !invoice) {
       return <p className="text-destructive">{t('invoices.detail.error')}</p>;
     }
 
     const isReceived = invoice.type === 'RECEIVED';
+    const isSimple = invoice.kind === 'SIMPLE';
     const listRoute = isReceived ? '/incoming-invoices' : '/outgoing-invoices';
+    const editRoute = isSimple
+      ? `/invoices/simple/${invoice.id}/edit`
+      : `/invoices/${invoice.id}/edit`;
 
     return (
       <>
@@ -88,7 +107,7 @@ const InvoiceDetail = () => {
                 variant="outline"
                 size="sm"
                 className="gap-1.5"
-                onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
+                onClick={() => navigate(editRoute)}
               >
                 <Pencil className="h-3.5 w-3.5" />
                 {t('invoices.actions.edit')}
@@ -127,9 +146,17 @@ const InvoiceDetail = () => {
 
           <InvoiceInfoCards invoice={invoice} />
           <InvoiceItemsTable invoice={invoice} currency={currency} />
-          <PaymentsCard invoice={invoice} payments={payments} currency={currency} />
+          <PaymentsCard
+            invoice={invoice}
+            payments={payments}
+            currency={currency}
+          />
           <StatusHistoryCard statusHistory={invoice.statusHistory} />
-          <InvoicePrintDocument invoice={invoice} company={company} invoiceRef={invoiceRef} />
+          <InvoicePrintDocument
+            invoice={invoice}
+            company={company}
+            invoiceRef={invoiceRef}
+          />
         </div>
       </>
     );

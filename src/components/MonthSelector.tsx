@@ -23,7 +23,9 @@ export const MonthSelector = ({
   onYearChange,
 }: MonthSelectorProps) => {
   const { t } = useTranslation();
-  const months = Array.from({ length: 12 }, (_, i) => t(`taxReport.months.${i}`));
+  const months = Array.from({ length: 12 }, (_, i) =>
+    t(`taxReport.months.${i}`),
+  );
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   return (

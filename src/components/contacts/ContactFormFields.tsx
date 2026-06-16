@@ -28,7 +28,11 @@ export const ContactFormFields = ({ control }: ContactFormFieldsProps) => {
         name="name"
         label={t('contacts.fields.name')}
         type="text"
-        rules={{ required: t('validation.required', { field: t('contacts.fields.name') }) }}
+        rules={{
+          required: t('validation.required', {
+            field: t('contacts.fields.name'),
+          }),
+        }}
         placeholder={t('contacts.placeholders.name')}
       />
       <InputController
@@ -51,7 +55,11 @@ export const ContactFormFields = ({ control }: ContactFormFieldsProps) => {
         label={t('contacts.fields.country')}
         type="text"
         placeholder={t('contacts.placeholders.country')}
-        rules={{ required: t('validation.required', { field: t('contacts.fields.country') }) }}
+        rules={{
+          required: t('validation.required', {
+            field: t('contacts.fields.country'),
+          }),
+        }}
       />
       <InputController
         control={control}

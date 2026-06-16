@@ -49,6 +49,7 @@ import {
 } from '@/api/model';
 import { addDays, daysBetween } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
+import { recomputeRow, sumRates, type RateField } from './incomingRates';
 import {
   getbankSnapshotLabel,
   toNumber,
@@ -66,7 +67,10 @@ const cellInputClass =
   'h-9 rounded-md border-0 bg-transparent px-1.5 text-sm shadow-none transition-colors hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:ring-0 focus-visible:ring-offset-0';
 
 type FieldName = FieldPath<UpdateInvoiceFormValues>;
-type FieldRules = UseControllerProps<UpdateInvoiceFormValues, FieldName>['rules'];
+type FieldRules = UseControllerProps<
+  UpdateInvoiceFormValues,
+  FieldName
+>['rules'];
 
 const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
 
@@ -129,9 +133,7 @@ const TextField = ({
             }
           />
         </FormControl>
-        {hint && (
-          <p className="text-[11px] text-muted-foreground/80">{hint}</p>
-        )}
+        {hint && <p className="text-[11px] text-muted-foreground/80">{hint}</p>}
         <FormMessage />
       </FormItem>
     )}
@@ -218,7 +220,9 @@ const InvoiceItemRow = ({
 
   const quantity = toNumber(form.watch(`items.${index}.quantity`));
   const unitPrice = toNumber(form.watch(`items.${index}.unitPrice`));
-  const vatRate = isVatPayer ? toNumber(form.watch(`items.${index}.vatRate`)) : 0;
+  const vatRate = isVatPayer
+    ? toNumber(form.watch(`items.${index}.vatRate`))
+    : 0;
   const computedTotal = quantity * unitPrice * (1 + vatRate / 100);
 
   const handleNumericChange = (
@@ -424,7 +428,10 @@ export default function UpdateInvoice() {
     { value: 'USD', label: t('currencies.USD') },
   ];
   const vatModeOptions = [
-    { value: UpdateInvoiceDtoVatMode.STANDARD, label: t('invoices.vatModes.STANDARD') },
+    {
+      value: UpdateInvoiceDtoVatMode.STANDARD,
+      label: t('invoices.vatModes.STANDARD'),
+    },
     {
       value: UpdateInvoiceDtoVatMode.REVERSE_CHARGE,
       label: t('invoices.vatModes.REVERSE_CHARGE'),
@@ -437,8 +444,14 @@ export default function UpdateInvoice() {
     }),
   );
   const statusOptions = [
-    { value: UpdateInvoiceDtoStatus.DRAFT, label: t('invoices.statuses.DRAFT') },
-    { value: UpdateInvoiceDtoStatus.ISSUED, label: t('invoices.statuses.ISSUED') },
+    {
+      value: UpdateInvoiceDtoStatus.DRAFT,
+      label: t('invoices.statuses.DRAFT'),
+    },
+    {
+      value: UpdateInvoiceDtoStatus.ISSUED,
+      label: t('invoices.statuses.ISSUED'),
+    },
     { value: UpdateInvoiceDtoStatus.PAID, label: t('invoices.statuses.PAID') },
     {
       value: UpdateInvoiceDtoStatus.CANCELLED,
@@ -490,6 +503,23 @@ export default function UpdateInvoice() {
   const dueDays =
     createdDate && dueDate ? daysBetween(createdDate, dueDate) : null;
 
+  // Received invoices are edited as amounts-by-VAT-rate instead of line items.
+  const rates = form.watch('rates') ?? [];
+  const handleRateCellChange = (
+    index: number,
+    field: RateField,
+    rawValue: string,
+  ) => {
+    const rate = form.getValues(`rates.${index}.vatRate`) ?? 0;
+    const next = recomputeRow(rate, field, rawValue);
+    form.setValue(`rates.${index}.base`, next.base);
+    form.setValue(`rates.${index}.vat`, next.vat);
+    form.setValue(`rates.${index}.total`, next.total);
+  };
+  const handleRateTotalOnlyChange = (rawValue: string) =>
+    form.setValue('rates.0.total', rawValue);
+  const rateTotals = sumRates(rates);
+
   const vatMode = form.watch('vatMode');
   const shouldClaimVat = form.watch('shouldClaimVat');
   const vatClaimType = form.watch('vatClaimType');
@@ -500,7 +530,9 @@ export default function UpdateInvoice() {
   const renderContent = () => {
     if (!id) {
       return (
-        <p className="text-muted-foreground">{t('invoices.detail.invalidId')}</p>
+        <p className="text-muted-foreground">
+          {t('invoices.detail.invalidId')}
+        </p>
       );
     }
     if (isLoading) {
@@ -509,7 +541,9 @@ export default function UpdateInvoice() {
       );
     }
     if (isError || !invoiceResponse?.data) {
-      return <p className="text-destructive">{t('invoices.detail.loadError')}</p>;
+      return (
+        <p className="text-destructive">{t('invoices.detail.loadError')}</p>
+      );
     }
 
     return (
@@ -789,104 +823,244 @@ export default function UpdateInvoice() {
             </Card>
           </Collapsible>
 
-          {/* Line items + summary */}
-          <Card className="border-border/60 p-5 shadow-sm">
-            <div className="mb-2.5 flex items-center justify-between">
-              <p className={labelClass}>
-                {t('invoices.sections.items')}
+          {/* Received: amounts by VAT rate (no line items). Issued: line items. */}
+          {isReceived ? (
+            <Card className="border-border/60 p-5 shadow-sm">
+              <p className={cn(labelClass, 'mb-2')}>
+                {t('invoices.create.received.ratesTitle')}
                 <RequiredMark />
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1 px-2.5 text-[11px]"
-                onClick={addItem}
-              >
-                <Plus className="h-3 w-3" />
-                {t('invoices.items.addItem')}
-              </Button>
-            </div>
 
-            <div className="overflow-hidden rounded-lg border">
-              <div
-                className="grid items-center gap-2.5 border-b bg-muted/50 px-3 py-2"
-                style={{ gridTemplateColumns: gridTemplate }}
-              >
-                <span className={colHeadClass}>#</span>
-                <span className={colHeadClass}>
-                  {t('invoices.items.columns.description')}
-                </span>
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.fields.quantity')}
-                </span>
-                <span className={colHeadClass}>
-                  {t('invoices.fields.unit')}
-                </span>
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.fields.unitPrice')}
-                </span>
-                {isVatPayer && (
-                  <span className={cn(colHeadClass, 'text-right')}>
-                    {t('invoices.items.columns.vatRatePct')}
-                  </span>
-                )}
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.summary.total')}
-                </span>
-                <span />
-              </div>
-              {fields.map((field, index) => (
-                <InvoiceItemRow
-                  key={field.id}
-                  form={form}
-                  index={index}
-                  isVatPayer={isVatPayer}
-                  gridTemplate={gridTemplate}
-                  onRecalculate={calculateInvoiceTotals}
-                  onRemove={() => {
-                    removeItem(index);
-                    calculateInvoiceTotals();
-                  }}
-                  canRemove={fields.length > 1}
-                />
-              ))}
-            </div>
-
-            {/* Summary inside the items card — one glance */}
-            <div className="mt-4 flex items-end justify-between border-t pt-3.5">
-              <div className="flex gap-8">
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {isVatPayer
-                      ? t('invoices.summary.subtotal')
-                      : t('invoices.summary.total')}
-                  </p>
-                  <p className="mt-0.5 text-sm font-medium tabular-nums">
-                    {formatMoney(subtotal)}
-                  </p>
+              {isVatPayer ? (
+                <div className="overflow-hidden rounded-lg border">
+                  <div className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b bg-muted/50 px-3.5 py-2 sm:grid-cols-[80px_1fr_1fr_1fr]">
+                    <span className={colHeadClass}>
+                      {t('simpleInvoices.create.rates.rate')}
+                    </span>
+                    <span className={cn(colHeadClass, 'text-right')}>
+                      {t('simpleInvoices.create.rates.base')}
+                    </span>
+                    <span className={cn(colHeadClass, 'text-right')}>
+                      {t('simpleInvoices.create.rates.vat')}
+                    </span>
+                    <span className={cn(colHeadClass, 'text-right')}>
+                      {t('simpleInvoices.create.rates.totalWithVat')}
+                    </span>
+                  </div>
+                  {rates.map((row, index) => {
+                    const isEmpty = !(Number(row.total) > 0);
+                    const cellClass = (value: string) =>
+                      cn(
+                        'h-8 text-right text-sm tabular-nums',
+                        !value && 'border-dashed',
+                      );
+                    return (
+                      <div
+                        key={row.vatRate}
+                        className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[80px_1fr_1fr_1fr]"
+                      >
+                        <span
+                          className={cn(
+                            'text-sm font-semibold tabular-nums',
+                            isEmpty && 'text-muted-foreground/70',
+                          )}
+                        >
+                          {row.vatRate} %
+                        </span>
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          step="any"
+                          min={0}
+                          placeholder="0"
+                          value={row.base}
+                          onChange={(e) =>
+                            handleRateCellChange(index, 'base', e.target.value)
+                          }
+                          className={cellClass(row.base)}
+                        />
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          step="any"
+                          min={0}
+                          placeholder="0"
+                          value={row.vat}
+                          onChange={(e) =>
+                            handleRateCellChange(index, 'vat', e.target.value)
+                          }
+                          disabled={row.vatRate === 0}
+                          className={cellClass(row.vat)}
+                        />
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          step="any"
+                          min={0}
+                          placeholder="0"
+                          value={row.total}
+                          onChange={(e) =>
+                            handleRateCellChange(index, 'total', e.target.value)
+                          }
+                          className={cellClass(row.total)}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-                {isVatPayer && (
+              ) : (
+                <div className="space-y-1.5">
+                  <p className={labelClass}>
+                    {t('invoices.create.received.totalAmount')}
+                  </p>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    step="any"
+                    min={0}
+                    placeholder="0"
+                    value={rates[0]?.total ?? ''}
+                    onChange={(e) => handleRateTotalOnlyChange(e.target.value)}
+                    className="text-right tabular-nums"
+                  />
+                </div>
+              )}
+
+              {/* Totals */}
+              <div className="mt-4 flex items-end justify-between border-t pt-3.5">
+                <div className="flex gap-8">
                   <div>
                     <p className="text-xs text-muted-foreground">
-                      {t('invoices.summary.totalTax')}
+                      {isVatPayer
+                        ? t('invoices.create.received.baseTotal')
+                        : t('invoices.create.received.totalDue')}
                     </p>
-                    <p className="mt-0.5 text-sm font-medium tabular-nums text-foreground/70">
-                      {formatMoney(totalTax)}
+                    <p className="mt-0.5 text-sm font-medium tabular-nums">
+                      {formatMoney(
+                        isVatPayer ? rateTotals.base : rateTotals.total,
+                      )}
                     </p>
                   </div>
-                )}
+                  {isVatPayer && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">
+                        {t('invoices.create.received.vatTotal')}
+                      </p>
+                      <p className="mt-0.5 text-sm font-medium tabular-nums text-foreground/70">
+                        {formatMoney(rateTotals.vat)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">
+                    {t('invoices.create.received.totalDue')}
+                  </p>
+                  <p className="mt-0.5 text-2xl font-bold tracking-tight tabular-nums">
+                    {formatMoney(rateTotals.total)}
+                  </p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">
-                  {t('invoices.summary.totalDue')}
+            </Card>
+          ) : (
+            <Card className="border-border/60 p-5 shadow-sm">
+              <div className="mb-2.5 flex items-center justify-between">
+                <p className={labelClass}>
+                  {t('invoices.sections.items')}
+                  <RequiredMark />
                 </p>
-                <p className="mt-0.5 text-2xl font-bold tracking-tight tabular-nums">
-                  {formatMoney(totalWithTax)}
-                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1 px-2.5 text-[11px]"
+                  onClick={addItem}
+                >
+                  <Plus className="h-3 w-3" />
+                  {t('invoices.items.addItem')}
+                </Button>
               </div>
-            </div>
-          </Card>
+
+              <div className="overflow-hidden rounded-lg border">
+                <div
+                  className="grid items-center gap-2.5 border-b bg-muted/50 px-3 py-2"
+                  style={{ gridTemplateColumns: gridTemplate }}
+                >
+                  <span className={colHeadClass}>#</span>
+                  <span className={colHeadClass}>
+                    {t('invoices.items.columns.description')}
+                  </span>
+                  <span className={cn(colHeadClass, 'text-right')}>
+                    {t('invoices.fields.quantity')}
+                  </span>
+                  <span className={colHeadClass}>
+                    {t('invoices.fields.unit')}
+                  </span>
+                  <span className={cn(colHeadClass, 'text-right')}>
+                    {t('invoices.fields.unitPrice')}
+                  </span>
+                  {isVatPayer && (
+                    <span className={cn(colHeadClass, 'text-right')}>
+                      {t('invoices.items.columns.vatRatePct')}
+                    </span>
+                  )}
+                  <span className={cn(colHeadClass, 'text-right')}>
+                    {t('invoices.summary.total')}
+                  </span>
+                  <span />
+                </div>
+                {fields.map((field, index) => (
+                  <InvoiceItemRow
+                    key={field.id}
+                    form={form}
+                    index={index}
+                    isVatPayer={isVatPayer}
+                    gridTemplate={gridTemplate}
+                    onRecalculate={calculateInvoiceTotals}
+                    onRemove={() => {
+                      removeItem(index);
+                      calculateInvoiceTotals();
+                    }}
+                    canRemove={fields.length > 1}
+                  />
+                ))}
+              </div>
+
+              {/* Summary inside the items card — one glance */}
+              <div className="mt-4 flex items-end justify-between border-t pt-3.5">
+                <div className="flex gap-8">
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      {isVatPayer
+                        ? t('invoices.summary.subtotal')
+                        : t('invoices.summary.total')}
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium tabular-nums">
+                      {formatMoney(subtotal)}
+                    </p>
+                  </div>
+                  {isVatPayer && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">
+                        {t('invoices.summary.totalTax')}
+                      </p>
+                      <p className="mt-0.5 text-sm font-medium tabular-nums text-foreground/70">
+                        {formatMoney(totalTax)}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">
+                    {t('invoices.summary.totalDue')}
+                  </p>
+                  <p className="mt-0.5 text-2xl font-bold tracking-tight tabular-nums">
+                    {formatMoney(totalWithTax)}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Status & bookkeeping */}
           <Card className="border-border/60 p-5 shadow-sm">
@@ -940,7 +1114,9 @@ export default function UpdateInvoice() {
                         options={[
                           {
                             value: UpdateInvoiceDtoVatClaimType.FULL,
-                            label: t('invoices.vatClaim.claimType.options.FULL'),
+                            label: t(
+                              'invoices.vatClaim.claimType.options.FULL',
+                            ),
                           },
                           {
                             value: UpdateInvoiceDtoVatClaimType.PARTIAL,
@@ -950,14 +1126,17 @@ export default function UpdateInvoice() {
                           },
                         ]}
                       />
-                      {vatClaimType === UpdateInvoiceDtoVatClaimType.PARTIAL && (
+                      {vatClaimType ===
+                        UpdateInvoiceDtoVatClaimType.PARTIAL && (
                         <TextField
                           control={form.control}
                           name="vatClaimRatio"
                           type="number"
                           step="0.01"
                           label={t('invoices.vatClaim.claimRatio.label')}
-                          placeholder={t('invoices.vatClaim.claimRatio.placeholder')}
+                          placeholder={t(
+                            'invoices.vatClaim.claimRatio.placeholder',
+                          )}
                           hint={t('invoices.vatClaim.claimRatio.hint')}
                           rules={{
                             required: t(

@@ -467,6 +467,7 @@
     "empty": "Zatím nemáte evidovaný žádný zjednodušený doklad.",
     "loading": "Načítám zjednodušené doklady…",
     "error": "Nepodařilo se načíst zjednodušené doklady. Zkuste načtení zopakovat.",
+    "noMatches": "Žádné doklady neodpovídají hledání.",
     "stats": {
       "count": "Počet dokladů",
       "totalVat": "Celkové DPH",
@@ -581,6 +582,22 @@
       "messages": {
         "created": "Zjednodušený doklad byl vytvořen.",
         "createFailed": "Vytvoření zjednodušeného dokladu se nepodařilo."
+      }
+    },
+    "update": {
+      "title": "Upravit zjednodušený doklad",
+      "description": "Upravte údaje dokladu a uložte změny.",
+      "back": "Zpět na doklady",
+      "loading": "Načítám doklad…",
+      "loadError": "Doklad se nepodařilo načíst.",
+      "actions": {
+        "cancel": "Zrušit",
+        "save": "Uložit změny",
+        "submitting": "Ukládám…"
+      },
+      "messages": {
+        "updated": "Změny byly uloženy.",
+        "updateFailed": "Uložení změn se nepodařilo."
       }
     }
   },

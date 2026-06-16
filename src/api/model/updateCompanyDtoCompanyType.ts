@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateCompanyDtoCompanyType = typeof UpdateCompanyDtoCompanyType[keyof typeof UpdateCompanyDtoCompanyType];
-
+export type UpdateCompanyDtoCompanyType =
+  (typeof UpdateCompanyDtoCompanyType)[keyof typeof UpdateCompanyDtoCompanyType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateCompanyDtoCompanyType = {

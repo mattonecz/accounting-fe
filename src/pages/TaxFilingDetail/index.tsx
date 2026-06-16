@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useQueryClient } from '@tanstack/react-query';
-import { Calculator, Download, Send, TrendingDown, TrendingUp } from 'lucide-react';
+import {
+  Calculator,
+  Download,
+  Send,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
 import { useDataMessagesSubmitTax } from '@/api/data-messages/data-messages';
 import {
   downloadTaxFilingKhXml,
@@ -25,7 +31,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatMoney } from '@/lib/formatters';
 
-const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const InfoRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) => (
   <div className="flex items-center justify-between border-b border-border/60 py-2 last:border-0">
     <span className="text-sm text-muted-foreground">{label}</span>
     <span className="text-sm font-medium">{value}</span>
@@ -56,7 +68,9 @@ const TaxFilingDetail = () => {
   if (!id) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">{t('taxFilings.detail.invalidId')}</p>
+        <p className="text-muted-foreground">
+          {t('taxFilings.detail.invalidId')}
+        </p>
       </PageLayout>
     );
   }
@@ -64,7 +78,9 @@ const TaxFilingDetail = () => {
   if (isLoading) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">{t('taxFilings.detail.loading')}</p>
+        <p className="text-muted-foreground">
+          {t('taxFilings.detail.loading')}
+        </p>
       </PageLayout>
     );
   }
@@ -96,10 +112,14 @@ const TaxFilingDetail = () => {
     try {
       const response = await submitTax.mutateAsync({ taxFilingId: filing.id });
       if (response.data.success) {
-        enqueueSnackbar(t('taxFilings.detail.submitSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('taxFilings.detail.submitSuccess'), {
+          variant: 'success',
+        });
       } else {
         enqueueSnackbar(
-          t('taxFilings.detail.submitFailed', { message: response.data.statusMessage }),
+          t('taxFilings.detail.submitFailed', {
+            message: response.data.statusMessage,
+          }),
           { variant: 'error' },
         );
       }
@@ -128,7 +148,9 @@ const TaxFilingDetail = () => {
       link.click();
       URL.revokeObjectURL(url);
     } catch {
-      enqueueSnackbar(t('taxFilings.detail.downloadError'), { variant: 'error' });
+      enqueueSnackbar(t('taxFilings.detail.downloadError'), {
+        variant: 'error',
+      });
     } finally {
       setDownloading(null);
     }
@@ -181,12 +203,13 @@ const TaxFilingDetail = () => {
         }
       />
 
-      {filing.status === TaxFilingResponseDtoStatus.FAILED && filing.errorMessage && (
-        <Alert variant="destructive">
-          <AlertTitle>{t('taxFilings.detail.errorTitle')}</AlertTitle>
-          <AlertDescription>{filing.errorMessage}</AlertDescription>
-        </Alert>
-      )}
+      {filing.status === TaxFilingResponseDtoStatus.FAILED &&
+        filing.errorMessage && (
+          <Alert variant="destructive">
+            <AlertTitle>{t('taxFilings.detail.errorTitle')}</AlertTitle>
+            <AlertDescription>{filing.errorMessage}</AlertDescription>
+          </Alert>
+        )}
 
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard
@@ -212,7 +235,9 @@ const TaxFilingDetail = () => {
                 : t('taxFilings.statCards.vatRefund')
               : undefined
           }
-          variant={summary && summary.payableVat < 0 ? 'success' : 'destructive'}
+          variant={
+            summary && summary.payableVat < 0 ? 'success' : 'destructive'
+          }
         />
       </div>
 
@@ -239,7 +264,9 @@ const TaxFilingDetail = () => {
           />
           <InfoRow
             label={t('taxFilings.detail.submissionDate')}
-            value={filing.submissionDate ? formatDate(filing.submissionDate) : '–'}
+            value={
+              filing.submissionDate ? formatDate(filing.submissionDate) : '–'
+            }
           />
         </div>
       </FormCard>

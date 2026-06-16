@@ -466,6 +466,7 @@
     "empty": "No simple invoices recorded yet.",
     "loading": "Loading simple invoices…",
     "error": "Failed to load simple invoices. Please try again.",
+    "noMatches": "No documents match your search.",
     "stats": {
       "count": "Document Count",
       "totalVat": "Total VAT",
@@ -580,6 +581,22 @@
       "messages": {
         "created": "Simple invoice created successfully.",
         "createFailed": "Failed to create simple invoice."
+      }
+    },
+    "update": {
+      "title": "Edit simplified receipt",
+      "description": "Update the document details and save your changes.",
+      "back": "Back to receipts",
+      "loading": "Loading document…",
+      "loadError": "Failed to load the document.",
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "submitting": "Saving…"
+      },
+      "messages": {
+        "updated": "Changes saved.",
+        "updateFailed": "Failed to save changes."
       }
     }
   },

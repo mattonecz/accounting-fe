@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type TaxFilingDetailResponseDtoStatus = typeof TaxFilingDetailResponseDtoStatus[keyof typeof TaxFilingDetailResponseDtoStatus];
-
+export type TaxFilingDetailResponseDtoStatus =
+  (typeof TaxFilingDetailResponseDtoStatus)[keyof typeof TaxFilingDetailResponseDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaxFilingDetailResponseDtoStatus = {

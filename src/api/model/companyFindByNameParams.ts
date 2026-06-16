@@ -7,5 +7,5 @@
  */
 
 export type CompanyFindByNameParams = {
-name: string;
+  name: string;
 };

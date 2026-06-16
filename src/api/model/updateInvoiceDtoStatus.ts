@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateInvoiceDtoStatus = typeof UpdateInvoiceDtoStatus[keyof typeof UpdateInvoiceDtoStatus];
-
+export type UpdateInvoiceDtoStatus =
+  (typeof UpdateInvoiceDtoStatus)[keyof typeof UpdateInvoiceDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateInvoiceDtoStatus = {

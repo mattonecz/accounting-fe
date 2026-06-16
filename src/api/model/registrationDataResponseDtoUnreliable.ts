@@ -10,4 +10,6 @@
  * True if flagged unreliable (nespolehlivý plátce), false if reliable, null when not found.
  * @nullable
  */
-export type RegistrationDataResponseDtoUnreliable = { [key: string]: unknown } | null;
+export type RegistrationDataResponseDtoUnreliable = {
+  [key: string]: unknown;
+} | null;

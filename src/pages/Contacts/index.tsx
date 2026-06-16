@@ -8,8 +8,12 @@ import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
 
-const formatAddress = (contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>) =>
-  [contact.street, contact.psc, contact.city, contact.country].filter(Boolean).join(', ');
+const formatAddress = (
+  contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>,
+) =>
+  [contact.street, contact.psc, contact.city, contact.country]
+    .filter(Boolean)
+    .join(', ');
 
 export default function Contacts() {
   const { t } = useTranslation();
@@ -17,8 +21,16 @@ export default function Contacts() {
   const { data: contactsResponse } = useListContacts();
 
   const columns = [
-    { header: t('contacts.columns.name'), cell: (c: ContactResponseDto) => <span className="font-medium">{c.name}</span> },
-    { header: t('contacts.columns.ico'), cell: (c: ContactResponseDto) => c.ico },
+    {
+      header: t('contacts.columns.name'),
+      cell: (c: ContactResponseDto) => (
+        <span className="font-medium">{c.name}</span>
+      ),
+    },
+    {
+      header: t('contacts.columns.ico'),
+      cell: (c: ContactResponseDto) => c.ico,
+    },
     {
       header: t('contacts.columns.address'),
       cell: (c: ContactResponseDto) => (

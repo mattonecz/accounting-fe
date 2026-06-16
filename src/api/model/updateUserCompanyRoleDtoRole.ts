@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateUserCompanyRoleDtoRole = typeof UpdateUserCompanyRoleDtoRole[keyof typeof UpdateUserCompanyRoleDtoRole];
-
+export type UpdateUserCompanyRoleDtoRole =
+  (typeof UpdateUserCompanyRoleDtoRole)[keyof typeof UpdateUserCompanyRoleDtoRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateUserCompanyRoleDtoRole = {

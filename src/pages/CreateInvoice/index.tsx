@@ -7,7 +7,14 @@ import {
   UseControllerProps,
   UseFormReturn,
 } from 'react-hook-form';
-import { ArrowLeft, Check, ChevronDown, Loader2, Plus, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  Loader2,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
   Form,
@@ -33,7 +40,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { useInvoiceForm, type InvoiceFormValues } from '@/components/invoices/useInvoiceForm';
+import {
+  useInvoiceForm,
+  type InvoiceFormValues,
+} from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
 import {
   CreateInvoiceDtoPaymentMethod,
@@ -116,9 +126,7 @@ const TextField = ({
             }
           />
         </FormControl>
-        {hint && (
-          <p className="text-[11px] text-muted-foreground/80">{hint}</p>
-        )}
+        {hint && <p className="text-[11px] text-muted-foreground/80">{hint}</p>}
         <FormMessage />
       </FormItem>
     )}
@@ -403,18 +411,21 @@ const CreateIssuedInvoice = () => {
     { value: 'USD', label: t('currencies.USD') },
   ];
   const vatModeOptions = [
-    { value: CreateInvoiceDtoVatMode.STANDARD, label: t('invoices.vatModes.STANDARD') },
+    {
+      value: CreateInvoiceDtoVatMode.STANDARD,
+      label: t('invoices.vatModes.STANDARD'),
+    },
     {
       value: CreateInvoiceDtoVatMode.REVERSE_CHARGE,
       label: t('invoices.vatModes.REVERSE_CHARGE'),
     },
   ];
-  const paymentMethodOptions = Object.values(
-    CreateInvoiceDtoPaymentMethod,
-  ).map((method) => ({
-    value: method,
-    label: t(`invoices.paymentMethods.${method}`),
-  }));
+  const paymentMethodOptions = Object.values(CreateInvoiceDtoPaymentMethod).map(
+    (method) => ({
+      value: method,
+      label: t(`invoices.paymentMethods.${method}`),
+    }),
+  );
 
   const defaultItem = {
     name: '',
@@ -955,7 +966,9 @@ const CreateIssuedInvoice = () => {
                         options={[
                           {
                             value: CreateInvoiceDtoVatClaimType.FULL,
-                            label: t('invoices.vatClaim.claimType.options.FULL'),
+                            label: t(
+                              'invoices.vatClaim.claimType.options.FULL',
+                            ),
                           },
                           {
                             value: CreateInvoiceDtoVatClaimType.PARTIAL,
@@ -965,14 +978,17 @@ const CreateIssuedInvoice = () => {
                           },
                         ]}
                       />
-                      {vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL && (
+                      {vatClaimType ===
+                        CreateInvoiceDtoVatClaimType.PARTIAL && (
                         <TextField
                           control={form.control}
                           name="vatClaimRatio"
                           type="number"
                           step="0.01"
                           label={t('invoices.vatClaim.claimRatio.label')}
-                          placeholder={t('invoices.vatClaim.claimRatio.placeholder')}
+                          placeholder={t(
+                            'invoices.vatClaim.claimRatio.placeholder',
+                          )}
                           hint={t('invoices.vatClaim.claimRatio.hint')}
                           rules={{
                             required: t(

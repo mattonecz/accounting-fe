@@ -55,7 +55,7 @@ const paymentMethodSchema = z.enum([
 type PaymentFormValues = {
   amount: string;
   paymentDate: string;
-  paymentMethod: typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod];
+  paymentMethod: (typeof CreatePaymentDtoPaymentMethod)[keyof typeof CreatePaymentDtoPaymentMethod];
   reference: string;
 };
 
@@ -90,11 +90,11 @@ const getDefaultAmount = (invoice: InvoiceResponseDto) => {
 
 const getDefaultPaymentMethod = (
   invoice: InvoicePaymentSource,
-): typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod] => {
+): (typeof CreatePaymentDtoPaymentMethod)[keyof typeof CreatePaymentDtoPaymentMethod] => {
   const pm = invoice.paymentMethod;
   const values = Object.values(CreatePaymentDtoPaymentMethod) as string[];
   if (pm && values.includes(pm as string)) {
-    return pm as typeof CreatePaymentDtoPaymentMethod[keyof typeof CreatePaymentDtoPaymentMethod];
+    return pm as (typeof CreatePaymentDtoPaymentMethod)[keyof typeof CreatePaymentDtoPaymentMethod];
   }
   return CreatePaymentDtoPaymentMethod.BANK_TRANSFER;
 };
@@ -153,10 +153,22 @@ export function RecordPaymentDialog({
   }, [defaultValues, form, open]);
 
   const paymentMethodOptions = [
-    { value: CreatePaymentDtoPaymentMethod.BANK_TRANSFER, label: t('invoices.paymentMethods.BANK_TRANSFER') },
-    { value: CreatePaymentDtoPaymentMethod.CASH, label: t('invoices.paymentMethods.CASH') },
-    { value: CreatePaymentDtoPaymentMethod.CARD, label: t('invoices.paymentMethods.CARD') },
-    { value: CreatePaymentDtoPaymentMethod.OTHER, label: t('invoices.paymentMethods.OTHER') },
+    {
+      value: CreatePaymentDtoPaymentMethod.BANK_TRANSFER,
+      label: t('invoices.paymentMethods.BANK_TRANSFER'),
+    },
+    {
+      value: CreatePaymentDtoPaymentMethod.CASH,
+      label: t('invoices.paymentMethods.CASH'),
+    },
+    {
+      value: CreatePaymentDtoPaymentMethod.CARD,
+      label: t('invoices.paymentMethods.CARD'),
+    },
+    {
+      value: CreatePaymentDtoPaymentMethod.OTHER,
+      label: t('invoices.paymentMethods.OTHER'),
+    },
   ];
 
   const handleSubmit = (values: PaymentFormValues) => {
@@ -172,12 +184,20 @@ export function RecordPaymentDialog({
       },
       {
         onSuccess: async () => {
-          enqueueSnackbar(t('payments.messages.recordSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('payments.messages.recordSuccess'), {
+            variant: 'success',
+          });
 
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: getInvoiceListByCompanyQueryKey() }),
-            queryClient.invalidateQueries({ queryKey: getInvoiceGetQueryKey(invoice.id) }),
-            queryClient.invalidateQueries({ queryKey: getPaymentListByInvoiceQueryKey(invoice.id) }),
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceListByCompanyQueryKey(),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceGetQueryKey(invoice.id),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getPaymentListByInvoiceQueryKey(invoice.id),
+            }),
           ]);
 
           onSuccess?.();
@@ -185,7 +205,9 @@ export function RecordPaymentDialog({
           form.reset(defaultValues);
         },
         onError: () => {
-          enqueueSnackbar(t('payments.messages.recordError'), { variant: 'error' });
+          enqueueSnackbar(t('payments.messages.recordError'), {
+            variant: 'error',
+          });
         },
       },
     );
@@ -212,11 +234,16 @@ export function RecordPaymentDialog({
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle>{t('payments.actions.record')}</DialogTitle>
-          <DialogDescription>{t('invoices.fields.number')} {invoice.number}</DialogDescription>
+          <DialogDescription>
+            {t('invoices.fields.number')} {invoice.number}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="paymentDate"
@@ -238,7 +265,12 @@ export function RecordPaymentDialog({
                 <FormItem>
                   <FormLabel>{t('payments.fields.amount')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="1" inputMode="decimal" {...field} />
+                    <Input
+                      type="number"
+                      step="1"
+                      inputMode="decimal"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -268,7 +300,9 @@ export function RecordPaymentDialog({
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('payments.placeholders.method')} />
+                        <SelectValue
+                          placeholder={t('payments.placeholders.method')}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -285,7 +319,12 @@ export function RecordPaymentDialog({
             />
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isPending}
+              >
                 {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>

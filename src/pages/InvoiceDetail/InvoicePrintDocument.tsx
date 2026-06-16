@@ -3,7 +3,11 @@
 // deterministic regardless of theme/dark-mode and safe for html2canvas (no oklch/tokens).
 import { useEffect, useState, type RefObject } from 'react';
 import QRCode from 'qrcode';
-import type { CompanyResponseDto, ContactSnapshotDto, InvoiceResponseDto } from '@/api/model';
+import type {
+  CompanyResponseDto,
+  ContactSnapshotDto,
+  InvoiceResponseDto,
+} from '@/api/model';
 import { formatDate, formatMoney } from './utils';
 import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
 
@@ -27,7 +31,9 @@ const companyToParty = (company?: CompanyResponseDto): Party => {
   const line1 = [company?.street, houseLine].filter(Boolean).join(' ');
   const line2 = [company?.psc, company?.city].filter(Boolean).join(' ');
   const country =
-    company?.country && company.country.toUpperCase() !== 'CZ' ? company.country : undefined;
+    company?.country && company.country.toUpperCase() !== 'CZ'
+      ? company.country
+      : undefined;
   return {
     name: company?.companyName || company?.name || '—',
     ico: company?.ico,
@@ -40,7 +46,9 @@ const contactToParty = (contact?: ContactSnapshotDto): Party => {
   const line1 = contact?.street;
   const line2 = [contact?.psc, contact?.city].filter(Boolean).join(' ');
   const country =
-    contact?.country && contact.country.toUpperCase() !== 'CZ' ? contact.country : undefined;
+    contact?.country && contact.country.toUpperCase() !== 'CZ'
+      ? contact.country
+      : undefined;
   return {
     name: contact?.name || '—',
     ico: contact?.ico,
@@ -57,7 +65,10 @@ const buildSpayd = (invoice: InvoiceResponseDto): string | null => {
 
   const swift = invoice.bankSnapshot?.swift?.replace(/\s+/g, '').toUpperCase();
   const acc = swift ? `${iban}+${swift}` : iban;
-  const vs = (invoice.variableSymbol || invoice.number || '').replace(/\D/g, '');
+  const vs = (invoice.variableSymbol || invoice.number || '').replace(
+    /\D/g,
+    '',
+  );
   const msg = `FAKTURA ${invoice.number ?? ''}`.trim().slice(0, 60);
 
   const fields = [
@@ -84,7 +95,9 @@ const Row = ({
 }) => (
   <div className="pf-row">
     <span className="k">{label}</span>
-    <span className={`v${mono ? ' tnum' : ''}${accent ? ' accent' : ''}`}>{value || '—'}</span>
+    <span className={`v${mono ? ' tnum' : ''}${accent ? ' accent' : ''}`}>
+      {value || '—'}
+    </span>
   </div>
 );
 
@@ -97,8 +110,12 @@ export const InvoicePrintDocument = ({
   const isReceived = invoice.type === 'RECEIVED';
 
   // The party that issued the document goes top-left + masthead; the recipient top-right.
-  const supplier = isReceived ? contactToParty(invoice.contactSnapshot) : companyToParty(company);
-  const customer = isReceived ? companyToParty(company) : contactToParty(invoice.contactSnapshot);
+  const supplier = isReceived
+    ? contactToParty(invoice.contactSnapshot)
+    : companyToParty(company);
+  const customer = isReceived
+    ? companyToParty(company)
+    : contactToParty(invoice.contactSnapshot);
 
   const bank = invoice.bankSnapshot;
   const variableSymbol = invoice.variableSymbol || invoice.number;
@@ -118,8 +135,12 @@ export const InvoicePrintDocument = ({
     .map(([rate, value]) => ({ rate, ...value }));
   const hasVat = toNumber(invoice.totalTax) > 0;
 
-  const paidAmount = (invoice.payments ?? []).reduce((sum, p) => sum + Number(p.amount ?? 0), 0);
-  const fullyPaid = paidAmount > 0 && paidAmount + 0.01 >= toNumber(invoice.totalWithTax);
+  const paidAmount = (invoice.payments ?? []).reduce(
+    (sum, p) => sum + Number(p.amount ?? 0),
+    0,
+  );
+  const fullyPaid =
+    paidAmount > 0 && paidAmount + 0.01 >= toNumber(invoice.totalWithTax);
   const lastPaymentDate = (invoice.payments ?? [])
     .map((p) => p.paymentDate)
     .filter(Boolean)
@@ -134,7 +155,11 @@ export const InvoicePrintDocument = ({
       setQrUrl(null);
       return;
     }
-    QRCode.toDataURL(spayd, { margin: 0, width: 256, errorCorrectionLevel: 'M' })
+    QRCode.toDataURL(spayd, {
+      margin: 0,
+      width: 256,
+      errorCorrectionLevel: 'M',
+    })
       .then((url) => active && setQrUrl(url))
       .catch(() => active && setQrUrl(null));
     return () => {
@@ -164,7 +189,8 @@ export const InvoicePrintDocument = ({
           </div>
           <div className="pf-title">
             <h1>
-              Faktura <span className="pf-num tnum">{invoice.number || ''}</span>
+              Faktura{' '}
+              <span className="pf-num tnum">{invoice.number || ''}</span>
             </h1>
             {hasVat && <div className="pf-kind">Daňový doklad</div>}
           </div>
@@ -188,7 +214,12 @@ export const InvoicePrintDocument = ({
             <div className="pf-kv spaced">
               <Row label="Bankovní účet" value={bank?.number} mono />
               {bank?.iban && <Row label="IBAN" value={bank.iban} mono />}
-              <Row label="Variabilní symbol" value={variableSymbol} mono accent />
+              <Row
+                label="Variabilní symbol"
+                value={variableSymbol}
+                mono
+                accent
+              />
               <Row label="Způsob platby" value="Převodem" />
             </div>
           </div>
@@ -205,9 +236,23 @@ export const InvoicePrintDocument = ({
               <Row label="DIČ" value={customer.dic} mono />
             </div>
             <div className="pf-kv spaced">
-              <Row label="Datum vystavení" value={formatDate(invoice.createdDate)} mono />
-              <Row label="Datum splatnosti" value={formatDate(invoice.dueDate)} mono />
-              {hasVat && <Row label="Datum zdan. plnění" value={formatDate(invoice.duzpDate)} mono />}
+              <Row
+                label="Datum vystavení"
+                value={formatDate(invoice.createdDate)}
+                mono
+              />
+              <Row
+                label="Datum splatnosti"
+                value={formatDate(invoice.dueDate)}
+                mono
+              />
+              {hasVat && (
+                <Row
+                  label="Datum zdan. plnění"
+                  value={formatDate(invoice.duzpDate)}
+                  mono
+                />
+              )}
             </div>
           </div>
         </div>
@@ -234,8 +279,12 @@ export const InvoicePrintDocument = ({
                     {quantity}
                     {item.unit ? ` ${item.unit}` : ''}
                   </td>
-                  {hasVat && <td className="tnum">{toNumber(item.vatRate)} %</td>}
-                  <td className="tnum">{formatMoney(item.unitPrice, currency)}</td>
+                  {hasVat && (
+                    <td className="tnum">{toNumber(item.vatRate)} %</td>
+                  )}
+                  <td className="tnum">
+                    {formatMoney(item.unitPrice, currency)}
+                  </td>
                   <td className="tnum amt">{formatMoney(base, currency)}</td>
                 </tr>
               );
@@ -282,7 +331,9 @@ export const InvoicePrintDocument = ({
             )}
             <div className="pf-total">
               <span className="t">Celkem k úhradě</span>
-              <span className="a tnum">{formatMoney(invoice.totalWithTax, currency)}</span>
+              <span className="a tnum">
+                {formatMoney(invoice.totalWithTax, currency)}
+              </span>
             </div>
             {fullyPaid && (
               <div className="pf-paidwrap">
@@ -306,9 +357,7 @@ export const InvoicePrintDocument = ({
         {/* Footer */}
         <div className="pf-foot">
           <div className="pf-legal">
-            {hasVat
-              ? 'Daňový doklad dle zákona č. 235/2004 Sb., o DPH. '
-              : ''}
+            {hasVat ? 'Daňový doklad dle zákona č. 235/2004 Sb., o DPH. ' : ''}
             Vystaveno elektronicky, platné i bez podpisu a razítka.
           </div>
         </div>

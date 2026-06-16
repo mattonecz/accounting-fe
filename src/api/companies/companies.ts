@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,15 +18,11 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   CompanyFindByNameParams,
@@ -37,551 +30,862 @@ import type {
   CreateCompanyDto,
   IsdsSettingsDto,
   UpdateCompanyDto,
-  UpdateIsdsCredentialsDto
+  UpdateIsdsCredentialsDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Create company
  */
 export const companyCreate = (
-    createCompanyDto: CreateCompanyDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompanyResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/companies`,
-      createCompanyDto,options
-    );
-  }
+  createCompanyDto: CreateCompanyDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<CompanyResponseDto>> => {
+  return axios.default.post(`/companies`, createCompanyDto, options);
+};
 
+export const getCompanyCreateMutationOptions = <
+  TError = AxiosError<CompanyResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof companyCreate>>,
+    TError,
+    { data: CreateCompanyDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof companyCreate>>,
+  TError,
+  { data: CreateCompanyDto },
+  TContext
+> => {
+  const mutationKey = ['companyCreate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof companyCreate>>,
+    { data: CreateCompanyDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getCompanyCreateMutationOptions = <TError = AxiosError<CompanyResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyCreate>>, TError,{data: CreateCompanyDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof companyCreate>>, TError,{data: CreateCompanyDto}, TContext> => {
+    return companyCreate(data, axiosOptions);
+  };
 
-const mutationKey = ['companyCreate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type CompanyCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof companyCreate>>
+>;
+export type CompanyCreateMutationBody = CreateCompanyDto;
+export type CompanyCreateMutationError = AxiosError<CompanyResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof companyCreate>>, {data: CreateCompanyDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  companyCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CompanyCreateMutationResult = NonNullable<Awaited<ReturnType<typeof companyCreate>>>
-    export type CompanyCreateMutationBody = CreateCompanyDto
-    export type CompanyCreateMutationError = AxiosError<CompanyResponseDto>
-
-    /**
+/**
  * @summary Create company
  */
-export const useCompanyCreate = <TError = AxiosError<CompanyResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyCreate>>, TError,{data: CreateCompanyDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof companyCreate>>,
-        TError,
-        {data: CreateCompanyDto},
-        TContext
-      > => {
+export const useCompanyCreate = <
+  TError = AxiosError<CompanyResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof companyCreate>>,
+      TError,
+      { data: CreateCompanyDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof companyCreate>>,
+  TError,
+  { data: CreateCompanyDto },
+  TContext
+> => {
+  const mutationOptions = getCompanyCreateMutationOptions(options);
 
-      const mutationOptions = getCompanyCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Update company
  */
 export const companyUpdate = (
-    updateCompanyDto: UpdateCompanyDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompanyResponseDto>> => {
-    
-    
-    return axios.default.patch(
-      `/companies`,
-      updateCompanyDto,options
-    );
-  }
+  updateCompanyDto: UpdateCompanyDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<CompanyResponseDto>> => {
+  return axios.default.patch(`/companies`, updateCompanyDto, options);
+};
 
+export const getCompanyUpdateMutationOptions = <
+  TError = AxiosError<CompanyResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof companyUpdate>>,
+    TError,
+    { data: UpdateCompanyDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof companyUpdate>>,
+  TError,
+  { data: UpdateCompanyDto },
+  TContext
+> => {
+  const mutationKey = ['companyUpdate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof companyUpdate>>,
+    { data: UpdateCompanyDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getCompanyUpdateMutationOptions = <TError = AxiosError<CompanyResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdate>>, TError,{data: UpdateCompanyDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof companyUpdate>>, TError,{data: UpdateCompanyDto}, TContext> => {
+    return companyUpdate(data, axiosOptions);
+  };
 
-const mutationKey = ['companyUpdate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type CompanyUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof companyUpdate>>
+>;
+export type CompanyUpdateMutationBody = UpdateCompanyDto;
+export type CompanyUpdateMutationError = AxiosError<CompanyResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof companyUpdate>>, {data: UpdateCompanyDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  companyUpdate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CompanyUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof companyUpdate>>>
-    export type CompanyUpdateMutationBody = UpdateCompanyDto
-    export type CompanyUpdateMutationError = AxiosError<CompanyResponseDto>
-
-    /**
+/**
  * @summary Update company
  */
-export const useCompanyUpdate = <TError = AxiosError<CompanyResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdate>>, TError,{data: UpdateCompanyDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof companyUpdate>>,
-        TError,
-        {data: UpdateCompanyDto},
-        TContext
-      > => {
+export const useCompanyUpdate = <
+  TError = AxiosError<CompanyResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof companyUpdate>>,
+      TError,
+      { data: UpdateCompanyDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof companyUpdate>>,
+  TError,
+  { data: UpdateCompanyDto },
+  TContext
+> => {
+  const mutationOptions = getCompanyUpdateMutationOptions(options);
 
-      const mutationOptions = getCompanyUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Set company ISDS (datové schránky) credentials
  */
 export const companyUpdateIsdsCredentials = (
-    updateIsdsCredentialsDto: UpdateIsdsCredentialsDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<IsdsSettingsDto>> => {
-    
-    
-    return axios.default.patch(
-      `/companies/isds-credentials`,
-      updateIsdsCredentialsDto,options
-    );
-  }
+  updateIsdsCredentialsDto: UpdateIsdsCredentialsDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<IsdsSettingsDto>> => {
+  return axios.default.patch(
+    `/companies/isds-credentials`,
+    updateIsdsCredentialsDto,
+    options,
+  );
+};
 
+export const getCompanyUpdateIsdsCredentialsMutationOptions = <
+  TError = AxiosError<IsdsSettingsDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+    TError,
+    { data: UpdateIsdsCredentialsDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+  TError,
+  { data: UpdateIsdsCredentialsDto },
+  TContext
+> => {
+  const mutationKey = ['companyUpdateIsdsCredentials'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+    { data: UpdateIsdsCredentialsDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getCompanyUpdateIsdsCredentialsMutationOptions = <TError = AxiosError<IsdsSettingsDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext> => {
+    return companyUpdateIsdsCredentials(data, axiosOptions);
+  };
 
-const mutationKey = ['companyUpdateIsdsCredentials'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type CompanyUpdateIsdsCredentialsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>
+>;
+export type CompanyUpdateIsdsCredentialsMutationBody = UpdateIsdsCredentialsDto;
+export type CompanyUpdateIsdsCredentialsMutationError =
+  AxiosError<IsdsSettingsDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, {data: UpdateIsdsCredentialsDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  companyUpdateIsdsCredentials(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CompanyUpdateIsdsCredentialsMutationResult = NonNullable<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>>
-    export type CompanyUpdateIsdsCredentialsMutationBody = UpdateIsdsCredentialsDto
-    export type CompanyUpdateIsdsCredentialsMutationError = AxiosError<IsdsSettingsDto>
-
-    /**
+/**
  * @summary Set company ISDS (datové schránky) credentials
  */
-export const useCompanyUpdateIsdsCredentials = <TError = AxiosError<IsdsSettingsDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>, TError,{data: UpdateIsdsCredentialsDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
-        TError,
-        {data: UpdateIsdsCredentialsDto},
-        TContext
-      > => {
+export const useCompanyUpdateIsdsCredentials = <
+  TError = AxiosError<IsdsSettingsDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+      TError,
+      { data: UpdateIsdsCredentialsDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof companyUpdateIsdsCredentials>>,
+  TError,
+  { data: UpdateIsdsCredentialsDto },
+  TContext
+> => {
+  const mutationOptions =
+    getCompanyUpdateIsdsCredentialsMutationOptions(options);
 
-      const mutationOptions = getCompanyUpdateIsdsCredentialsMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Get the active company ISDS (datové schránky) settings
  */
 export const companyGetIsdsSettings = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<IsdsSettingsDto>> => {
-    
-    
-    return axios.default.get(
-      `/companies/isds-credentials`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<IsdsSettingsDto>> => {
+  return axios.default.get(`/companies/isds-credentials`, options);
+};
 
 export const getCompanyGetIsdsSettingsQueryKey = () => {
-    return [
-    `/companies/isds-credentials`
-    ] as const;
-    }
+  return [`/companies/isds-credentials`] as const;
+};
 
-    
-export const getCompanyGetIsdsSettingsQueryOptions = <TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getCompanyGetIsdsSettingsQueryOptions = <
+  TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+  TError = AxiosError<IsdsSettingsDto>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getCompanyGetIsdsSettingsQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getCompanyGetIsdsSettingsQueryKey();
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof companyGetIsdsSettings>>
+  > = ({ signal }) => companyGetIsdsSettings({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyGetIsdsSettings>>> = ({ signal }) => companyGetIsdsSettings({ signal, ...axiosOptions });
+export type CompanyGetIsdsSettingsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof companyGetIsdsSettings>>
+>;
+export type CompanyGetIsdsSettingsQueryError = AxiosError<IsdsSettingsDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CompanyGetIsdsSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof companyGetIsdsSettings>>>
-export type CompanyGetIsdsSettingsQueryError = AxiosError<IsdsSettingsDto>
-
-
-export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>> & Pick<
+export function useCompanyGetIsdsSettings<
+  TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+  TError = AxiosError<IsdsSettingsDto>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyGetIsdsSettings>>,
           TError,
           Awaited<ReturnType<typeof companyGetIsdsSettings>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyGetIsdsSettings<
+  TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+  TError = AxiosError<IsdsSettingsDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyGetIsdsSettings>>,
           TError,
           Awaited<ReturnType<typeof companyGetIsdsSettings>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyGetIsdsSettings<
+  TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+  TError = AxiosError<IsdsSettingsDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get the active company ISDS (datové schránky) settings
  */
 
-export function useCompanyGetIsdsSettings<TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError = AxiosError<IsdsSettingsDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGetIsdsSettings>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCompanyGetIsdsSettings<
+  TData = Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+  TError = AxiosError<IsdsSettingsDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyGetIsdsSettings>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getCompanyGetIsdsSettingsQueryOptions(options);
 
-  const queryOptions = getCompanyGetIsdsSettingsQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary List companies the user belongs to
  */
 export const companyListByUser = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompanyResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/companies/list`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<CompanyResponseDto[]>> => {
+  return axios.default.get(`/companies/list`, options);
+};
 
 export const getCompanyListByUserQueryKey = () => {
-    return [
-    `/companies/list`
-    ] as const;
-    }
+  return [`/companies/list`] as const;
+};
 
-    
-export const getCompanyListByUserQueryOptions = <TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getCompanyListByUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof companyListByUser>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof companyListByUser>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCompanyListByUserQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getCompanyListByUserQueryKey();
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof companyListByUser>>
+  > = ({ signal }) => companyListByUser({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof companyListByUser>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyListByUser>>> = ({ signal }) => companyListByUser({ signal, ...axiosOptions });
+export type CompanyListByUserQueryResult = NonNullable<
+  Awaited<ReturnType<typeof companyListByUser>>
+>;
+export type CompanyListByUserQueryError = AxiosError<CompanyResponseDto[]>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CompanyListByUserQueryResult = NonNullable<Awaited<ReturnType<typeof companyListByUser>>>
-export type CompanyListByUserQueryError = AxiosError<CompanyResponseDto[]>
-
-
-export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData>> & Pick<
+export function useCompanyListByUser<
+  TData = Awaited<ReturnType<typeof companyListByUser>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyListByUser>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyListByUser>>,
           TError,
           Awaited<ReturnType<typeof companyListByUser>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyListByUser<
+  TData = Awaited<ReturnType<typeof companyListByUser>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyListByUser>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyListByUser>>,
           TError,
           Awaited<ReturnType<typeof companyListByUser>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyListByUser<
+  TData = Awaited<ReturnType<typeof companyListByUser>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyListByUser>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List companies the user belongs to
  */
 
-export function useCompanyListByUser<TData = Awaited<ReturnType<typeof companyListByUser>>, TError = AxiosError<CompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyListByUser>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCompanyListByUser<
+  TData = Awaited<ReturnType<typeof companyListByUser>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyListByUser>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getCompanyListByUserQueryOptions(options);
 
-  const queryOptions = getCompanyListByUserQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Get company by id
  */
 export const companyGet = (
-    id: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompanyResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/companies/${id}`,options
-    );
-  }
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<CompanyResponseDto>> => {
+  return axios.default.get(`/companies/${id}`, options);
+};
 
+export const getCompanyGetQueryKey = (id?: string) => {
+  return [`/companies/${id}`] as const;
+};
 
-
-
-export const getCompanyGetQueryKey = (id?: string,) => {
-    return [
-    `/companies/${id}`
-    ] as const;
-    }
-
-    
-export const getCompanyGetQueryOptions = <TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getCompanyGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof companyGet>>,
+  TError = AxiosError<CompanyResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCompanyGetQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getCompanyGetQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof companyGet>>> = ({
+    signal,
+  }) => companyGet(id, { signal, ...axiosOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof companyGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyGet>>> = ({ signal }) => companyGet(id, { signal, ...axiosOptions });
+export type CompanyGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof companyGet>>
+>;
+export type CompanyGetQueryError = AxiosError<CompanyResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CompanyGetQueryResult = NonNullable<Awaited<ReturnType<typeof companyGet>>>
-export type CompanyGetQueryError = AxiosError<CompanyResponseDto>
-
-
-export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>> & Pick<
+export function useCompanyGet<
+  TData = Awaited<ReturnType<typeof companyGet>>,
+  TError = AxiosError<CompanyResponseDto>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyGet>>,
           TError,
           Awaited<ReturnType<typeof companyGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyGet<
+  TData = Awaited<ReturnType<typeof companyGet>>,
+  TError = AxiosError<CompanyResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyGet>>,
           TError,
           Awaited<ReturnType<typeof companyGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyGet<
+  TData = Awaited<ReturnType<typeof companyGet>>,
+  TError = AxiosError<CompanyResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get company by id
  */
 
-export function useCompanyGet<TData = Awaited<ReturnType<typeof companyGet>>, TError = AxiosError<CompanyResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCompanyGet<
+  TData = Awaited<ReturnType<typeof companyGet>>,
+  TError = AxiosError<CompanyResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof companyGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getCompanyGetQueryOptions(id, options);
 
-  const queryOptions = getCompanyGetQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Find user companies by name (partial, diacritic-insensitive)
  */
 export const companyFindByName = (
-    params: CompanyFindByNameParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<CompanyResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/companies/findByName`,{
+  params: CompanyFindByNameParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<CompanyResponseDto[]>> => {
+  return axios.default.get(`/companies/findByName`, {
     ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
+    params: { ...params, ...options?.params },
+  });
+};
 
-
-
-
-export const getCompanyFindByNameQueryKey = (params?: CompanyFindByNameParams,) => {
-    return [
-    `/companies/findByName`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getCompanyFindByNameQueryOptions = <TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(params: CompanyFindByNameParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getCompanyFindByNameQueryKey = (
+  params?: CompanyFindByNameParams,
 ) => {
+  return [`/companies/findByName`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+export const getCompanyFindByNameQueryOptions = <
+  TData = Awaited<ReturnType<typeof companyFindByName>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  params: CompanyFindByNameParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyFindByName>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getCompanyFindByNameQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getCompanyFindByNameQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof companyFindByName>>
+  > = ({ signal }) => companyFindByName(params, { signal, ...axiosOptions });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof companyFindByName>>> = ({ signal }) => companyFindByName(params, { signal, ...axiosOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof companyFindByName>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type CompanyFindByNameQueryResult = NonNullable<
+  Awaited<ReturnType<typeof companyFindByName>>
+>;
+export type CompanyFindByNameQueryError = AxiosError<CompanyResponseDto[]>;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CompanyFindByNameQueryResult = NonNullable<Awaited<ReturnType<typeof companyFindByName>>>
-export type CompanyFindByNameQueryError = AxiosError<CompanyResponseDto[]>
-
-
-export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(
- params: CompanyFindByNameParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData>> & Pick<
+export function useCompanyFindByName<
+  TData = Awaited<ReturnType<typeof companyFindByName>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  params: CompanyFindByNameParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyFindByName>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyFindByName>>,
           TError,
           Awaited<ReturnType<typeof companyFindByName>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(
- params: CompanyFindByNameParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyFindByName<
+  TData = Awaited<ReturnType<typeof companyFindByName>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  params: CompanyFindByNameParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyFindByName>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof companyFindByName>>,
           TError,
           Awaited<ReturnType<typeof companyFindByName>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(
- params: CompanyFindByNameParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useCompanyFindByName<
+  TData = Awaited<ReturnType<typeof companyFindByName>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  params: CompanyFindByNameParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyFindByName>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Find user companies by name (partial, diacritic-insensitive)
  */
 
-export function useCompanyFindByName<TData = Awaited<ReturnType<typeof companyFindByName>>, TError = AxiosError<CompanyResponseDto[]>>(
- params: CompanyFindByNameParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof companyFindByName>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCompanyFindByName<
+  TData = Awaited<ReturnType<typeof companyFindByName>>,
+  TError = AxiosError<CompanyResponseDto[]>,
+>(
+  params: CompanyFindByNameParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof companyFindByName>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getCompanyFindByNameQueryOptions(params, options);
 
-  const queryOptions = getCompanyFindByNameQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-

@@ -52,7 +52,10 @@ const TotalRow = ({
   </div>
 );
 
-export const InvoiceItemsTable = ({ invoice, currency }: InvoiceItemsTableProps) => {
+export const InvoiceItemsTable = ({
+  invoice,
+  currency,
+}: InvoiceItemsTableProps) => {
   const { t } = useTranslation();
 
   const taxBase = toNumber(invoice.total);
@@ -72,7 +75,9 @@ export const InvoiceItemsTable = ({ invoice, currency }: InvoiceItemsTableProps)
 
   return (
     <DetailCard>
-      <SectionLabel className="mb-3.5">{t('invoices.detail.items.title')}</SectionLabel>
+      <SectionLabel className="mb-3.5">
+        {t('invoices.detail.items.title')}
+      </SectionLabel>
 
       <div className="overflow-hidden rounded-lg border border-border/70">
         <div
@@ -108,7 +113,9 @@ export const InvoiceItemsTable = ({ invoice, currency }: InvoiceItemsTableProps)
               className="grid items-center gap-3 border-b border-border/60 px-4 py-3 last:border-b-0"
               style={{ gridTemplateColumns: GRID }}
             >
-              <span className="text-sm font-medium text-foreground">{item.name}</span>
+              <span className="text-sm font-medium text-foreground">
+                {item.name}
+              </span>
               <span className="text-right text-sm tabular-nums text-foreground">
                 {quantity}
                 {item.unit ? ` ${item.unit}` : ''}
@@ -130,7 +137,10 @@ export const InvoiceItemsTable = ({ invoice, currency }: InvoiceItemsTableProps)
       <div className="mt-3 space-y-1.5">
         {hasVat && (
           <>
-            <TotalRow label={t('invoices.summary.taxBase')} value={formatMoney(taxBase, currency)} />
+            <TotalRow
+              label={t('invoices.summary.taxBase')}
+              value={formatMoney(taxBase, currency)}
+            />
             {vatRows.map(([rate, tax]) => (
               <TotalRow
                 key={rate}

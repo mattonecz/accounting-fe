@@ -9,8 +9,8 @@
 /**
  * Invoice status. Defaults to ISSUED when omitted.
  */
-export type CreateInvoiceDtoStatus = typeof CreateInvoiceDtoStatus[keyof typeof CreateInvoiceDtoStatus];
-
+export type CreateInvoiceDtoStatus =
+  (typeof CreateInvoiceDtoStatus)[keyof typeof CreateInvoiceDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateInvoiceDtoStatus = {

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CreateUserCompanyDtoRole = typeof CreateUserCompanyDtoRole[keyof typeof CreateUserCompanyDtoRole];
-
+export type CreateUserCompanyDtoRole =
+  (typeof CreateUserCompanyDtoRole)[keyof typeof CreateUserCompanyDtoRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateUserCompanyDtoRole = {

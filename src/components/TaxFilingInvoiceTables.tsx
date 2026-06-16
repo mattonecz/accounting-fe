@@ -41,13 +41,15 @@ export const TaxFilingInvoiceTables = ({
       header: t('taxFilings.invoiceTables.columns.base'),
       headerClassName: 'text-right',
       cellClassName: 'text-right tabular-nums',
-      cell: (invoice: InvoiceResponseDto) => fmtMoney(Number(invoice.total ?? 0)),
+      cell: (invoice: InvoiceResponseDto) =>
+        fmtMoney(Number(invoice.total ?? 0)),
     },
     {
       header: t('taxFilings.invoiceTables.columns.vat'),
       headerClassName: 'text-right',
       cellClassName: 'text-right tabular-nums',
-      cell: (invoice: InvoiceResponseDto) => fmtMoney(Number(invoice.totalTax ?? 0)),
+      cell: (invoice: InvoiceResponseDto) =>
+        fmtMoney(Number(invoice.totalTax ?? 0)),
     },
     {
       header: t('taxFilings.invoiceTables.columns.total'),

@@ -9,8 +9,8 @@
 /**
  * Derived lifecycle state
  */
-export type MessageStatusResponseDtoState = typeof MessageStatusResponseDtoState[keyof typeof MessageStatusResponseDtoState];
-
+export type MessageStatusResponseDtoState =
+  (typeof MessageStatusResponseDtoState)[keyof typeof MessageStatusResponseDtoState];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MessageStatusResponseDtoState = {

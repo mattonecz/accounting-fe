@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type InvoiceResponseDtoPaymentMethod = typeof InvoiceResponseDtoPaymentMethod[keyof typeof InvoiceResponseDtoPaymentMethod];
-
+export type InvoiceResponseDtoPaymentMethod =
+  (typeof InvoiceResponseDtoPaymentMethod)[keyof typeof InvoiceResponseDtoPaymentMethod];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceResponseDtoPaymentMethod = {

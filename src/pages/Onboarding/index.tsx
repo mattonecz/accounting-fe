@@ -648,92 +648,99 @@ export default function Onboarding() {
                     <Controller
                       control={control}
                       name="c_ufo"
-                    render={({ field }) => (
-                      <div className="space-y-2">
-                        <Label htmlFor="c_ufo">
-                          {t('onboarding.tax.fields.taxOffice')}
-                        </Label>
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(
-                              value === CLEAR_SELECT_VALUE ? '' : value,
-                            )
-                          }
-                          value={field.value || CLEAR_SELECT_VALUE}
-                        >
-                          <SelectTrigger id="c_ufo">
-                            <SelectValue
-                              placeholder={t(
-                                'onboarding.tax.placeholders.taxOffice',
-                              )}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={CLEAR_SELECT_VALUE}>
-                              {t('onboarding.taxOfficeClear')}
-                            </SelectItem>
-                            {TAX_OFFICE_OPTIONS.map((option) => (
-                              <SelectItem key={option.code} value={option.code}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                  />
-
-                  <Controller
-                    control={control}
-                    name="c_pracufo"
-                    render={({ field }) => (
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="c_pracufo">
-                          {t('onboarding.tax.fields.workplace')}
-                        </Label>
-                        <Select
-                          disabled={
-                            !selectedTaxOfficeCode ||
-                            selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
-                          }
-                          onValueChange={(value) =>
-                            field.onChange(
-                              value === CLEAR_SELECT_VALUE ? '' : value,
-                            )
-                          }
-                          value={field.value || CLEAR_SELECT_VALUE}
-                        >
-                          <SelectTrigger id="c_pracufo">
-                            <SelectValue
-                              placeholder={t(
-                                'onboarding.tax.placeholders.workplace',
-                              )}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedTaxOfficeCode !==
-                              SPECIAL_TAX_OFFICE_CODE && (
+                      render={({ field }) => (
+                        <div className="space-y-2">
+                          <Label htmlFor="c_ufo">
+                            {t('onboarding.tax.fields.taxOffice')}
+                          </Label>
+                          <Select
+                            onValueChange={(value) =>
+                              field.onChange(
+                                value === CLEAR_SELECT_VALUE ? '' : value,
+                              )
+                            }
+                            value={field.value || CLEAR_SELECT_VALUE}
+                          >
+                            <SelectTrigger id="c_ufo">
+                              <SelectValue
+                                placeholder={t(
+                                  'onboarding.tax.placeholders.taxOffice',
+                                )}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
                               <SelectItem value={CLEAR_SELECT_VALUE}>
                                 {t('onboarding.taxOfficeClear')}
                               </SelectItem>
-                            )}
-                            {workplaceOptions.map((option) => (
-                              <SelectItem key={option.code} value={option.code}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <p className="text-sm text-muted-foreground">
-                          {!selectedTaxOfficeCode
-                            ? t('onboarding.tax.hints.noOffice')
-                            : selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
-                              ? t('onboarding.tax.hints.special')
-                              : t('onboarding.tax.hints.normal')}
-                        </p>
-                      </div>
-                    )}
-                  />
+                              {TAX_OFFICE_OPTIONS.map((option) => (
+                                <SelectItem
+                                  key={option.code}
+                                  value={option.code}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    />
+
+                    <Controller
+                      control={control}
+                      name="c_pracufo"
+                      render={({ field }) => (
+                        <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="c_pracufo">
+                            {t('onboarding.tax.fields.workplace')}
+                          </Label>
+                          <Select
+                            disabled={
+                              !selectedTaxOfficeCode ||
+                              selectedTaxOfficeCode === SPECIAL_TAX_OFFICE_CODE
+                            }
+                            onValueChange={(value) =>
+                              field.onChange(
+                                value === CLEAR_SELECT_VALUE ? '' : value,
+                              )
+                            }
+                            value={field.value || CLEAR_SELECT_VALUE}
+                          >
+                            <SelectTrigger id="c_pracufo">
+                              <SelectValue
+                                placeholder={t(
+                                  'onboarding.tax.placeholders.workplace',
+                                )}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedTaxOfficeCode !==
+                                SPECIAL_TAX_OFFICE_CODE && (
+                                <SelectItem value={CLEAR_SELECT_VALUE}>
+                                  {t('onboarding.taxOfficeClear')}
+                                </SelectItem>
+                              )}
+                              {workplaceOptions.map((option) => (
+                                <SelectItem
+                                  key={option.code}
+                                  value={option.code}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <p className="text-sm text-muted-foreground">
+                            {!selectedTaxOfficeCode
+                              ? t('onboarding.tax.hints.noOffice')
+                              : selectedTaxOfficeCode ===
+                                  SPECIAL_TAX_OFFICE_CODE
+                                ? t('onboarding.tax.hints.special')
+                                : t('onboarding.tax.hints.normal')}
+                          </p>
+                        </div>
+                      )}
+                    />
                   </CardContent>
                 </Card>
               )}

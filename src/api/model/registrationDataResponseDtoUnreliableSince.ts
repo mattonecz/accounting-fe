@@ -10,4 +10,6 @@
  * Date the payer was flagged unreliable (ISO date), if any.
  * @nullable
  */
-export type RegistrationDataResponseDtoUnreliableSince = { [key: string]: unknown } | null;
+export type RegistrationDataResponseDtoUnreliableSince = {
+  [key: string]: unknown;
+} | null;

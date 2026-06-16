@@ -70,9 +70,7 @@ export const UploadReceiptButton = ({
         ) : (
           <Sparkles className="h-4 w-4" />
         )}
-        {isPending
-          ? t('receiptUpload.processing')
-          : t('receiptUpload.button')}
+        {isPending ? t('receiptUpload.processing') : t('receiptUpload.button')}
       </Button>
     </>
   );

@@ -5,93 +5,104 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   DocumentParseReceiptBody,
-  ParseReceiptResponseDto
+  ParseReceiptResponseDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Parse receipt image into structured data
  */
 export const documentParseReceipt = (
-    documentParseReceiptBody: DocumentParseReceiptBody, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ParseReceiptResponseDto>> => {
-    
-    const formData = new FormData();
-formData.append(`file`, documentParseReceiptBody.file)
+  documentParseReceiptBody: DocumentParseReceiptBody,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<ParseReceiptResponseDto>> => {
+  const formData = new FormData();
+  formData.append(`file`, documentParseReceiptBody.file);
 
-    return axios.default.post(
-      `/documents/receipt/parse`,
-      formData,options
-    );
-  }
+  return axios.default.post(`/documents/receipt/parse`, formData, options);
+};
 
+export const getDocumentParseReceiptMutationOptions = <
+  TError = AxiosError<ParseReceiptResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof documentParseReceipt>>,
+    TError,
+    { data: DocumentParseReceiptBody },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof documentParseReceipt>>,
+  TError,
+  { data: DocumentParseReceiptBody },
+  TContext
+> => {
+  const mutationKey = ['documentParseReceipt'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof documentParseReceipt>>,
+    { data: DocumentParseReceiptBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getDocumentParseReceiptMutationOptions = <TError = AxiosError<ParseReceiptResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof documentParseReceipt>>, TError,{data: DocumentParseReceiptBody}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof documentParseReceipt>>, TError,{data: DocumentParseReceiptBody}, TContext> => {
+    return documentParseReceipt(data, axiosOptions);
+  };
 
-const mutationKey = ['documentParseReceipt'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type DocumentParseReceiptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof documentParseReceipt>>
+>;
+export type DocumentParseReceiptMutationBody = DocumentParseReceiptBody;
+export type DocumentParseReceiptMutationError =
+  AxiosError<ParseReceiptResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof documentParseReceipt>>, {data: DocumentParseReceiptBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  documentParseReceipt(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DocumentParseReceiptMutationResult = NonNullable<Awaited<ReturnType<typeof documentParseReceipt>>>
-    export type DocumentParseReceiptMutationBody = DocumentParseReceiptBody
-    export type DocumentParseReceiptMutationError = AxiosError<ParseReceiptResponseDto>
-
-    /**
+/**
  * @summary Parse receipt image into structured data
  */
-export const useDocumentParseReceipt = <TError = AxiosError<ParseReceiptResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof documentParseReceipt>>, TError,{data: DocumentParseReceiptBody}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof documentParseReceipt>>,
-        TError,
-        {data: DocumentParseReceiptBody},
-        TContext
-      > => {
+export const useDocumentParseReceipt = <
+  TError = AxiosError<ParseReceiptResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof documentParseReceipt>>,
+      TError,
+      { data: DocumentParseReceiptBody },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof documentParseReceipt>>,
+  TError,
+  { data: DocumentParseReceiptBody },
+  TContext
+> => {
+  const mutationOptions = getDocumentParseReceiptMutationOptions(options);
 
-      const mutationOptions = getDocumentParseReceiptMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
+  return useMutation(mutationOptions, queryClient);
+};

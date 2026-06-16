@@ -9,8 +9,8 @@
 /**
  * Required for kind=INVOICE.
  */
-export type CreateInvoiceDtoVatMode = typeof CreateInvoiceDtoVatMode[keyof typeof CreateInvoiceDtoVatMode];
-
+export type CreateInvoiceDtoVatMode =
+  (typeof CreateInvoiceDtoVatMode)[keyof typeof CreateInvoiceDtoVatMode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateInvoiceDtoVatMode = {

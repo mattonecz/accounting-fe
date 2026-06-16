@@ -7,5 +7,5 @@
  */
 
 export type FindContactsByNameParams = {
-name: string;
+  name: string;
 };

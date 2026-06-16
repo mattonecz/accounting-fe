@@ -52,7 +52,10 @@ export const SettingsMenu = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={activeDialog === 'billing'} onOpenChange={(o) => !o && close()}>
+      <Dialog
+        open={activeDialog === 'billing'}
+        onOpenChange={(o) => !o && close()}
+      >
         <DialogContent className="max-w-2xl p-0">
           <ScrollArea className="max-h-[85vh]">
             <div className="p-6">
@@ -68,7 +71,10 @@ export const SettingsMenu = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={activeDialog === 'defaults'} onOpenChange={(o) => !o && close()}>
+      <Dialog
+        open={activeDialog === 'defaults'}
+        onOpenChange={(o) => !o && close()}
+      >
         <DialogContent className="max-w-2xl p-0">
           <ScrollArea className="max-h-[85vh]">
             <div className="p-6">

@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,173 +18,251 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   InvoiceSettingsResponseDto,
-  UpdateInvoiceSettingsDto
+  UpdateInvoiceSettingsDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Get invoice settings for company
  */
 export const invoiceSettingsGet = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceSettingsResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/invoice-settings`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceSettingsResponseDto>> => {
+  return axios.default.get(`/invoice-settings`, options);
+};
 
 export const getInvoiceSettingsGetQueryKey = () => {
-    return [
-    `/invoice-settings`
-    ] as const;
-    }
+  return [`/invoice-settings`] as const;
+};
 
-    
-export const getInvoiceSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof invoiceSettingsGet>>, TError = AxiosError<InvoiceSettingsResponseDto>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getInvoiceSettingsGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceSettingsGet>>,
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof invoiceSettingsGet>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getInvoiceSettingsGetQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceSettingsGetQueryKey();
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof invoiceSettingsGet>>
+  > = ({ signal }) => invoiceSettingsGet({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceSettingsGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceSettingsGet>>> = ({ signal }) => invoiceSettingsGet({ signal, ...axiosOptions });
+export type InvoiceSettingsGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceSettingsGet>>
+>;
+export type InvoiceSettingsGetQueryError =
+  AxiosError<InvoiceSettingsResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceSettingsGet>>>
-export type InvoiceSettingsGetQueryError = AxiosError<InvoiceSettingsResponseDto>
-
-
-export function useInvoiceSettingsGet<TData = Awaited<ReturnType<typeof invoiceSettingsGet>>, TError = AxiosError<InvoiceSettingsResponseDto>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData>> & Pick<
+export function useInvoiceSettingsGet<
+  TData = Awaited<ReturnType<typeof invoiceSettingsGet>>,
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceSettingsGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceSettingsGet>>,
           TError,
           Awaited<ReturnType<typeof invoiceSettingsGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceSettingsGet<TData = Awaited<ReturnType<typeof invoiceSettingsGet>>, TError = AxiosError<InvoiceSettingsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceSettingsGet<
+  TData = Awaited<ReturnType<typeof invoiceSettingsGet>>,
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceSettingsGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceSettingsGet>>,
           TError,
           Awaited<ReturnType<typeof invoiceSettingsGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceSettingsGet<TData = Awaited<ReturnType<typeof invoiceSettingsGet>>, TError = AxiosError<InvoiceSettingsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceSettingsGet<
+  TData = Awaited<ReturnType<typeof invoiceSettingsGet>>,
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceSettingsGet>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get invoice settings for company
  */
 
-export function useInvoiceSettingsGet<TData = Awaited<ReturnType<typeof invoiceSettingsGet>>, TError = AxiosError<InvoiceSettingsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceSettingsGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceSettingsGet<
+  TData = Awaited<ReturnType<typeof invoiceSettingsGet>>,
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceSettingsGet>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceSettingsGetQueryOptions(options);
 
-  const queryOptions = getInvoiceSettingsGetQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Update invoice settings for company
  */
 export const invoiceSettingsUpdate = (
-    updateInvoiceSettingsDto: UpdateInvoiceSettingsDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceSettingsResponseDto>> => {
-    
-    
-    return axios.default.patch(
-      `/invoice-settings`,
-      updateInvoiceSettingsDto,options
-    );
-  }
+  updateInvoiceSettingsDto: UpdateInvoiceSettingsDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceSettingsResponseDto>> => {
+  return axios.default.patch(
+    `/invoice-settings`,
+    updateInvoiceSettingsDto,
+    options,
+  );
+};
 
+export const getInvoiceSettingsUpdateMutationOptions = <
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
+    TError,
+    { data: UpdateInvoiceSettingsDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
+  TError,
+  { data: UpdateInvoiceSettingsDto },
+  TContext
+> => {
+  const mutationKey = ['invoiceSettingsUpdate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
+    { data: UpdateInvoiceSettingsDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getInvoiceSettingsUpdateMutationOptions = <TError = AxiosError<InvoiceSettingsResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceSettingsUpdate>>, TError,{data: UpdateInvoiceSettingsDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof invoiceSettingsUpdate>>, TError,{data: UpdateInvoiceSettingsDto}, TContext> => {
+    return invoiceSettingsUpdate(data, axiosOptions);
+  };
 
-const mutationKey = ['invoiceSettingsUpdate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type InvoiceSettingsUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceSettingsUpdate>>
+>;
+export type InvoiceSettingsUpdateMutationBody = UpdateInvoiceSettingsDto;
+export type InvoiceSettingsUpdateMutationError =
+  AxiosError<InvoiceSettingsResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceSettingsUpdate>>, {data: UpdateInvoiceSettingsDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  invoiceSettingsUpdate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type InvoiceSettingsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceSettingsUpdate>>>
-    export type InvoiceSettingsUpdateMutationBody = UpdateInvoiceSettingsDto
-    export type InvoiceSettingsUpdateMutationError = AxiosError<InvoiceSettingsResponseDto>
-
-    /**
+/**
  * @summary Update invoice settings for company
  */
-export const useInvoiceSettingsUpdate = <TError = AxiosError<InvoiceSettingsResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceSettingsUpdate>>, TError,{data: UpdateInvoiceSettingsDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
-        TError,
-        {data: UpdateInvoiceSettingsDto},
-        TContext
-      > => {
+export const useInvoiceSettingsUpdate = <
+  TError = AxiosError<InvoiceSettingsResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
+      TError,
+      { data: UpdateInvoiceSettingsDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof invoiceSettingsUpdate>>,
+  TError,
+  { data: UpdateInvoiceSettingsDto },
+  TContext
+> => {
+  const mutationOptions = getInvoiceSettingsUpdateMutationOptions(options);
 
-      const mutationOptions = getInvoiceSettingsUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
+  return useMutation(mutationOptions, queryClient);
+};

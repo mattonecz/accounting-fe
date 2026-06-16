@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,12 @@ import { useCompanyGet } from '@/api/companies/companies';
 import { useAuth } from '@/contexts/AuthContext';
 import { daysBetween } from '@/lib/formatters';
 import {
+  getDefaultRateRows,
+  invoiceItemsToRates,
+  ratesToInvoiceItems,
+  type RateRowValue,
+} from './incomingRates';
+import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
   UpdateInvoiceDto,
@@ -31,6 +37,11 @@ export type UpdateInvoiceFormValues = UpdateInvoiceDto & {
   shouldClaimVat?: boolean;
   /** Helper field – number of days until the due date. Not sent to the backend. */
   paymentDays?: number;
+  /**
+   * Amounts-by-VAT-rate rows for received invoices. Edited instead of line
+   * items and converted back to `items` on submit. Not sent to the backend.
+   */
+  rates?: RateRowValue[];
 };
 
 export const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -84,6 +95,7 @@ const getDefaultValues = (): UpdateInvoiceFormValues => ({
   paymentDays: 0,
   paymentMethod: UpdateInvoiceDtoPaymentMethod.BANK_TRANSFER,
   items: [DEFAULT_ITEM],
+  rates: getDefaultRateRows(),
 });
 
 // Loose text compare: trim + case-insensitive, so trailing spaces or casing in
@@ -167,11 +179,19 @@ export function useUpdateInvoiceForm(id: string) {
   const { data: banks, isError: banksError } = useBankListByCompany();
   const { activeCompanyId } = useAuth();
 
+  const { data: companyResponse, isError: companyError } = useCompanyGet(
+    activeCompanyId ?? '',
+  );
+
   // The contact/bank fields are resolved by looking up the loaded lists, so the
   // prefill must wait until those lists have settled (loaded or errored) — the
-  // invoice itself is usually cached and arrives first.
-  const listsReady = (!!contacts || contactsError) && (!!banks || banksError);
-  const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
+  // invoice itself is usually cached and arrives first. The company must also be
+  // resolved before prefill, because the received-invoice rate rows are built
+  // differently for VAT vs non-VAT payers (isVatPayer).
+  const listsReady =
+    (!!contacts || contactsError) &&
+    (!!banks || banksError) &&
+    (!!companyResponse || companyError);
   const { mutate: updateInvoice, isPending: isUpdatingInvoice } =
     useInvoiceUpdate();
 
@@ -206,24 +226,19 @@ export function useUpdateInvoiceForm(id: string) {
     [contacts?.data],
   );
 
-  const prefilledId = useRef<string | null>(null);
-  // The form JSX is held back until this flips true, so every controlled Select
-  // mounts with its prefilled value already in place. A Radix Select only shows
-  // a value whose <SelectItem> it has seen; setting `contactId`/`bankId` via a
-  // post-mount reset (the item never having been rendered) leaves it blank.
-  const [isPrefilled, setIsPrefilled] = useState(false);
-
-  // A different invoice id means we must prefill again before showing the form.
-  useEffect(() => {
-    setIsPrefilled(false);
-  }, [id]);
+  // The form JSX is held back until the prefill for the current invoice has run,
+  // so every controlled Select mounts with its value already in place (a Radix
+  // Select only shows a value whose <SelectItem> it has seen). Tracking the
+  // prefilled id in state — and deriving the gate from it — stays correct under
+  // React StrictMode's double-mount and React Query cache hits; a ref + separate
+  // boolean desynced there and left the gate stuck closed on warm-cache navigation.
+  const [prefilledId, setPrefilledId] = useState<string | null>(null);
 
   useEffect(() => {
     const invoice = invoiceResponse?.data;
     if (!invoice || !listsReady) return;
     // Prefill once per invoice; later background refetches must not clobber edits.
-    if (prefilledId.current === invoice.id) return;
-    prefilledId.current = invoice.id;
+    if (prefilledId === invoice.id) return;
 
     const invoiceType =
       (invoice.type as UpdateInvoiceDtoType) || UpdateInvoiceDtoType.ISSUED;
@@ -257,7 +272,10 @@ export function useUpdateInvoiceForm(id: string) {
       createdDate: invoice.createdDate,
       duzpDate: invoice.duzpDate,
       dueDate: invoice.dueDate,
-      paymentDays: daysBetween(invoice.createdDate ?? '', invoice.dueDate ?? ''),
+      paymentDays: daysBetween(
+        invoice.createdDate ?? '',
+        invoice.dueDate ?? '',
+      ),
       variableSymbol: invoice.variableSymbol ?? '',
       specificSymbol: invoice.specificSymbol ?? '',
       konstantSymbol: invoice.konstantSymbol ?? '',
@@ -277,6 +295,11 @@ export function useUpdateInvoiceForm(id: string) {
             total: toNumber(item.total),
           }))
         : [DEFAULT_ITEM],
+      // Received invoices are edited as amounts-by-VAT-rate, rebuilt from the
+      // stored line items; issued invoices keep the line-item editor.
+      rates: isReceived
+        ? invoiceItemsToRates(invoice.items, isVatPayer)
+        : getDefaultRateRows(),
       shouldClaimVat:
         invoice.vatClaimStatus == null
           ? true
@@ -292,12 +315,22 @@ export function useUpdateInvoiceForm(id: string) {
         ? invoice.vatClaimMonth.slice(0, 7)
         : (invoice.duzpDate?.slice(0, 7) ?? ''),
       vatClaimNote:
-        invoice.vatClaimNote != null
-          ? String(invoice.vatClaimNote)
-          : '',
+        invoice.vatClaimNote != null ? String(invoice.vatClaimNote) : '',
     });
-    setIsPrefilled(true);
-  }, [form, invoiceResponse?.data, listsReady, sortedBanks, sortedContacts]);
+    setPrefilledId(invoice.id);
+  }, [
+    form,
+    invoiceResponse?.data,
+    listsReady,
+    isVatPayer,
+    sortedBanks,
+    sortedContacts,
+    prefilledId,
+  ]);
+
+  // Open the form only once the prefill has run for the invoice now loaded.
+  const isPrefilled =
+    !!invoiceResponse?.data && prefilledId === invoiceResponse.data.id;
 
   useEffect(() => {
     if (selectedCurrency === 'CZK') {
@@ -327,6 +360,7 @@ export function useUpdateInvoiceForm(id: string) {
     const {
       shouldClaimVat,
       paymentDays: _paymentDays,
+      rates,
       vatClaimType,
       vatClaimRatio,
       vatClaimMonth,
@@ -344,11 +378,24 @@ export function useUpdateInvoiceForm(id: string) {
       ? rest.vatMode
       : UpdateInvoiceDtoVatMode.NON_VAT_PAYER;
 
-    const finalItems = rest.items?.map((item) => ({
-      ...item,
-      unit: trimOrUndefined(item.unit),
-      vatRate: isVatPayer ? item.vatRate : undefined,
-    }));
+    // Received invoices are edited as amounts-by-VAT-rate and converted back to
+    // line items (mirroring create); issued invoices use the line-item editor.
+    const finalItems = isReceived
+      ? ratesToInvoiceItems(rates ?? [], isVatPayer, (rate) =>
+          i18n.t('invoices.create.received.rateLineName', { rate }),
+        )
+      : rest.items?.map((item) => ({
+          ...item,
+          unit: trimOrUndefined(item.unit),
+          vatRate: isVatPayer ? item.vatRate : undefined,
+        }));
+
+    if (isReceived && finalItems?.length === 0) {
+      enqueueSnackbar(i18n.t('invoices.create.received.amountRequired'), {
+        variant: 'error',
+      });
+      return;
+    }
 
     const isVatClaimApplicable =
       isReceived && finalVatMode === UpdateInvoiceDtoVatMode.STANDARD;
@@ -401,15 +448,23 @@ export function useUpdateInvoiceForm(id: string) {
       { data: payload },
       {
         onSuccess: async (response) => {
-          enqueueSnackbar(i18n.t('invoices.messages.updated'), { variant: 'success' });
+          enqueueSnackbar(i18n.t('invoices.messages.updated'), {
+            variant: 'success',
+          });
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: getInvoiceListByCompanyQueryKey() }),
-            queryClient.invalidateQueries({ queryKey: getInvoiceGetQueryKey(id || data.id) }),
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceListByCompanyQueryKey(),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceGetQueryKey(id || data.id),
+            }),
           ]);
           navigate(`/invoices/${response.data.id}`);
         },
         onError: () => {
-          enqueueSnackbar(i18n.t('invoices.messages.updateFailed'), { variant: 'error' });
+          enqueueSnackbar(i18n.t('invoices.messages.updateFailed'), {
+            variant: 'error',
+          });
         },
       },
     );

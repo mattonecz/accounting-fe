@@ -199,8 +199,8 @@ const BillingInfoFormContent = ({
 
   const validateAtLeastOneNumber = () => {
     const values = getValues();
-    const hasAnyNumber = ADDRESS_NUMBER_FIELDS.some(
-      (fieldName) => (values[fieldName] as string | undefined)?.trim(),
+    const hasAnyNumber = ADDRESS_NUMBER_FIELDS.some((fieldName) =>
+      (values[fieldName] as string | undefined)?.trim(),
     );
     return (
       Boolean(hasAnyNumber) ||
@@ -444,7 +444,9 @@ const BillingInfoFormContent = ({
                 control={form.control}
                 name="orientationNumber"
                 label={t('settings.billing.fields.orientationNumber')}
-                placeholder={t('settings.billing.placeholders.orientationNumber')}
+                placeholder={t(
+                  'settings.billing.placeholders.orientationNumber',
+                )}
                 variant="vertical"
                 onChangeOverride={(e, onChange) => {
                   onChange(e.target.value);
@@ -455,7 +457,9 @@ const BillingInfoFormContent = ({
                 control={form.control}
                 name="registrationNumber"
                 label={t('settings.billing.fields.registrationNumber')}
-                placeholder={t('settings.billing.placeholders.registrationNumber')}
+                placeholder={t(
+                  'settings.billing.placeholders.registrationNumber',
+                )}
                 variant="vertical"
                 onChangeOverride={(e, onChange) => {
                   onChange(e.target.value);

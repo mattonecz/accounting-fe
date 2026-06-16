@@ -62,7 +62,10 @@ export const VatBreakdownTable = ({
       <CardHeader>
         <CardTitle>{t('taxReport.breakdown.title')}</CardTitle>
         <CardDescription>
-          {t('taxReport.breakdown.description', { month: monthName, year: selectedYear })}
+          {t('taxReport.breakdown.description', {
+            month: monthName,
+            year: selectedYear,
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -80,41 +83,87 @@ export const VatBreakdownTable = ({
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('taxReport.breakdown.columns.type')}</TableHead>
-                  <TableHead className="text-right">{t('taxReport.breakdown.columns.base')}</TableHead>
-                  <TableHead className="text-right">{t('taxReport.breakdown.columns.vat')}</TableHead>
-                  <TableHead className="text-right">{t('taxReport.breakdown.columns.total')}</TableHead>
+                  <TableHead className="text-right">
+                    {t('taxReport.breakdown.columns.base')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('taxReport.breakdown.columns.vat')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('taxReport.breakdown.columns.total')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
-                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.issued')}</TableCell>
-                  <TableCell className="text-right">{fmt(vydaneFaktury.base)}</TableCell>
-                  <TableCell className="text-right font-medium">{fmt(vydaneFaktury.vat)}</TableCell>
-                  <TableCell className="text-right">{fmt(vydaneFaktury.total)}</TableCell>
+                  <TableCell className="font-medium">
+                    {t('taxReport.breakdown.rows.issued')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(vydaneFaktury.base)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {fmt(vydaneFaktury.vat)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(vydaneFaktury.total)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.received')}</TableCell>
-                  <TableCell className="text-right">{fmt(prijateFaktury.base)}</TableCell>
-                  <TableCell className="text-right font-medium">{fmt(prijateFaktury.vat)}</TableCell>
-                  <TableCell className="text-right">{fmt(prijateFaktury.total)}</TableCell>
+                  <TableCell className="font-medium">
+                    {t('taxReport.breakdown.rows.received')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(prijateFaktury.base)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {fmt(prijateFaktury.vat)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(prijateFaktury.total)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium">{t('taxReport.breakdown.rows.simple')}</TableCell>
-                  <TableCell className="text-right">{fmt(zjednoduseneDoklady.base)}</TableCell>
-                  <TableCell className="text-right font-medium">{fmt(zjednoduseneDoklady.vat)}</TableCell>
-                  <TableCell className="text-right">{fmt(zjednoduseneDoklady.total)}</TableCell>
+                  <TableCell className="font-medium">
+                    {t('taxReport.breakdown.rows.simple')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(zjednoduseneDoklady.base)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {fmt(zjednoduseneDoklady.vat)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(zjednoduseneDoklady.total)}
+                  </TableCell>
                 </TableRow>
                 <TableRow className="bg-muted/50 font-semibold">
-                  <TableCell>{t('taxReport.breakdown.rows.inputTotal')}</TableCell>
-                  <TableCell className="text-right">{fmt(zakladNaVstupu)}</TableCell>
-                  <TableCell className="text-right">{fmt(vstupniDPH)}</TableCell>
-                  <TableCell className="text-right">{fmt(obratNaVstupu)}</TableCell>
+                  <TableCell>
+                    {t('taxReport.breakdown.rows.inputTotal')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(zakladNaVstupu)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(vstupniDPH)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(obratNaVstupu)}
+                  </TableCell>
                 </TableRow>
                 <TableRow className="bg-muted/30 font-semibold">
-                  <TableCell>{t('taxReport.breakdown.rows.outputTotal')}</TableCell>
-                  <TableCell className="text-right">{fmt(zakladNaVystupu)}</TableCell>
-                  <TableCell className="text-right">{fmt(vystupniDPH)}</TableCell>
-                  <TableCell className="text-right">{fmt(obratNaVystupu)}</TableCell>
+                  <TableCell>
+                    {t('taxReport.breakdown.rows.outputTotal')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(zakladNaVystupu)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(vystupniDPH)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmt(obratNaVystupu)}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

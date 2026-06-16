@@ -22,21 +22,30 @@ const CreateBankAccount = () => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const { mutate: createBank, isPending } = useBankCreate();
-  const form = useForm<BankAccountFormValues>({ defaultValues: { name: '', currency: '' } });
+  const form = useForm<BankAccountFormValues>({
+    defaultValues: { name: '', currency: '' },
+  });
 
   const onSubmit = (data: BankAccountFormValues) => {
     createBank(
       { data: data satisfies CreateBankDto },
       {
         onSuccess: async () => {
-          enqueueSnackbar(t('bankAccounts.messages.created', { name: data.name }), {
-            variant: 'success',
+          enqueueSnackbar(
+            t('bankAccounts.messages.created', { name: data.name }),
+            {
+              variant: 'success',
+            },
+          );
+          await queryClient.invalidateQueries({
+            queryKey: getBankListByCompanyQueryKey(),
           });
-          await queryClient.invalidateQueries({ queryKey: getBankListByCompanyQueryKey() });
           navigate('/bank-accounts');
         },
         onError: () => {
-          enqueueSnackbar(t('bankAccounts.messages.createFailed'), { variant: 'error' });
+          enqueueSnackbar(t('bankAccounts.messages.createFailed'), {
+            variant: 'error',
+          });
         },
       },
     );
@@ -52,14 +61,24 @@ const CreateBankAccount = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormCard title={t('bankAccounts.create.title')} titleClassName="text-center">
+          <FormCard
+            title={t('bankAccounts.create.title')}
+            titleClassName="text-center"
+          >
             <div className="mx-auto max-w-3xl space-y-4">
-              <BankAccountFormFields control={form.control} getValues={form.getValues} />
+              <BankAccountFormFields
+                control={form.control}
+                getValues={form.getValues}
+              />
             </div>
           </FormCard>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => navigate('/bank-accounts')}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/bank-accounts')}
+            >
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type InvoiceResponseDtoKind = typeof InvoiceResponseDtoKind[keyof typeof InvoiceResponseDtoKind];
-
+export type InvoiceResponseDtoKind =
+  (typeof InvoiceResponseDtoKind)[keyof typeof InvoiceResponseDtoKind];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceResponseDtoKind = {

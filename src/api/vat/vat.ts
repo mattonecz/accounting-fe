@@ -5,9 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,206 +15,320 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   InvoiceResponseDto,
   VatExportDefault,
   VatExportParams,
-  VatSummaryByMonthParams
+  VatSummaryByMonthParams,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Export VAT return and control statement XML
  */
 export const vatExport = (
-    params: VatExportParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<VatExportDefault>> => {
-    
-    
-    return axios.default.get(
-      `/vat/export`,{
+  params: VatExportParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<VatExportDefault>> => {
+  return axios.default.get(`/vat/export`, {
     ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
+    params: { ...params, ...options?.params },
+  });
+};
 
+export const getVatExportQueryKey = (params?: VatExportParams) => {
+  return [`/vat/export`, ...(params ? [params] : [])] as const;
+};
 
-
-
-export const getVatExportQueryKey = (params?: VatExportParams,) => {
-    return [
-    `/vat/export`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getVatExportQueryOptions = <TData = Awaited<ReturnType<typeof vatExport>>, TError = AxiosError<VatExportDefault>>(params: VatExportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getVatExportQueryOptions = <
+  TData = Awaited<ReturnType<typeof vatExport>>,
+  TError = AxiosError<VatExportDefault>,
+>(
+  params: VatExportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getVatExportQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getVatExportQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof vatExport>>> = ({
+    signal,
+  }) => vatExport(params, { signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof vatExport>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof vatExport>>> = ({ signal }) => vatExport(params, { signal, ...axiosOptions });
+export type VatExportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof vatExport>>
+>;
+export type VatExportQueryError = AxiosError<VatExportDefault>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type VatExportQueryResult = NonNullable<Awaited<ReturnType<typeof vatExport>>>
-export type VatExportQueryError = AxiosError<VatExportDefault>
-
-
-export function useVatExport<TData = Awaited<ReturnType<typeof vatExport>>, TError = AxiosError<VatExportDefault>>(
- params: VatExportParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>> & Pick<
+export function useVatExport<
+  TData = Awaited<ReturnType<typeof vatExport>>,
+  TError = AxiosError<VatExportDefault>,
+>(
+  params: VatExportParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof vatExport>>,
           TError,
           Awaited<ReturnType<typeof vatExport>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useVatExport<TData = Awaited<ReturnType<typeof vatExport>>, TError = AxiosError<VatExportDefault>>(
- params: VatExportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVatExport<
+  TData = Awaited<ReturnType<typeof vatExport>>,
+  TError = AxiosError<VatExportDefault>,
+>(
+  params: VatExportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof vatExport>>,
           TError,
           Awaited<ReturnType<typeof vatExport>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useVatExport<TData = Awaited<ReturnType<typeof vatExport>>, TError = AxiosError<VatExportDefault>>(
- params: VatExportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVatExport<
+  TData = Awaited<ReturnType<typeof vatExport>>,
+  TError = AxiosError<VatExportDefault>,
+>(
+  params: VatExportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Export VAT return and control statement XML
  */
 
-export function useVatExport<TData = Awaited<ReturnType<typeof vatExport>>, TError = AxiosError<VatExportDefault>>(
- params: VatExportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useVatExport<
+  TData = Awaited<ReturnType<typeof vatExport>>,
+  TError = AxiosError<VatExportDefault>,
+>(
+  params: VatExportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof vatExport>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getVatExportQueryOptions(params, options);
 
-  const queryOptions = getVatExportQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary List invoices contributing to the VAT return for a given month
  */
 export const vatSummaryByMonth = (
-    params: VatSummaryByMonthParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/vat/summary-by-month`,{
+  params: VatSummaryByMonthParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto[]>> => {
+  return axios.default.get(`/vat/summary-by-month`, {
     ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
+    params: { ...params, ...options?.params },
+  });
+};
 
-
-
-
-export const getVatSummaryByMonthQueryKey = (params?: VatSummaryByMonthParams,) => {
-    return [
-    `/vat/summary-by-month`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getVatSummaryByMonthQueryOptions = <TData = Awaited<ReturnType<typeof vatSummaryByMonth>>, TError = AxiosError<unknown>>(params: VatSummaryByMonthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getVatSummaryByMonthQueryKey = (
+  params?: VatSummaryByMonthParams,
 ) => {
+  return [`/vat/summary-by-month`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+export const getVatSummaryByMonthQueryOptions = <
+  TData = Awaited<ReturnType<typeof vatSummaryByMonth>>,
+  TError = AxiosError<unknown>,
+>(
+  params: VatSummaryByMonthParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof vatSummaryByMonth>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getVatSummaryByMonthQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getVatSummaryByMonthQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof vatSummaryByMonth>>
+  > = ({ signal }) => vatSummaryByMonth(params, { signal, ...axiosOptions });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof vatSummaryByMonth>>> = ({ signal }) => vatSummaryByMonth(params, { signal, ...axiosOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof vatSummaryByMonth>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type VatSummaryByMonthQueryResult = NonNullable<
+  Awaited<ReturnType<typeof vatSummaryByMonth>>
+>;
+export type VatSummaryByMonthQueryError = AxiosError<unknown>;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type VatSummaryByMonthQueryResult = NonNullable<Awaited<ReturnType<typeof vatSummaryByMonth>>>
-export type VatSummaryByMonthQueryError = AxiosError<unknown>
-
-
-export function useVatSummaryByMonth<TData = Awaited<ReturnType<typeof vatSummaryByMonth>>, TError = AxiosError<unknown>>(
- params: VatSummaryByMonthParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData>> & Pick<
+export function useVatSummaryByMonth<
+  TData = Awaited<ReturnType<typeof vatSummaryByMonth>>,
+  TError = AxiosError<unknown>,
+>(
+  params: VatSummaryByMonthParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof vatSummaryByMonth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof vatSummaryByMonth>>,
           TError,
           Awaited<ReturnType<typeof vatSummaryByMonth>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useVatSummaryByMonth<TData = Awaited<ReturnType<typeof vatSummaryByMonth>>, TError = AxiosError<unknown>>(
- params: VatSummaryByMonthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVatSummaryByMonth<
+  TData = Awaited<ReturnType<typeof vatSummaryByMonth>>,
+  TError = AxiosError<unknown>,
+>(
+  params: VatSummaryByMonthParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof vatSummaryByMonth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof vatSummaryByMonth>>,
           TError,
           Awaited<ReturnType<typeof vatSummaryByMonth>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useVatSummaryByMonth<TData = Awaited<ReturnType<typeof vatSummaryByMonth>>, TError = AxiosError<unknown>>(
- params: VatSummaryByMonthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVatSummaryByMonth<
+  TData = Awaited<ReturnType<typeof vatSummaryByMonth>>,
+  TError = AxiosError<unknown>,
+>(
+  params: VatSummaryByMonthParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof vatSummaryByMonth>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List invoices contributing to the VAT return for a given month
  */
 
-export function useVatSummaryByMonth<TData = Awaited<ReturnType<typeof vatSummaryByMonth>>, TError = AxiosError<unknown>>(
- params: VatSummaryByMonthParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof vatSummaryByMonth>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useVatSummaryByMonth<
+  TData = Awaited<ReturnType<typeof vatSummaryByMonth>>,
+  TError = AxiosError<unknown>,
+>(
+  params: VatSummaryByMonthParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof vatSummaryByMonth>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getVatSummaryByMonthQueryOptions(params, options);
 
-  const queryOptions = getVatSummaryByMonthQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-

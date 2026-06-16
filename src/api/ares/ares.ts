@@ -5,154 +5,188 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   AresResponseDto,
   ContactSearchDto,
   RegistrationDataRequestDto,
-  RegistrationDataResponseDto
+  RegistrationDataResponseDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Search ARES registry
  */
 export const aresSearch = (
-    contactSearchDto: ContactSearchDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<AresResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/ares/search`,
-      contactSearchDto,options
-    );
-  }
+  contactSearchDto: ContactSearchDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<AresResponseDto>> => {
+  return axios.default.post(`/ares/search`, contactSearchDto, options);
+};
 
+export const getAresSearchMutationOptions = <
+  TError = AxiosError<AresResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof aresSearch>>,
+    TError,
+    { data: ContactSearchDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof aresSearch>>,
+  TError,
+  { data: ContactSearchDto },
+  TContext
+> => {
+  const mutationKey = ['aresSearch'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof aresSearch>>,
+    { data: ContactSearchDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getAresSearchMutationOptions = <TError = AxiosError<AresResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aresSearch>>, TError,{data: ContactSearchDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof aresSearch>>, TError,{data: ContactSearchDto}, TContext> => {
+    return aresSearch(data, axiosOptions);
+  };
 
-const mutationKey = ['aresSearch'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type AresSearchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof aresSearch>>
+>;
+export type AresSearchMutationBody = ContactSearchDto;
+export type AresSearchMutationError = AxiosError<AresResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof aresSearch>>, {data: ContactSearchDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  aresSearch(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AresSearchMutationResult = NonNullable<Awaited<ReturnType<typeof aresSearch>>>
-    export type AresSearchMutationBody = ContactSearchDto
-    export type AresSearchMutationError = AxiosError<AresResponseDto>
-
-    /**
+/**
  * @summary Search ARES registry
  */
-export const useAresSearch = <TError = AxiosError<AresResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aresSearch>>, TError,{data: ContactSearchDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof aresSearch>>,
-        TError,
-        {data: ContactSearchDto},
-        TContext
-      > => {
+export const useAresSearch = <
+  TError = AxiosError<AresResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof aresSearch>>,
+      TError,
+      { data: ContactSearchDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof aresSearch>>,
+  TError,
+  { data: ContactSearchDto },
+  TContext
+> => {
+  const mutationOptions = getAresSearchMutationOptions(options);
 
-      const mutationOptions = getAresSearchMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Get ARES registration data (+ optional VAT status)
  */
 export const getRegistrationData = (
-    registrationDataRequestDto: RegistrationDataRequestDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RegistrationDataResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/ares/registration-data`,
-      registrationDataRequestDto,options
-    );
-  }
+  registrationDataRequestDto: RegistrationDataRequestDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<RegistrationDataResponseDto>> => {
+  return axios.default.post(
+    `/ares/registration-data`,
+    registrationDataRequestDto,
+    options,
+  );
+};
 
+export const getGetRegistrationDataMutationOptions = <
+  TError = AxiosError<RegistrationDataResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof getRegistrationData>>,
+    TError,
+    { data: RegistrationDataRequestDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof getRegistrationData>>,
+  TError,
+  { data: RegistrationDataRequestDto },
+  TContext
+> => {
+  const mutationKey = ['getRegistrationData'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof getRegistrationData>>,
+    { data: RegistrationDataRequestDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getGetRegistrationDataMutationOptions = <TError = AxiosError<RegistrationDataResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRegistrationData>>, TError,{data: RegistrationDataRequestDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof getRegistrationData>>, TError,{data: RegistrationDataRequestDto}, TContext> => {
+    return getRegistrationData(data, axiosOptions);
+  };
 
-const mutationKey = ['getRegistrationData'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type GetRegistrationDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof getRegistrationData>>
+>;
+export type GetRegistrationDataMutationBody = RegistrationDataRequestDto;
+export type GetRegistrationDataMutationError =
+  AxiosError<RegistrationDataResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getRegistrationData>>, {data: RegistrationDataRequestDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  getRegistrationData(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetRegistrationDataMutationResult = NonNullable<Awaited<ReturnType<typeof getRegistrationData>>>
-    export type GetRegistrationDataMutationBody = RegistrationDataRequestDto
-    export type GetRegistrationDataMutationError = AxiosError<RegistrationDataResponseDto>
-
-    /**
+/**
  * @summary Get ARES registration data (+ optional VAT status)
  */
-export const useGetRegistrationData = <TError = AxiosError<RegistrationDataResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getRegistrationData>>, TError,{data: RegistrationDataRequestDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getRegistrationData>>,
-        TError,
-        {data: RegistrationDataRequestDto},
-        TContext
-      > => {
+export const useGetRegistrationData = <
+  TError = AxiosError<RegistrationDataResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof getRegistrationData>>,
+      TError,
+      { data: RegistrationDataRequestDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof getRegistrationData>>,
+  TError,
+  { data: RegistrationDataRequestDto },
+  TContext
+> => {
+  const mutationOptions = getGetRegistrationDataMutationOptions(options);
 
-      const mutationOptions = getGetRegistrationDataMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
+  return useMutation(mutationOptions, queryClient);
+};

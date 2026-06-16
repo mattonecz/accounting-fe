@@ -40,7 +40,9 @@ const CreateDataMessage = () => {
       },
       {
         onSuccess: () => {
-          enqueueSnackbar(t('dataMessages.create.success'), { variant: 'success' });
+          enqueueSnackbar(t('dataMessages.create.success'), {
+            variant: 'success',
+          });
           navigate('/data-messages');
         },
         onError: () => {
@@ -105,7 +107,7 @@ const CreateDataMessage = () => {
               id="xmlContent"
               className="min-h-[220px] font-mono"
               value={xmlContent}
-              placeholder="<?xml version=&quot;1.0&quot;?>"
+              placeholder='<?xml version="1.0"?>'
               onChange={(event) => setXmlContent(event.target.value)}
             />
           </div>
@@ -113,7 +115,10 @@ const CreateDataMessage = () => {
       </FormCard>
 
       <div className="flex justify-end">
-        <Button onClick={handleSubmit} disabled={!isValid || sendMessage.isPending}>
+        <Button
+          onClick={handleSubmit}
+          disabled={!isValid || sendMessage.isPending}
+        >
           {sendMessage.isPending
             ? t('dataMessages.create.submitting')
             : t('dataMessages.create.submit')}

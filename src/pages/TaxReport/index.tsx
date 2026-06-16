@@ -1,10 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { vatExport, useVatSummaryByMonth } from '@/api/vat/vat';
-import {
-  InvoiceResponseDtoKind,
-  type InvoiceResponseDto,
-} from '@/api/model';
+import { InvoiceResponseDtoKind, type InvoiceResponseDto } from '@/api/model';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
@@ -124,9 +121,14 @@ const TaxReport = () => {
               onMonthChange={setSelectedMonth}
               onYearChange={setSelectedYear}
             />
-            <Button onClick={() => void handleVatExport()} disabled={isExporting}>
+            <Button
+              onClick={() => void handleVatExport()}
+              disabled={isExporting}
+            >
               <FileSpreadsheet className="mr-2 h-4 w-4" />
-              {isExporting ? t('taxReport.actions.exporting') : t('taxReport.actions.export')}
+              {isExporting
+                ? t('taxReport.actions.exporting')
+                : t('taxReport.actions.export')}
             </Button>
           </>
         }
@@ -158,7 +160,11 @@ const TaxReport = () => {
           title={t('taxReport.statCards.result')}
           value={fmt(Math.abs(vysledekDPH))}
           icon={Calculator}
-          trend={vysledekDPH >= 0 ? t('taxReport.statCards.vatDue') : t('taxReport.statCards.vatRefund')}
+          trend={
+            vysledekDPH >= 0
+              ? t('taxReport.statCards.vatDue')
+              : t('taxReport.statCards.vatRefund')
+          }
           variant={vysledekDPH >= 0 ? 'destructive' : 'success'}
         />
       </div>
@@ -180,10 +186,7 @@ const TaxReport = () => {
           isError={isError}
         />
 
-        <VatExplanationCard
-          vysledekDPH={vysledekDPH}
-          isFetching={isFetching}
-        />
+        <VatExplanationCard vysledekDPH={vysledekDPH} isFetching={isFetching} />
       </div>
     </PageLayout>
   );

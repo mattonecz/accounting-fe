@@ -2,7 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { DataMessageDtoState } from '@/api/model';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, HelpCircle, PackageCheck, Send, XCircle } from 'lucide-react';
+import {
+  CheckCircle2,
+  HelpCircle,
+  PackageCheck,
+  Send,
+  XCircle,
+} from 'lucide-react';
 
 type DataMessageStatusBadgeProps = {
   state: DataMessageDtoState;
@@ -44,7 +50,10 @@ export function DataMessageStatusBadge({
   const Icon = config?.icon ?? HelpCircle;
 
   return (
-    <Badge variant="outline" className={cn('gap-1.5', config?.className, className)}>
+    <Badge
+      variant="outline"
+      className={cn('gap-1.5', config?.className, className)}
+    >
       <Icon className="h-3.5 w-3.5" />
       <span>{t(`dataMessages.states.${state}`, state)}</span>
     </Badge>

@@ -7,7 +7,10 @@ type InvoiceStatusDotProps = {
   className?: string;
 };
 
-const statusStyles: Record<InvoiceDisplayStatus, { dot: string; text: string }> = {
+const statusStyles: Record<
+  InvoiceDisplayStatus,
+  { dot: string; text: string }
+> = {
   PAID: { dot: 'bg-success', text: 'text-success' },
   ISSUED: { dot: 'bg-muted-foreground', text: 'text-muted-foreground' },
   OVERDUE: { dot: 'bg-destructive', text: 'text-destructive' },

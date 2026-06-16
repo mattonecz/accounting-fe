@@ -18,10 +18,7 @@ export const FormCard = ({
 }: FormCardProps) => (
   <Card className={cn('p-6', className)}>
     <div
-      className={cn(
-        'mb-6',
-        actions ? 'flex items-center justify-between' : '',
-      )}
+      className={cn('mb-6', actions ? 'flex items-center justify-between' : '')}
     >
       <h3 className={cn('text-lg font-semibold', titleClassName)}>{title}</h3>
       {actions}

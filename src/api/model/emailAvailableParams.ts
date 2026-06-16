@@ -7,5 +7,5 @@
  */
 
 export type EmailAvailableParams = {
-email: string;
+  email: string;
 };

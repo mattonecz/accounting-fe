@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,473 +18,716 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   CreatePaymentDto,
   PaymentResponseDto,
-  UpdatePaymentDto
+  UpdatePaymentDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Create payment
  */
 export const paymentCreate = (
-    createPaymentDto: CreatePaymentDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaymentResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/payments`,
-      createPaymentDto,options
-    );
-  }
+  createPaymentDto: CreatePaymentDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaymentResponseDto>> => {
+  return axios.default.post(`/payments`, createPaymentDto, options);
+};
 
+export const getPaymentCreateMutationOptions = <
+  TError = AxiosError<PaymentResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof paymentCreate>>,
+    TError,
+    { data: CreatePaymentDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof paymentCreate>>,
+  TError,
+  { data: CreatePaymentDto },
+  TContext
+> => {
+  const mutationKey = ['paymentCreate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof paymentCreate>>,
+    { data: CreatePaymentDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getPaymentCreateMutationOptions = <TError = AxiosError<PaymentResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentCreate>>, TError,{data: CreatePaymentDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof paymentCreate>>, TError,{data: CreatePaymentDto}, TContext> => {
+    return paymentCreate(data, axiosOptions);
+  };
 
-const mutationKey = ['paymentCreate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type PaymentCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof paymentCreate>>
+>;
+export type PaymentCreateMutationBody = CreatePaymentDto;
+export type PaymentCreateMutationError = AxiosError<PaymentResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof paymentCreate>>, {data: CreatePaymentDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  paymentCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PaymentCreateMutationResult = NonNullable<Awaited<ReturnType<typeof paymentCreate>>>
-    export type PaymentCreateMutationBody = CreatePaymentDto
-    export type PaymentCreateMutationError = AxiosError<PaymentResponseDto>
-
-    /**
+/**
  * @summary Create payment
  */
-export const usePaymentCreate = <TError = AxiosError<PaymentResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentCreate>>, TError,{data: CreatePaymentDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof paymentCreate>>,
-        TError,
-        {data: CreatePaymentDto},
-        TContext
-      > => {
+export const usePaymentCreate = <
+  TError = AxiosError<PaymentResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof paymentCreate>>,
+      TError,
+      { data: CreatePaymentDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof paymentCreate>>,
+  TError,
+  { data: CreatePaymentDto },
+  TContext
+> => {
+  const mutationOptions = getPaymentCreateMutationOptions(options);
 
-      const mutationOptions = getPaymentCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Update payment
  */
 export const paymentUpdate = (
-    updatePaymentDto: UpdatePaymentDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaymentResponseDto>> => {
-    
-    
-    return axios.default.patch(
-      `/payments`,
-      updatePaymentDto,options
-    );
-  }
+  updatePaymentDto: UpdatePaymentDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaymentResponseDto>> => {
+  return axios.default.patch(`/payments`, updatePaymentDto, options);
+};
 
+export const getPaymentUpdateMutationOptions = <
+  TError = AxiosError<PaymentResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof paymentUpdate>>,
+    TError,
+    { data: UpdatePaymentDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof paymentUpdate>>,
+  TError,
+  { data: UpdatePaymentDto },
+  TContext
+> => {
+  const mutationKey = ['paymentUpdate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof paymentUpdate>>,
+    { data: UpdatePaymentDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getPaymentUpdateMutationOptions = <TError = AxiosError<PaymentResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentUpdate>>, TError,{data: UpdatePaymentDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof paymentUpdate>>, TError,{data: UpdatePaymentDto}, TContext> => {
+    return paymentUpdate(data, axiosOptions);
+  };
 
-const mutationKey = ['paymentUpdate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type PaymentUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof paymentUpdate>>
+>;
+export type PaymentUpdateMutationBody = UpdatePaymentDto;
+export type PaymentUpdateMutationError = AxiosError<PaymentResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof paymentUpdate>>, {data: UpdatePaymentDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  paymentUpdate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PaymentUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof paymentUpdate>>>
-    export type PaymentUpdateMutationBody = UpdatePaymentDto
-    export type PaymentUpdateMutationError = AxiosError<PaymentResponseDto>
-
-    /**
+/**
  * @summary Update payment
  */
-export const usePaymentUpdate = <TError = AxiosError<PaymentResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentUpdate>>, TError,{data: UpdatePaymentDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof paymentUpdate>>,
-        TError,
-        {data: UpdatePaymentDto},
-        TContext
-      > => {
+export const usePaymentUpdate = <
+  TError = AxiosError<PaymentResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof paymentUpdate>>,
+      TError,
+      { data: UpdatePaymentDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof paymentUpdate>>,
+  TError,
+  { data: UpdatePaymentDto },
+  TContext
+> => {
+  const mutationOptions = getPaymentUpdateMutationOptions(options);
 
-      const mutationOptions = getPaymentUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary List payments by company
  */
 export const paymentListByCompany = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaymentResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/payments/list`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaymentResponseDto[]>> => {
+  return axios.default.get(`/payments/list`, options);
+};
 
 export const getPaymentListByCompanyQueryKey = () => {
-    return [
-    `/payments/list`
-    ] as const;
-    }
+  return [`/payments/list`] as const;
+};
 
-    
-export const getPaymentListByCompanyQueryOptions = <TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getPaymentListByCompanyQueryOptions = <
+  TData = Awaited<ReturnType<typeof paymentListByCompany>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof paymentListByCompany>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getPaymentListByCompanyQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getPaymentListByCompanyQueryKey();
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof paymentListByCompany>>
+  > = ({ signal }) => paymentListByCompany({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof paymentListByCompany>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentListByCompany>>> = ({ signal }) => paymentListByCompany({ signal, ...axiosOptions });
+export type PaymentListByCompanyQueryResult = NonNullable<
+  Awaited<ReturnType<typeof paymentListByCompany>>
+>;
+export type PaymentListByCompanyQueryError = AxiosError<PaymentResponseDto[]>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PaymentListByCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof paymentListByCompany>>>
-export type PaymentListByCompanyQueryError = AxiosError<PaymentResponseDto[]>
-
-
-export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>> & Pick<
+export function usePaymentListByCompany<
+  TData = Awaited<ReturnType<typeof paymentListByCompany>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByCompany>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentListByCompany>>,
           TError,
           Awaited<ReturnType<typeof paymentListByCompany>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentListByCompany<
+  TData = Awaited<ReturnType<typeof paymentListByCompany>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByCompany>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentListByCompany>>,
           TError,
           Awaited<ReturnType<typeof paymentListByCompany>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentListByCompany<
+  TData = Awaited<ReturnType<typeof paymentListByCompany>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByCompany>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List payments by company
  */
 
-export function usePaymentListByCompany<TData = Awaited<ReturnType<typeof paymentListByCompany>>, TError = AxiosError<PaymentResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function usePaymentListByCompany<
+  TData = Awaited<ReturnType<typeof paymentListByCompany>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByCompany>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getPaymentListByCompanyQueryOptions(options);
 
-  const queryOptions = getPaymentListByCompanyQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary List payments by invoice
  */
 export const paymentListByInvoice = (
-    invoiceId: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaymentResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/payments/invoice/${invoiceId}`,options
-    );
-  }
+  invoiceId: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaymentResponseDto[]>> => {
+  return axios.default.get(`/payments/invoice/${invoiceId}`, options);
+};
 
+export const getPaymentListByInvoiceQueryKey = (invoiceId?: string) => {
+  return [`/payments/invoice/${invoiceId}`] as const;
+};
 
-
-
-export const getPaymentListByInvoiceQueryKey = (invoiceId?: string,) => {
-    return [
-    `/payments/invoice/${invoiceId}`
-    ] as const;
-    }
-
-    
-export const getPaymentListByInvoiceQueryOptions = <TData = Awaited<ReturnType<typeof paymentListByInvoice>>, TError = AxiosError<PaymentResponseDto[]>>(invoiceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getPaymentListByInvoiceQueryOptions = <
+  TData = Awaited<ReturnType<typeof paymentListByInvoice>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  invoiceId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getPaymentListByInvoiceQueryKey(invoiceId);
 
-  const queryKey =  queryOptions?.queryKey ?? getPaymentListByInvoiceQueryKey(invoiceId);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof paymentListByInvoice>>
+  > = ({ signal }) =>
+    paymentListByInvoice(invoiceId, { signal, ...axiosOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!invoiceId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof paymentListByInvoice>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentListByInvoice>>> = ({ signal }) => paymentListByInvoice(invoiceId, { signal, ...axiosOptions });
+export type PaymentListByInvoiceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof paymentListByInvoice>>
+>;
+export type PaymentListByInvoiceQueryError = AxiosError<PaymentResponseDto[]>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(invoiceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PaymentListByInvoiceQueryResult = NonNullable<Awaited<ReturnType<typeof paymentListByInvoice>>>
-export type PaymentListByInvoiceQueryError = AxiosError<PaymentResponseDto[]>
-
-
-export function usePaymentListByInvoice<TData = Awaited<ReturnType<typeof paymentListByInvoice>>, TError = AxiosError<PaymentResponseDto[]>>(
- invoiceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData>> & Pick<
+export function usePaymentListByInvoice<
+  TData = Awaited<ReturnType<typeof paymentListByInvoice>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  invoiceId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByInvoice>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentListByInvoice>>,
           TError,
           Awaited<ReturnType<typeof paymentListByInvoice>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByInvoice<TData = Awaited<ReturnType<typeof paymentListByInvoice>>, TError = AxiosError<PaymentResponseDto[]>>(
- invoiceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentListByInvoice<
+  TData = Awaited<ReturnType<typeof paymentListByInvoice>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  invoiceId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByInvoice>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentListByInvoice>>,
           TError,
           Awaited<ReturnType<typeof paymentListByInvoice>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentListByInvoice<TData = Awaited<ReturnType<typeof paymentListByInvoice>>, TError = AxiosError<PaymentResponseDto[]>>(
- invoiceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentListByInvoice<
+  TData = Awaited<ReturnType<typeof paymentListByInvoice>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  invoiceId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List payments by invoice
  */
 
-export function usePaymentListByInvoice<TData = Awaited<ReturnType<typeof paymentListByInvoice>>, TError = AxiosError<PaymentResponseDto[]>>(
- invoiceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentListByInvoice>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function usePaymentListByInvoice<
+  TData = Awaited<ReturnType<typeof paymentListByInvoice>>,
+  TError = AxiosError<PaymentResponseDto[]>,
+>(
+  invoiceId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof paymentListByInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getPaymentListByInvoiceQueryOptions(invoiceId, options);
 
-  const queryOptions = getPaymentListByInvoiceQueryOptions(invoiceId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Get payment by id
  */
 export const paymentGet = (
-    id: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaymentResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/payments/${id}`,options
-    );
-  }
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaymentResponseDto>> => {
+  return axios.default.get(`/payments/${id}`, options);
+};
 
+export const getPaymentGetQueryKey = (id?: string) => {
+  return [`/payments/${id}`] as const;
+};
 
-
-
-export const getPaymentGetQueryKey = (id?: string,) => {
-    return [
-    `/payments/${id}`
-    ] as const;
-    }
-
-    
-export const getPaymentGetQueryOptions = <TData = Awaited<ReturnType<typeof paymentGet>>, TError = AxiosError<PaymentResponseDto>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getPaymentGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof paymentGet>>,
+  TError = AxiosError<PaymentResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getPaymentGetQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getPaymentGetQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentGet>>> = ({
+    signal,
+  }) => paymentGet(id, { signal, ...axiosOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof paymentGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentGet>>> = ({ signal }) => paymentGet(id, { signal, ...axiosOptions });
+export type PaymentGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof paymentGet>>
+>;
+export type PaymentGetQueryError = AxiosError<PaymentResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PaymentGetQueryResult = NonNullable<Awaited<ReturnType<typeof paymentGet>>>
-export type PaymentGetQueryError = AxiosError<PaymentResponseDto>
-
-
-export function usePaymentGet<TData = Awaited<ReturnType<typeof paymentGet>>, TError = AxiosError<PaymentResponseDto>>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>> & Pick<
+export function usePaymentGet<
+  TData = Awaited<ReturnType<typeof paymentGet>>,
+  TError = AxiosError<PaymentResponseDto>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentGet>>,
           TError,
           Awaited<ReturnType<typeof paymentGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentGet<TData = Awaited<ReturnType<typeof paymentGet>>, TError = AxiosError<PaymentResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentGet<
+  TData = Awaited<ReturnType<typeof paymentGet>>,
+  TError = AxiosError<PaymentResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof paymentGet>>,
           TError,
           Awaited<ReturnType<typeof paymentGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePaymentGet<TData = Awaited<ReturnType<typeof paymentGet>>, TError = AxiosError<PaymentResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePaymentGet<
+  TData = Awaited<ReturnType<typeof paymentGet>>,
+  TError = AxiosError<PaymentResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get payment by id
  */
 
-export function usePaymentGet<TData = Awaited<ReturnType<typeof paymentGet>>, TError = AxiosError<PaymentResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function usePaymentGet<
+  TData = Awaited<ReturnType<typeof paymentGet>>,
+  TError = AxiosError<PaymentResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof paymentGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getPaymentGetQueryOptions(id, options);
 
-  const queryOptions = getPaymentGetQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Delete payment
  */
 export const paymentDelete = (
-    id: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<void>> => {
-    
-    
-    return axios.default.delete(
-      `/payments/${id}`,options
-    );
-  }
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<void>> => {
+  return axios.default.delete(`/payments/${id}`, options);
+};
 
+export const getPaymentDeleteMutationOptions = <
+  TError = AxiosError<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof paymentDelete>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof paymentDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['paymentDelete'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof paymentDelete>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
-export const getPaymentDeleteMutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof paymentDelete>>, TError,{id: string}, TContext> => {
+    return paymentDelete(id, axiosOptions);
+  };
 
-const mutationKey = ['paymentDelete'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type PaymentDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof paymentDelete>>
+>;
 
+export type PaymentDeleteMutationError = AxiosError<unknown>;
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof paymentDelete>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  paymentDelete(id,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PaymentDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof paymentDelete>>>
-    
-    export type PaymentDeleteMutationError = AxiosError<unknown>
-
-    /**
+/**
  * @summary Delete payment
  */
-export const usePaymentDelete = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof paymentDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof paymentDelete>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const usePaymentDelete = <
+  TError = AxiosError<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof paymentDelete>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof paymentDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getPaymentDeleteMutationOptions(options);
 
-      const mutationOptions = getPaymentDeleteMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
+  return useMutation(mutationOptions, queryClient);
+};

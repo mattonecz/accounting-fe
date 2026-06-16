@@ -2,19 +2,17 @@ import { useTranslation } from 'react-i18next';
 import { InvoiceResponseDtoStatus } from '@/api/model';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import {
-  CheckCircle2,
-  FileText,
-  Pencil,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle2, FileText, Pencil, XCircle } from 'lucide-react';
 
 type InvoiceStatusBadgeProps = {
   status: InvoiceResponseDtoStatus;
   className?: string;
 };
 
-const statusStyles: Record<InvoiceResponseDtoStatus, { className: string; icon: typeof Pencil }> = {
+const statusStyles: Record<
+  InvoiceResponseDtoStatus,
+  { className: string; icon: typeof Pencil }
+> = {
   [InvoiceResponseDtoStatus.DRAFT]: {
     className: 'border-slate-200 bg-slate-100 text-slate-700',
     icon: Pencil,

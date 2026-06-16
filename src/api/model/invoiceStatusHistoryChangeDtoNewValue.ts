@@ -10,4 +10,6 @@
  * New field value after the change
  * @nullable
  */
-export type InvoiceStatusHistoryChangeDtoNewValue = { [key: string]: unknown } | null;
+export type InvoiceStatusHistoryChangeDtoNewValue = {
+  [key: string]: unknown;
+} | null;

@@ -23,6 +23,7 @@ import CreateInvoice from './pages/CreateInvoice';
 import UpdateInvoice from './pages/UpdateInvoice';
 import SimpleInvoices from './pages/SimpleInvoices';
 import CreateSimpleInvoice from './pages/CreateSimpleInvoice';
+import UpdateSimpleInvoice from './pages/UpdateSimpleInvoice';
 import InvoiceDetail from './pages/InvoiceDetail';
 import TaxReport from './pages/TaxReport';
 import TaxFilings from './pages/TaxFilings';
@@ -40,124 +41,131 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nextProvider i18n={i18n}>
-    <AuthProvider>
-      <SnackbarProvider
-        maxSnack={3}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        autoHideDuration={3000}
-      >
-        <TooltipProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/onboarding"
-                element={
-                  <ProtectedRoute requireNoCompany>
-                    <Onboarding />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/*"
-                element={
-                  <ProtectedRoute requireCompany>
-                    <div className="flex min-h-screen bg-background">
-                      <Sidebar />
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <MobileTopBar />
-                        <Topbar />
-                        <Routes>
-                          <Route path="/" element={<Dashboard />} />
-                          <Route path="/contacts" element={<Contacts />} />
-                          <Route
-                            path="/contacts/create"
-                            element={<CreateContact />}
-                          />
-                          <Route
-                            path="/contacts/:id/edit"
-                            element={<UpdateContact />}
-                          />
-                          <Route
-                            path="/contacts/:id"
-                            element={<ContactDetail />}
-                          />
-                          <Route
-                            path="/bank-accounts"
-                            element={<BankAccounts />}
-                          />
-                          <Route
-                            path="/bank-accounts/create"
-                            element={<CreateBankAccount />}
-                          />
-                          <Route
-                            path="/bank-accounts/:id/edit"
-                            element={<UpdateBankAccount />}
-                          />
-                          <Route
-                            path="/incoming-invoices"
-                            element={<IncomingInvoices />}
-                          />
-                          <Route
-                            path="/outgoing-invoices"
-                            element={<OutgoingInvoices />}
-                          />
-                          <Route
-                            path="/invoices/create"
-                            element={<CreateInvoice />}
-                          />
-                          <Route
-                            path="/invoices/:id/edit"
-                            element={<UpdateInvoice />}
-                          />
-                          <Route
-                            path="/invoices/simple"
-                            element={<SimpleInvoices />}
-                          />
-                          <Route
-                            path="/invoices/simple/create"
-                            element={<CreateSimpleInvoice />}
-                          />
-                          <Route
-                            path="/invoices/:id"
-                            element={<InvoiceDetail />}
-                          />
-                          <Route path="/tax-report" element={<TaxReport />} />
-                          <Route path="/tax-filings" element={<TaxFilings />} />
-                          <Route
-                            path="/tax-filings/create"
-                            element={<CreateTaxFiling />}
-                          />
-                          <Route
-                            path="/tax-filings/:id"
-                            element={<TaxFilingDetail />}
-                          />
-                          <Route
-                            path="/data-messages"
-                            element={<DataMessages />}
-                          />
-                          <Route
-                            path="/data-messages/create"
-                            element={<CreateDataMessage />}
-                          />
-                          <Route
-                            path="/data-messages/:id"
-                            element={<DataMessageDetail />}
-                          />
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
+      <AuthProvider>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          autoHideDuration={3000}
+        >
+          <TooltipProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <ProtectedRoute requireNoCompany>
+                      <Onboarding />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/*"
+                  element={
+                    <ProtectedRoute requireCompany>
+                      <div className="flex min-h-screen bg-background">
+                        <Sidebar />
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <MobileTopBar />
+                          <Topbar />
+                          <Routes>
+                            <Route path="/" element={<Dashboard />} />
+                            <Route path="/contacts" element={<Contacts />} />
+                            <Route
+                              path="/contacts/create"
+                              element={<CreateContact />}
+                            />
+                            <Route
+                              path="/contacts/:id/edit"
+                              element={<UpdateContact />}
+                            />
+                            <Route
+                              path="/contacts/:id"
+                              element={<ContactDetail />}
+                            />
+                            <Route
+                              path="/bank-accounts"
+                              element={<BankAccounts />}
+                            />
+                            <Route
+                              path="/bank-accounts/create"
+                              element={<CreateBankAccount />}
+                            />
+                            <Route
+                              path="/bank-accounts/:id/edit"
+                              element={<UpdateBankAccount />}
+                            />
+                            <Route
+                              path="/incoming-invoices"
+                              element={<IncomingInvoices />}
+                            />
+                            <Route
+                              path="/outgoing-invoices"
+                              element={<OutgoingInvoices />}
+                            />
+                            <Route
+                              path="/invoices/create"
+                              element={<CreateInvoice />}
+                            />
+                            <Route
+                              path="/invoices/:id/edit"
+                              element={<UpdateInvoice />}
+                            />
+                            <Route
+                              path="/invoices/simple"
+                              element={<SimpleInvoices />}
+                            />
+                            <Route
+                              path="/invoices/simple/create"
+                              element={<CreateSimpleInvoice />}
+                            />
+                            <Route
+                              path="/invoices/simple/:id/edit"
+                              element={<UpdateSimpleInvoice />}
+                            />
+                            <Route
+                              path="/invoices/:id"
+                              element={<InvoiceDetail />}
+                            />
+                            <Route path="/tax-report" element={<TaxReport />} />
+                            <Route
+                              path="/tax-filings"
+                              element={<TaxFilings />}
+                            />
+                            <Route
+                              path="/tax-filings/create"
+                              element={<CreateTaxFiling />}
+                            />
+                            <Route
+                              path="/tax-filings/:id"
+                              element={<TaxFilingDetail />}
+                            />
+                            <Route
+                              path="/data-messages"
+                              element={<DataMessages />}
+                            />
+                            <Route
+                              path="/data-messages/create"
+                              element={<CreateDataMessage />}
+                            />
+                            <Route
+                              path="/data-messages/:id"
+                              element={<DataMessageDetail />}
+                            />
+                            <Route path="*" element={<NotFound />} />
+                          </Routes>
+                        </div>
+                        <AiChatDialog />
                       </div>
-                      <AiChatDialog />
-                    </div>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SnackbarProvider>
-    </AuthProvider>
-  </I18nextProvider>
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SnackbarProvider>
+      </AuthProvider>
+    </I18nextProvider>
   </QueryClientProvider>
 );
 

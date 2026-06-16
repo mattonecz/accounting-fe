@@ -16,7 +16,9 @@ interface ContactInvoicesCardProps {
   contactId: string;
 }
 
-export const ContactInvoicesCard = ({ contactId }: ContactInvoicesCardProps) => {
+export const ContactInvoicesCard = ({
+  contactId,
+}: ContactInvoicesCardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -46,16 +48,23 @@ export const ContactInvoicesCard = ({ contactId }: ContactInvoicesCardProps) => 
     {
       header: t('invoices.list.columns.amount'),
       cell: (invoice: InvoiceResponseDto) =>
-        formatMoney(invoice.totalWithTax, invoice.currency || 'CZK', i18n.language),
+        formatMoney(
+          invoice.totalWithTax,
+          invoice.currency || 'CZK',
+          i18n.language,
+        ),
       cellClassName: 'font-semibold',
     },
     {
       header: t('invoices.list.columns.status'),
-      cell: (invoice: InvoiceResponseDto) => <InvoiceStatusBadge status={invoice.status} />,
+      cell: (invoice: InvoiceResponseDto) => (
+        <InvoiceStatusBadge status={invoice.status} />
+      ),
     },
     {
       header: t('invoices.list.columns.createdDate'),
-      cell: (invoice: InvoiceResponseDto) => formatDate(invoice.createdDate, i18n.language),
+      cell: (invoice: InvoiceResponseDto) =>
+        formatDate(invoice.createdDate, i18n.language),
       cellClassName: 'text-muted-foreground',
     },
   ];
@@ -75,7 +84,10 @@ export const ContactInvoicesCard = ({ contactId }: ContactInvoicesCardProps) => 
         totalPages > 1 ? (
           <div className="flex items-center justify-between gap-4">
             <span className="text-sm text-muted-foreground">
-              {t('common.pagination.pageOf', { page: result?.page ?? page, totalPages })}
+              {t('common.pagination.pageOf', {
+                page: result?.page ?? page,
+                totalPages,
+              })}
             </span>
             <div className="flex gap-2">
               <Button

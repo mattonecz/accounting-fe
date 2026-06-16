@@ -9,8 +9,8 @@
 /**
  * CLAIMED is reserved for the future tax-filing workflow and cannot be set via API.
  */
-export type UpdateInvoiceDtoVatClaimStatus = typeof UpdateInvoiceDtoVatClaimStatus[keyof typeof UpdateInvoiceDtoVatClaimStatus];
-
+export type UpdateInvoiceDtoVatClaimStatus =
+  (typeof UpdateInvoiceDtoVatClaimStatus)[keyof typeof UpdateInvoiceDtoVatClaimStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateInvoiceDtoVatClaimStatus = {

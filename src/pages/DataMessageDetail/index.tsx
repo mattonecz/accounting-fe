@@ -12,7 +12,13 @@ import { DataMessageStatusBadge } from '@/components/DataMessageStatusBadge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { formatDate, formatDateTime } from '@/lib/formatters';
 
-const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const InfoRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) => (
   <div className="flex items-center justify-between border-b border-border/60 py-2 last:border-0">
     <span className="text-sm text-muted-foreground">{label}</span>
     <span className="text-sm font-medium">{value}</span>
@@ -63,7 +69,9 @@ const DataMessageDetail = () => {
   if (!id) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">{t('dataMessages.detail.invalidId')}</p>
+        <p className="text-muted-foreground">
+          {t('dataMessages.detail.invalidId')}
+        </p>
       </PageLayout>
     );
   }
@@ -71,7 +79,9 @@ const DataMessageDetail = () => {
   if (recordLoading) {
     return (
       <PageLayout>
-        <p className="text-muted-foreground">{t('dataMessages.detail.loading')}</p>
+        <p className="text-muted-foreground">
+          {t('dataMessages.detail.loading')}
+        </p>
       </PageLayout>
     );
   }
@@ -120,7 +130,10 @@ const DataMessageDetail = () => {
             label={t('dataMessages.detail.direction')}
             value={
               record
-                ? t(`dataMessages.directions.${record.direction}`, record.direction)
+                ? t(
+                    `dataMessages.directions.${record.direction}`,
+                    record.direction,
+                  )
                 : '–'
             }
           />

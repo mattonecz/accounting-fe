@@ -10,4 +10,6 @@
  * Financial office code (číslo FÚ) the payer belongs to.
  * @nullable
  */
-export type RegistrationDataResponseDtoTaxOfficeCode = { [key: string]: unknown } | null;
+export type RegistrationDataResponseDtoTaxOfficeCode = {
+  [key: string]: unknown;
+} | null;

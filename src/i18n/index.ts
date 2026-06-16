@@ -6,7 +6,8 @@ import en from './locales/en.json';
 const savedLanguage = localStorage.getItem('app-language');
 const browserLanguage = navigator.language.split('-')[0];
 const defaultLanguage =
-  savedLanguage ?? (['cs', 'en'].includes(browserLanguage) ? browserLanguage : 'cs');
+  savedLanguage ??
+  (['cs', 'en'].includes(browserLanguage) ? browserLanguage : 'cs');
 
 i18n.use(initReactI18next).init({
   resources: {

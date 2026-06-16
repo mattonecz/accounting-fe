@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdatePaymentDtoPaymentMethod = typeof UpdatePaymentDtoPaymentMethod[keyof typeof UpdatePaymentDtoPaymentMethod];
-
+export type UpdatePaymentDtoPaymentMethod =
+  (typeof UpdatePaymentDtoPaymentMethod)[keyof typeof UpdatePaymentDtoPaymentMethod];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdatePaymentDtoPaymentMethod = {

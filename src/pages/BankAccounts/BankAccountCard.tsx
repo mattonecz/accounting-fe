@@ -11,8 +11,9 @@ import { Pencil, Star } from 'lucide-react';
 import type { BankResponseDto } from '@/api/model';
 import { cn } from '@/lib/utils';
 
-const getAccountIdentifier = (account: Pick<BankResponseDto, 'number' | 'iban'>) =>
-  account.number || account.iban || '-';
+const getAccountIdentifier = (
+  account: Pick<BankResponseDto, 'number' | 'iban'>,
+) => account.number || account.iban || '-';
 
 interface BankAccountCardProps {
   account: BankResponseDto;
@@ -20,7 +21,11 @@ interface BankAccountCardProps {
   onSetDefault: (account: BankResponseDto) => void;
 }
 
-export const BankAccountCard = ({ account, onEdit, onSetDefault }: BankAccountCardProps) => {
+export const BankAccountCard = ({
+  account,
+  onEdit,
+  onSetDefault,
+}: BankAccountCardProps) => {
   const { t } = useTranslation();
 
   return (
@@ -56,9 +61,15 @@ export const BankAccountCard = ({ account, onEdit, onSetDefault }: BankAccountCa
                 ? t('bankAccounts.defaultAccount')
                 : t('bankAccounts.setNameAsDefault', { name: account.name })
             }
-            title={account.default ? t('bankAccounts.defaultAccount') : t('bankAccounts.setAsDefault')}
+            title={
+              account.default
+                ? t('bankAccounts.defaultAccount')
+                : t('bankAccounts.setAsDefault')
+            }
           >
-            <Star className={cn('h-4 w-4', account.default && 'fill-current')} />
+            <Star
+              className={cn('h-4 w-4', account.default && 'fill-current')}
+            />
           </Button>
         </div>
       </CardHeader>
@@ -66,7 +77,9 @@ export const BankAccountCard = ({ account, onEdit, onSetDefault }: BankAccountCa
         <div className="space-y-2">
           <div>
             <p className="text-sm text-muted-foreground">
-              {account.number ? t('bankAccounts.fields.number') : t('bankAccounts.fields.iban')}
+              {account.number
+                ? t('bankAccounts.fields.number')
+                : t('bankAccounts.fields.iban')}
             </p>
             <p className="text-base font-medium text-foreground">
               {getAccountIdentifier(account)}
@@ -76,7 +89,9 @@ export const BankAccountCard = ({ account, onEdit, onSetDefault }: BankAccountCa
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
               {t('bankAccounts.fields.currency')}
             </p>
-            <p className="text-sm font-medium text-foreground">{account.currency}</p>
+            <p className="text-sm font-medium text-foreground">
+              {account.currency}
+            </p>
           </div>
         </div>
       </CardContent>

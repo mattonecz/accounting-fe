@@ -36,7 +36,9 @@ const claimRatio = (invoice: InvoiceResponseDto): number => {
 const sumVat = (invoices: InvoiceResponseDto[], applyClaimRatio: boolean) =>
   invoices.reduce(
     (acc, invoice) =>
-      acc + Number(invoice.totalTax ?? 0) * (applyClaimRatio ? claimRatio(invoice) : 1),
+      acc +
+      Number(invoice.totalTax ?? 0) *
+        (applyClaimRatio ? claimRatio(invoice) : 1),
     0,
   );
 
@@ -95,7 +97,9 @@ const CreateTaxFiling = () => {
       },
       {
         onSuccess: () => {
-          enqueueSnackbar(t('taxFilings.create.success'), { variant: 'success' });
+          enqueueSnackbar(t('taxFilings.create.success'), {
+            variant: 'success',
+          });
           navigate('/tax-filings');
         },
         onError: () => {

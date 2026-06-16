@@ -7,16 +7,16 @@
  */
 
 export type VatExportParams = {
-/**
- * Year (YYYY)
- * @minimum 1900
- * @maximum 2100
- */
-year: number;
-/**
- * Month (1-12)
- * @minimum 1
- * @maximum 12
- */
-month: number;
+  /**
+   * Year (YYYY)
+   * @minimum 1900
+   * @maximum 2100
+   */
+  year: number;
+  /**
+   * Month (1-12)
+   * @minimum 1
+   * @maximum 12
+   */
+  month: number;
 };

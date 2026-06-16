@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,382 +18,530 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   LoginDto,
   LoginResponseDto,
-  UserCompanyResponseDto
+  UserCompanyResponseDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Sign in
  */
 export const signIn = (
-    loginDto: LoginDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<LoginResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/auth/login`,
-      loginDto,options
-    );
-  }
+  loginDto: LoginDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<LoginResponseDto>> => {
+  return axios.default.post(`/auth/login`, loginDto, options);
+};
 
+export const getSignInMutationOptions = <
+  TError = AxiosError<LoginResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof signIn>>,
+    TError,
+    { data: LoginDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof signIn>>,
+  TError,
+  { data: LoginDto },
+  TContext
+> => {
+  const mutationKey = ['signIn'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof signIn>>,
+    { data: LoginDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getSignInMutationOptions = <TError = AxiosError<LoginResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: LoginDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: LoginDto}, TContext> => {
+    return signIn(data, axiosOptions);
+  };
 
-const mutationKey = ['signIn'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type SignInMutationResult = NonNullable<
+  Awaited<ReturnType<typeof signIn>>
+>;
+export type SignInMutationBody = LoginDto;
+export type SignInMutationError = AxiosError<LoginResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signIn>>, {data: LoginDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  signIn(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SignInMutationResult = NonNullable<Awaited<ReturnType<typeof signIn>>>
-    export type SignInMutationBody = LoginDto
-    export type SignInMutationError = AxiosError<LoginResponseDto>
-
-    /**
+/**
  * @summary Sign in
  */
-export const useSignIn = <TError = AxiosError<LoginResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: LoginDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof signIn>>,
-        TError,
-        {data: LoginDto},
-        TContext
-      > => {
+export const useSignIn = <
+  TError = AxiosError<LoginResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof signIn>>,
+      TError,
+      { data: LoginDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof signIn>>,
+  TError,
+  { data: LoginDto },
+  TContext
+> => {
+  const mutationOptions = getSignInMutationOptions(options);
 
-      const mutationOptions = getSignInMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Refresh tokens
  */
 export const refresh = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<LoginResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/auth/refresh`,undefined,options
-    );
-  }
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<LoginResponseDto>> => {
+  return axios.default.post(`/auth/refresh`, undefined, options);
+};
 
+export const getRefreshMutationOptions = <
+  TError = AxiosError<LoginResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof refresh>>,
+    TError,
+    void,
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof refresh>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ['refresh'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof refresh>>,
+    void
+  > = () => {
+    return refresh(axiosOptions);
+  };
 
-export const getRefreshMutationOptions = <TError = AxiosError<LoginResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['refresh'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+export type RefreshMutationResult = NonNullable<
+  Awaited<ReturnType<typeof refresh>>
+>;
 
-      
+export type RefreshMutationError = AxiosError<LoginResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refresh>>, void> = () => {
-          
-
-          return  refresh(axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RefreshMutationResult = NonNullable<Awaited<ReturnType<typeof refresh>>>
-    
-    export type RefreshMutationError = AxiosError<LoginResponseDto>
-
-    /**
+/**
  * @summary Refresh tokens
  */
-export const useRefresh = <TError = AxiosError<LoginResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refresh>>, TError,void, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof refresh>>,
-        TError,
-        void,
-        TContext
-      > => {
+export const useRefresh = <
+  TError = AxiosError<LoginResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof refresh>>,
+      TError,
+      void,
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof refresh>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getRefreshMutationOptions(options);
 
-      const mutationOptions = getRefreshMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Logout
  */
 export const logout = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<void>> => {
-    
-    
-    return axios.default.post(
-      `/auth/logout`,undefined,options
-    );
-  }
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<void>> => {
+  return axios.default.post(`/auth/logout`, undefined, options);
+};
 
+export const getLogoutMutationOptions = <
+  TError = AxiosError<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof logout>>,
+    TError,
+    void,
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof logout>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ['logout'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof logout>>,
+    void
+  > = () => {
+    return logout(axiosOptions);
+  };
 
-export const getLogoutMutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['logout'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+export type LogoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof logout>>
+>;
 
-      
+export type LogoutMutationError = AxiosError<unknown>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logout>>, void> = () => {
-          
-
-          return  logout(axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
-    
-    export type LogoutMutationError = AxiosError<unknown>
-
-    /**
+/**
  * @summary Logout
  */
-export const useLogout = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof logout>>,
-        TError,
-        void,
-        TContext
-      > => {
+export const useLogout = <TError = AxiosError<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof logout>>,
+      TError,
+      void,
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof logout>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getLogoutMutationOptions(options);
 
-      const mutationOptions = getLogoutMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Get Profile
  */
 export const getProfile = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<void>> => {
-    
-    
-    return axios.default.get(
-      `/auth/profile`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<void>> => {
+  return axios.default.get(`/auth/profile`, options);
+};
 
 export const getGetProfileQueryKey = () => {
-    return [
-    `/auth/profile`
-    ] as const;
-    }
+  return [`/auth/profile`] as const;
+};
 
-    
-export const getGetProfileQueryOptions = <TData = Awaited<ReturnType<typeof getProfile>>, TError = AxiosError<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getGetProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProfile>>,
+  TError = AxiosError<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetProfileQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getGetProfileQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getProfile>>> = ({
+    signal,
+  }) => getProfile({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProfile>>> = ({ signal }) => getProfile({ signal, ...axiosOptions });
+export type GetProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProfile>>
+>;
+export type GetProfileQueryError = AxiosError<unknown>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getProfile>>>
-export type GetProfileQueryError = AxiosError<unknown>
-
-
-export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TError = AxiosError<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>> & Pick<
+export function useGetProfile<
+  TData = Awaited<ReturnType<typeof getProfile>>,
+  TError = AxiosError<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getProfile>>,
           TError,
           Awaited<ReturnType<typeof getProfile>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProfile<
+  TData = Awaited<ReturnType<typeof getProfile>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getProfile>>,
           TError,
           Awaited<ReturnType<typeof getProfile>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProfile<
+  TData = Awaited<ReturnType<typeof getProfile>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Profile
  */
 
-export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TError = AxiosError<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetProfile<
+  TData = Awaited<ReturnType<typeof getProfile>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProfile>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProfileQueryOptions(options);
 
-  const queryOptions = getGetProfileQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary List company memberships for current user
  */
 export const authListMemberships = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<UserCompanyResponseDto[]>> => {
-    
-    
-    return axios.default.get(
-      `/auth/memberships`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<UserCompanyResponseDto[]>> => {
+  return axios.default.get(`/auth/memberships`, options);
+};
 
 export const getAuthListMembershipsQueryKey = () => {
-    return [
-    `/auth/memberships`
-    ] as const;
-    }
+  return [`/auth/memberships`] as const;
+};
 
-    
-export const getAuthListMembershipsQueryOptions = <TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getAuthListMembershipsQueryOptions = <
+  TData = Awaited<ReturnType<typeof authListMemberships>>,
+  TError = AxiosError<UserCompanyResponseDto[]>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof authListMemberships>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAuthListMembershipsQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getAuthListMembershipsQueryKey();
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof authListMemberships>>
+  > = ({ signal }) => authListMemberships({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof authListMemberships>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authListMemberships>>> = ({ signal }) => authListMemberships({ signal, ...axiosOptions });
+export type AuthListMembershipsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof authListMemberships>>
+>;
+export type AuthListMembershipsQueryError = AxiosError<
+  UserCompanyResponseDto[]
+>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AuthListMembershipsQueryResult = NonNullable<Awaited<ReturnType<typeof authListMemberships>>>
-export type AuthListMembershipsQueryError = AxiosError<UserCompanyResponseDto[]>
-
-
-export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>> & Pick<
+export function useAuthListMemberships<
+  TData = Awaited<ReturnType<typeof authListMemberships>>,
+  TError = AxiosError<UserCompanyResponseDto[]>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof authListMemberships>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof authListMemberships>>,
           TError,
           Awaited<ReturnType<typeof authListMemberships>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthListMemberships<
+  TData = Awaited<ReturnType<typeof authListMemberships>>,
+  TError = AxiosError<UserCompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof authListMemberships>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof authListMemberships>>,
           TError,
           Awaited<ReturnType<typeof authListMemberships>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthListMemberships<
+  TData = Awaited<ReturnType<typeof authListMemberships>>,
+  TError = AxiosError<UserCompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof authListMemberships>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List company memberships for current user
  */
 
-export function useAuthListMemberships<TData = Awaited<ReturnType<typeof authListMemberships>>, TError = AxiosError<UserCompanyResponseDto[]>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authListMemberships>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAuthListMemberships<
+  TData = Awaited<ReturnType<typeof authListMemberships>>,
+  TError = AxiosError<UserCompanyResponseDto[]>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof authListMemberships>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getAuthListMembershipsQueryOptions(options);
 
-  const queryOptions = getAuthListMembershipsQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-

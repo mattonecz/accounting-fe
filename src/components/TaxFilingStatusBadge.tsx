@@ -44,7 +44,10 @@ export function TaxFilingStatusBadge({
   const Icon = config?.icon ?? Loader2;
 
   return (
-    <Badge variant="outline" className={cn('gap-1.5', config?.className, className)}>
+    <Badge
+      variant="outline"
+      className={cn('gap-1.5', config?.className, className)}
+    >
       <Icon
         className={cn(
           'h-3.5 w-3.5',

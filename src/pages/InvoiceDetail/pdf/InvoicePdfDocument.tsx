@@ -42,9 +42,19 @@ const s = StyleSheet.create({
   },
 
   // Masthead
-  mast: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  mast: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   brand: { flexDirection: 'row', alignItems: 'center' },
-  mark: { width: 22, height: 22, borderRadius: 4.5, backgroundColor: C.accent, marginRight: 8 },
+  mark: {
+    width: 22,
+    height: 22,
+    borderRadius: 4.5,
+    backgroundColor: C.accent,
+    marginRight: 8,
+  },
   brandName: { fontSize: 10.5, fontWeight: 700 },
   tagline: { fontSize: 8.25, color: C.ink3, marginTop: 1 },
   titleWrap: { alignItems: 'flex-end' },
@@ -58,7 +68,12 @@ const s = StyleSheet.create({
     color: C.ink3,
     marginTop: 6,
   },
-  rule: { borderTopWidth: 1, borderTopColor: C.line, borderStyle: 'dashed', marginTop: 12 },
+  rule: {
+    borderTopWidth: 1,
+    borderTopColor: C.line,
+    borderStyle: 'dashed',
+    marginTop: 12,
+  },
 
   // Parties
   parties: { flexDirection: 'row', marginTop: 20 },
@@ -88,7 +103,11 @@ const s = StyleSheet.create({
     borderTopColor: C.line2,
     borderStyle: 'dashed',
   },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2.5 },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 2.5,
+  },
   rowK: { fontSize: 9.75, color: C.ink3 },
   rowV: { fontSize: 9.75, fontWeight: 600, color: C.ink, textAlign: 'right' },
   rowVAccent: { color: C.accent },
@@ -108,7 +127,13 @@ const s = StyleSheet.create({
     borderStyle: 'dashed',
     paddingVertical: 9,
   },
-  th: { fontSize: 7.5, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: C.ink4 },
+  th: {
+    fontSize: 7.5,
+    fontWeight: 600,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: C.ink4,
+  },
   colDesc: { flexGrow: 1, flexShrink: 1, paddingRight: 8 },
   colQty: { width: 70, textAlign: 'right' },
   colVat: { width: 46, textAlign: 'right' },
@@ -164,7 +189,13 @@ const s = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 9,
   },
-  dot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: C.pos, marginRight: 5 },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: C.pos,
+    marginRight: 5,
+  },
   chipText: { fontSize: 9, fontWeight: 600, color: C.pos },
 
   // Note + footer
@@ -203,7 +234,10 @@ interface InvoicePdfDocumentProps {
   qrDataUrl?: string | null;
 }
 
-export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps) => {
+export const InvoicePdfDocument = ({
+  model,
+  qrDataUrl,
+}: InvoicePdfDocumentProps) => {
   const { hasVat } = model;
 
   return (
@@ -215,7 +249,9 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
             <View style={s.mark} />
             <View>
               <Text style={s.brandName}>{model.supplier.name}</Text>
-              {model.supplierTagline ? <Text style={s.tagline}>{model.supplierTagline}</Text> : null}
+              {model.supplierTagline ? (
+                <Text style={s.tagline}>{model.supplierTagline}</Text>
+              ) : null}
             </View>
           </View>
           <View style={s.titleWrap}>
@@ -234,7 +270,9 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
             <Text style={s.partyName}>{model.supplier.name}</Text>
             <View style={s.addr}>
               {model.supplier.address.map((line, i) => (
-                <Text key={i} style={s.addrLine}>{line}</Text>
+                <Text key={i} style={s.addrLine}>
+                  {line}
+                </Text>
               ))}
             </View>
             <View style={s.kv}>
@@ -244,7 +282,11 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
             <View style={s.kvSpaced}>
               <InfoRow label="Bankovní účet" value={model.bankNumber} />
               {model.iban ? <InfoRow label="IBAN" value={model.iban} /> : null}
-              <InfoRow label="Variabilní symbol" value={model.variableSymbol} accent />
+              <InfoRow
+                label="Variabilní symbol"
+                value={model.variableSymbol}
+                accent
+              />
               <InfoRow label="Způsob platby" value="Převodem" />
             </View>
           </View>
@@ -253,7 +295,9 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
             <Text style={s.partyName}>{model.customer.name}</Text>
             <View style={s.addr}>
               {model.customer.address.map((line, i) => (
-                <Text key={i} style={s.addrLine}>{line}</Text>
+                <Text key={i} style={s.addrLine}>
+                  {line}
+                </Text>
               ))}
             </View>
             <View style={s.kv}>
@@ -263,7 +307,9 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
             <View style={s.kvSpaced}>
               <InfoRow label="Datum vystavení" value={model.createdDate} />
               <InfoRow label="Datum splatnosti" value={model.dueDate} />
-              {hasVat ? <InfoRow label="Datum zdan. plnění" value={model.duzpDate} /> : null}
+              {hasVat ? (
+                <InfoRow label="Datum zdan. plnění" value={model.duzpDate} />
+              ) : null}
             </View>
           </View>
         </View>
@@ -274,13 +320,17 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
           <Text style={[s.colQty, s.th]}>Množství</Text>
           {hasVat ? <Text style={[s.colVat, s.th]}>DPH</Text> : null}
           <Text style={[s.colUnit, s.th]}>Cena za MJ</Text>
-          <Text style={[s.colTotal, s.th]}>{hasVat ? 'Celkem bez DPH' : 'Celkem'}</Text>
+          <Text style={[s.colTotal, s.th]}>
+            {hasVat ? 'Celkem bez DPH' : 'Celkem'}
+          </Text>
         </View>
         {model.items.map((item, i) => (
           <View key={i} style={s.itemRow} wrap={false}>
             <Text style={[s.colDesc, s.tdDesc]}>{item.name}</Text>
             <Text style={[s.colQty, s.tdNum]}>{item.quantityLabel}</Text>
-            {hasVat ? <Text style={[s.colVat, s.tdNum]}>{item.vatRate} %</Text> : null}
+            {hasVat ? (
+              <Text style={[s.colVat, s.tdNum]}>{item.vatRate} %</Text>
+            ) : null}
             <Text style={[s.colUnit, s.tdNum]}>{item.unitPrice}</Text>
             <Text style={[s.colTotal, s.tdAmt]}>{item.total}</Text>
           </View>
@@ -328,7 +378,8 @@ export const InvoicePdfDocument = ({ model, qrDataUrl }: InvoicePdfDocumentProps
                 <View style={s.chip}>
                   <View style={s.dot} />
                   <Text style={s.chipText}>
-                    Uhrazeno{model.lastPaymentDate ? ` ${model.lastPaymentDate}` : ''}
+                    Uhrazeno
+                    {model.lastPaymentDate ? ` ${model.lastPaymentDate}` : ''}
                   </Text>
                 </View>
               </View>

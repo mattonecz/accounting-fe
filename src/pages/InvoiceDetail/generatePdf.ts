@@ -32,11 +32,12 @@ export const generateInvoicePdf = async (
     }
   }
 
-  const [{ pdf }, { registerPdfFonts }, { InvoicePdfDocument }] = await Promise.all([
-    import('@react-pdf/renderer'),
-    import('./pdf/fonts'),
-    import('./pdf/InvoicePdfDocument'),
-  ]);
+  const [{ pdf }, { registerPdfFonts }, { InvoicePdfDocument }] =
+    await Promise.all([
+      import('@react-pdf/renderer'),
+      import('./pdf/fonts'),
+      import('./pdf/InvoicePdfDocument'),
+    ]);
 
   registerPdfFonts();
 

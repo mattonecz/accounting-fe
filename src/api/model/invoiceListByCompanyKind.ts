@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type InvoiceListByCompanyKind = typeof InvoiceListByCompanyKind[keyof typeof InvoiceListByCompanyKind];
-
+export type InvoiceListByCompanyKind =
+  (typeof InvoiceListByCompanyKind)[keyof typeof InvoiceListByCompanyKind];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceListByCompanyKind = {

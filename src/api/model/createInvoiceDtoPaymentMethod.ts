@@ -9,8 +9,8 @@
 /**
  * Payment method (forma úhrady). Defaults to BANK_TRANSFER.
  */
-export type CreateInvoiceDtoPaymentMethod = typeof CreateInvoiceDtoPaymentMethod[keyof typeof CreateInvoiceDtoPaymentMethod];
-
+export type CreateInvoiceDtoPaymentMethod =
+  (typeof CreateInvoiceDtoPaymentMethod)[keyof typeof CreateInvoiceDtoPaymentMethod];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateInvoiceDtoPaymentMethod = {

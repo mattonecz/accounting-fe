@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import type { InvoiceResponseDto } from '@/api/model';
-import { InvoiceResponseDtoKind, InvoiceResponseDtoVatClaimStatus } from '@/api/model';
+import {
+  InvoiceResponseDtoKind,
+  InvoiceResponseDtoVatClaimStatus,
+} from '@/api/model';
 import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DetailCard, MetaField, SectionLabel } from './primitives';
@@ -20,9 +23,15 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
     <>
       <div className="grid gap-4 lg:grid-cols-2">
         <DetailCard>
-          <SectionLabel className="mb-4">{t('invoices.detail.invoice.title')}</SectionLabel>
+          <SectionLabel className="mb-4">
+            {t('invoices.detail.invoice.title')}
+          </SectionLabel>
           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            <MetaField label={t('invoices.fields.number')} value={invoice.number} mono />
+            <MetaField
+              label={t('invoices.fields.number')}
+              value={invoice.number}
+              mono
+            />
             {isReceived && invoice.originalNumber && (
               <MetaField
                 label={t('invoices.fields.originalNumber')}
@@ -47,21 +56,35 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
             />
             <MetaField
               label={t('invoices.fields.vatMode')}
-              value={invoice.vatMode ? t(`invoices.vatModes.${invoice.vatMode}`) : '-'}
+              value={
+                invoice.vatMode
+                  ? t(`invoices.vatModes.${invoice.vatMode}`)
+                  : '-'
+              }
             />
           </div>
         </DetailCard>
 
         <DetailCard>
           <SectionLabel className="mb-4">
-            {isReceived ? t('invoices.fields.supplier') : t('invoices.fields.contact')}
+            {isReceived
+              ? t('invoices.fields.supplier')
+              : t('invoices.fields.contact')}
           </SectionLabel>
           <div className="mb-4 text-base font-semibold tracking-tight text-foreground">
             {counterparty?.name || '-'}
           </div>
           <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-            <MetaField label={t('contacts.fields.ico')} value={counterparty?.ico} mono />
-            <MetaField label={t('contacts.fields.dic')} value={counterparty?.dic} mono />
+            <MetaField
+              label={t('contacts.fields.ico')}
+              value={counterparty?.ico}
+              mono
+            />
+            <MetaField
+              label={t('contacts.fields.dic')}
+              value={counterparty?.dic}
+              mono
+            />
           </div>
           {addressLines.length > 0 && (
             <div className="mt-4 space-y-0.5 text-sm leading-relaxed text-muted-foreground">
@@ -75,14 +98,18 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
 
       {(invoice.note || invoice.internalNote) && (
         <DetailCard>
-          <SectionLabel className="mb-4">{t('invoices.detail.notes.title')}</SectionLabel>
+          <SectionLabel className="mb-4">
+            {t('invoices.detail.notes.title')}
+          </SectionLabel>
           <div className="space-y-4">
             {invoice.note && (
               <div>
                 <div className="text-[11px] text-muted-foreground">
                   {t('invoices.detail.notes.note')}
                 </div>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{invoice.note}</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+                  {invoice.note}
+                </p>
               </div>
             )}
             {invoice.internalNote && (
@@ -104,9 +131,12 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
       )}
 
       {invoice.vatClaimStatus &&
-        (invoice.type === 'RECEIVED' || invoice.kind === InvoiceResponseDtoKind.SIMPLE) && (
+        (invoice.type === 'RECEIVED' ||
+          invoice.kind === InvoiceResponseDtoKind.SIMPLE) && (
           <DetailCard>
-            <SectionLabel className="mb-4">{t('invoices.vatClaim.title')}</SectionLabel>
+            <SectionLabel className="mb-4">
+              {t('invoices.vatClaim.title')}
+            </SectionLabel>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <span className="text-[11px] text-muted-foreground">
@@ -115,11 +145,14 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
                 <span
                   className={cn(
                     'rounded-full px-2.5 py-0.5 text-xs font-medium',
-                    invoice.vatClaimStatus === InvoiceResponseDtoVatClaimStatus.CLAIMED &&
+                    invoice.vatClaimStatus ===
+                      InvoiceResponseDtoVatClaimStatus.CLAIMED &&
                       'bg-success/15 text-success',
-                    invoice.vatClaimStatus === InvoiceResponseDtoVatClaimStatus.SKIPPED &&
+                    invoice.vatClaimStatus ===
+                      InvoiceResponseDtoVatClaimStatus.SKIPPED &&
                       'bg-muted text-muted-foreground',
-                    invoice.vatClaimStatus === InvoiceResponseDtoVatClaimStatus.PENDING &&
+                    invoice.vatClaimStatus ===
+                      InvoiceResponseDtoVatClaimStatus.PENDING &&
                       'bg-warning/15 text-warning',
                   )}
                 >
@@ -132,8 +165,11 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
                     label={t('invoices.vatClaim.claimType.label')}
                     value={
                       <>
-                        {t(`invoices.vatClaim.claimType.options.${invoice.vatClaimType}`)}
-                        {invoice.vatClaimRatio != null && ` (${String(invoice.vatClaimRatio)})`}
+                        {t(
+                          `invoices.vatClaim.claimType.options.${invoice.vatClaimType}`,
+                        )}
+                        {invoice.vatClaimRatio != null &&
+                          ` (${String(invoice.vatClaimRatio)})`}
                       </>
                     }
                   />
@@ -145,7 +181,8 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
                     mono
                   />
                 )}
-                {invoice.vatClaimStatus === InvoiceResponseDtoVatClaimStatus.CLAIMED &&
+                {invoice.vatClaimStatus ===
+                  InvoiceResponseDtoVatClaimStatus.CLAIMED &&
                   invoice.vatClaimedAt && (
                     <MetaField
                       label={t('invoices.vatClaim.claimedAt')}

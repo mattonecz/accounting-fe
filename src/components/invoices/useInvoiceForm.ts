@@ -190,8 +190,7 @@ export const useInvoiceForm = () => {
   const duzpDate = form.watch('duzpDate');
   useEffect(() => {
     if (!duzpDate) return;
-    const claimMonthField =
-      form.formState.dirtyFields.vatClaimMonth ?? false;
+    const claimMonthField = form.formState.dirtyFields.vatClaimMonth ?? false;
     if (claimMonthField) return;
     form.setValue('vatClaimMonth', duzpDate.slice(0, 7));
   }, [duzpDate, form]);

@@ -13,7 +13,8 @@ export default function BankAccounts() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { data: bankAccounts, refetch: refetchBankAccounts } = useBankListByCompany();
+  const { data: bankAccounts, refetch: refetchBankAccounts } =
+    useBankListByCompany();
   const { mutate: setDefaultBank } = useBankSetDefault();
 
   const handleSetDefault = (account: BankResponseDto) => {
@@ -22,11 +23,16 @@ export default function BankAccounts() {
       { data: { bankId: account.id } },
       {
         onSuccess: () => {
-          enqueueSnackbar(t('bankAccounts.messages.setDefault', { name: account.name }), { variant: 'success' });
+          enqueueSnackbar(
+            t('bankAccounts.messages.setDefault', { name: account.name }),
+            { variant: 'success' },
+          );
           refetchBankAccounts();
         },
         onError: () => {
-          enqueueSnackbar(t('bankAccounts.messages.setDefaultFailed'), { variant: 'error' });
+          enqueueSnackbar(t('bankAccounts.messages.setDefaultFailed'), {
+            variant: 'error',
+          });
         },
       },
     );
@@ -34,7 +40,9 @@ export default function BankAccounts() {
 
   const sortedBankAccounts = [...(bankAccounts?.data ?? [])].sort((a, b) => {
     if (a.default !== b.default) return a.default ? -1 : 1;
-    return (a.name ?? '').localeCompare(b.name ?? '', 'cs', { sensitivity: 'base' });
+    return (a.name ?? '').localeCompare(b.name ?? '', 'cs', {
+      sensitivity: 'base',
+    });
   });
 
   return (

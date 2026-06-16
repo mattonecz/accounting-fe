@@ -131,7 +131,8 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
     InvoiceListByCompanySortOrder.DESC,
   );
   const [page, setPage] = useState(1);
-  const [paymentInvoice, setPaymentInvoice] = useState<InvoiceResponseDto | null>(null);
+  const [paymentInvoice, setPaymentInvoice] =
+    useState<InvoiceResponseDto | null>(null);
   const [pdfInvoiceId, setPdfInvoiceId] = useState<string | null>(null);
 
   // Debounce the search box, resetting to the first page on each new term.
@@ -204,7 +205,9 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
           )}
         >
           {label}
-          <Icon className={cn('h-3 w-3', active ? 'opacity-100' : 'opacity-40')} />
+          <Icon
+            className={cn('h-3 w-3', active ? 'opacity-100' : 'opacity-40')}
+          />
         </button>
       </TableHead>
     );
@@ -239,8 +242,13 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <EmptyIcon className="h-5 w-5" />
           </span>
-          <div className="text-sm font-semibold text-foreground">{t(config.emptyKey)}</div>
-          <Button className="mt-1 gap-2" onClick={() => navigate(config.createPath)}>
+          <div className="text-sm font-semibold text-foreground">
+            {t(config.emptyKey)}
+          </div>
+          <Button
+            className="mt-1 gap-2"
+            onClick={() => navigate(config.createPath)}
+          >
             <Plus className="h-4 w-4" />
             {t('invoices.actions.create')}
           </Button>
@@ -252,19 +260,29 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            {sortHead(t('invoices.list.columns.number'), InvoiceListByCompanySortBy.number)}
-            <TableHead className="h-10 w-[30%]">{t(config.contactColumnKey)}</TableHead>
+            {sortHead(
+              t('invoices.list.columns.number'),
+              InvoiceListByCompanySortBy.number,
+            )}
+            <TableHead className="h-10 w-[30%]">
+              {t(config.contactColumnKey)}
+            </TableHead>
             {sortHead(
               t('invoices.list.columns.amount'),
               InvoiceListByCompanySortBy.totalWithTax,
               'right',
             )}
-            {sortHead(t('invoices.list.columns.status'), InvoiceListByCompanySortBy.status)}
+            {sortHead(
+              t('invoices.list.columns.status'),
+              InvoiceListByCompanySortBy.status,
+            )}
             {sortHead(
               t('invoices.list.columns.createdDate'),
               InvoiceListByCompanySortBy.createdDate,
             )}
-            <TableHead className="h-10 text-right">{t('invoices.list.columns.actions')}</TableHead>
+            <TableHead className="h-10 text-right">
+              {t('invoices.list.columns.actions')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -281,7 +299,11 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
                 {invoice.contactSnapshot?.name || '-'}
               </TableCell>
               <TableCell className="py-3 text-right font-mono text-sm font-semibold tabular-nums">
-                {formatMoney(invoice.totalWithTax, invoice.currency || 'CZK', lang)}
+                {formatMoney(
+                  invoice.totalWithTax,
+                  invoice.currency || 'CZK',
+                  lang,
+                )}
               </TableCell>
               <TableCell className="py-3">
                 <InvoiceStatusDot status={getInvoiceDisplayStatus(invoice)} />
@@ -290,13 +312,18 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
                 {formatDate(invoice.createdDate, lang)}
               </TableCell>
               <TableCell className="py-2 text-right">
-                <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="flex justify-end gap-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button
                     variant="outline"
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
-                    aria-label={t('invoices.actions.editAriaLabel', { number: invoice.number })}
+                    aria-label={t('invoices.actions.editAriaLabel', {
+                      number: invoice.number,
+                    })}
                     title={t('invoices.actions.edit')}
                   >
                     <Pencil className="h-3.5 w-3.5" />
@@ -307,21 +334,29 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7"
-                        aria-label={t('invoices.actions.moreAriaLabel', { number: invoice.number })}
+                        aria-label={t('invoices.actions.moreAriaLabel', {
+                          number: invoice.number,
+                        })}
                       >
                         <MoreHorizontal className="h-3.5 w-3.5" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => setPaymentInvoice(invoice)}>
+                      <DropdownMenuItem
+                        onClick={() => setPaymentInvoice(invoice)}
+                      >
                         <Landmark className="mr-2 h-4 w-4" />
                         {t('payments.actions.record')}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/invoices/${invoice.id}`)}>
+                      <DropdownMenuItem
+                        onClick={() => navigate(`/invoices/${invoice.id}`)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         {t('invoices.actions.detail')}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setPdfInvoiceId(invoice.id)}>
+                      <DropdownMenuItem
+                        onClick={() => setPdfInvoiceId(invoice.id)}
+                      >
                         <Download className="mr-2 h-4 w-4" />
                         {t('invoices.actions.downloadPdf')}
                       </DropdownMenuItem>
@@ -348,9 +383,14 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
             <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-foreground">
               {t(config.titleKey)}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">{t(config.descriptionKey)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t(config.descriptionKey)}
+            </p>
           </div>
-          <Button className="gap-2 sm:shrink-0" onClick={() => navigate(config.createPath)}>
+          <Button
+            className="gap-2 sm:shrink-0"
+            onClick={() => navigate(config.createPath)}
+          >
             <Plus className="h-4 w-4" />
             {t('invoices.actions.create')}
           </Button>
@@ -391,7 +431,10 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
           {totalPages > 1 && (
             <div className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground">
-                {t('common.pagination.pageOf', { page: result?.page ?? page, totalPages })}
+                {t('common.pagination.pageOf', {
+                  page: result?.page ?? page,
+                  totalPages,
+                })}
               </span>
               <div className="flex gap-2">
                 <Button
@@ -432,7 +475,10 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
       )}
 
       {pdfInvoiceId && (
-        <InvoicePdfRenderer invoiceId={pdfInvoiceId} onDone={() => setPdfInvoiceId(null)} />
+        <InvoicePdfRenderer
+          invoiceId={pdfInvoiceId}
+          onDone={() => setPdfInvoiceId(null)}
+        />
       )}
     </PageLayout>
   );

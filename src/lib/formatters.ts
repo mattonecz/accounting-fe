@@ -1,6 +1,9 @@
 import i18n from '@/i18n';
 
-export const formatDate = (date: string | Date | null | undefined, lang?: string): string => {
+export const formatDate = (
+  date: string | Date | null | undefined,
+  lang?: string,
+): string => {
   if (!date) return '-';
   const locale = lang ?? i18n.language ?? 'cs';
   return new Intl.DateTimeFormat(locale, {

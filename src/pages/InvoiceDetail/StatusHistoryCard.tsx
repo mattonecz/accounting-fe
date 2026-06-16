@@ -9,7 +9,9 @@ interface StatusHistoryCardProps {
   statusHistory?: InvoiceStatusHistoryItemDto[];
 }
 
-export const StatusHistoryCard = ({ statusHistory }: StatusHistoryCardProps) => {
+export const StatusHistoryCard = ({
+  statusHistory,
+}: StatusHistoryCardProps) => {
   const { t } = useTranslation();
 
   const entries = [...(statusHistory ?? [])].sort(
@@ -71,7 +73,9 @@ export const StatusHistoryCard = ({ statusHistory }: StatusHistoryCardProps) => 
                           key={`${change.item}-${changeIndex}`}
                           className="rounded-md bg-muted/50 px-3 py-2 text-xs"
                         >
-                          <span className="font-medium text-foreground">{change.item}</span>
+                          <span className="font-medium text-foreground">
+                            {change.item}
+                          </span>
                           <span className="text-muted-foreground">
                             {': '}
                             {formatHistoryValue(change.originalValue)} →{' '}

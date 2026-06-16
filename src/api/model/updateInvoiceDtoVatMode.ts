@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateInvoiceDtoVatMode = typeof UpdateInvoiceDtoVatMode[keyof typeof UpdateInvoiceDtoVatMode];
-
+export type UpdateInvoiceDtoVatMode =
+  (typeof UpdateInvoiceDtoVatMode)[keyof typeof UpdateInvoiceDtoVatMode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateInvoiceDtoVatMode = {

@@ -15,16 +15,28 @@ export const CashflowCard = () => {
   const { t, i18n } = useTranslation();
 
   const chartData = useMemo(() => {
-    const monthFormat = new Intl.DateTimeFormat(i18n.language, { month: 'short' });
+    const monthFormat = new Intl.DateTimeFormat(i18n.language, {
+      month: 'short',
+    });
     const now = new Date();
     return MOCK_CASHFLOW.map((point, index) => {
-      const date = new Date(now.getFullYear(), now.getMonth() - (MOCK_CASHFLOW.length - 1 - index), 1);
+      const date = new Date(
+        now.getFullYear(),
+        now.getMonth() - (MOCK_CASHFLOW.length - 1 - index),
+        1,
+      );
       return { month: monthFormat.format(date), ...point };
     });
   }, [i18n.language]);
 
-  const totalIncome = MOCK_CASHFLOW.reduce((sum, point) => sum + point.income, 0);
-  const totalExpenses = MOCK_CASHFLOW.reduce((sum, point) => sum + point.expenses, 0);
+  const totalIncome = MOCK_CASHFLOW.reduce(
+    (sum, point) => sum + point.income,
+    0,
+  );
+  const totalExpenses = MOCK_CASHFLOW.reduce(
+    (sum, point) => sum + point.expenses,
+    0,
+  );
 
   const chartConfig: ChartConfig = {
     income: {
@@ -64,16 +76,37 @@ export const CashflowCard = () => {
         <AreaChart data={chartData} margin={{ left: 4, right: 4, top: 4 }}>
           <defs>
             <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--brand))" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="hsl(var(--brand))" stopOpacity={0} />
+              <stop
+                offset="5%"
+                stopColor="hsl(var(--brand))"
+                stopOpacity={0.25}
+              />
+              <stop
+                offset="95%"
+                stopColor="hsl(var(--brand))"
+                stopOpacity={0}
+              />
             </linearGradient>
             <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+              <stop
+                offset="5%"
+                stopColor="hsl(var(--destructive))"
+                stopOpacity={0.2}
+              />
+              <stop
+                offset="95%"
+                stopColor="hsl(var(--destructive))"
+                stopOpacity={0}
+              />
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
-          <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+          />
           <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
           <Area
             dataKey="income"

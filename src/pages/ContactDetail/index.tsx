@@ -20,10 +20,16 @@ export default function ContactDetail() {
 
   const renderContent = () => {
     if (!id) {
-      return <p className="text-muted-foreground">{t('contacts.detail.invalidId')}</p>;
+      return (
+        <p className="text-muted-foreground">
+          {t('contacts.detail.invalidId')}
+        </p>
+      );
     }
     if (isLoading) {
-      return <p className="text-muted-foreground">{t('contacts.detail.loading')}</p>;
+      return (
+        <p className="text-muted-foreground">{t('contacts.detail.loading')}</p>
+      );
     }
     if (isError || !contact) {
       return <p className="text-destructive">{t('contacts.detail.error')}</p>;
@@ -32,7 +38,7 @@ export default function ContactDetail() {
     return (
       <>
         <PageHeader
-        backButton
+          backButton
           title={contact.name}
           description={t('contacts.detail.description')}
           actions={

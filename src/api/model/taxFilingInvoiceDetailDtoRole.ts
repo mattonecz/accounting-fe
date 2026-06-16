@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type TaxFilingInvoiceDetailDtoRole = typeof TaxFilingInvoiceDetailDtoRole[keyof typeof TaxFilingInvoiceDetailDtoRole];
-
+export type TaxFilingInvoiceDetailDtoRole =
+  (typeof TaxFilingInvoiceDetailDtoRole)[keyof typeof TaxFilingInvoiceDetailDtoRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TaxFilingInvoiceDetailDtoRole = {

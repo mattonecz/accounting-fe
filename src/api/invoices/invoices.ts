@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,15 +18,11 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   CreateInvoiceDto,
@@ -38,701 +31,1098 @@ import type {
   InvoiceResponseDto,
   PaginatedInvoiceResponseDto,
   UpdateInvoiceDto,
-  UpdateInvoiceStatusDto
+  UpdateInvoiceStatusDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Create invoice
  */
 export const invoiceCreate = (
-    createInvoiceDto: CreateInvoiceDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/invoices`,
-      createInvoiceDto,options
-    );
-  }
+  createInvoiceDto: CreateInvoiceDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto>> => {
+  return axios.default.post(`/invoices`, createInvoiceDto, options);
+};
 
+export const getInvoiceCreateMutationOptions = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof invoiceCreate>>,
+    TError,
+    { data: CreateInvoiceDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof invoiceCreate>>,
+  TError,
+  { data: CreateInvoiceDto },
+  TContext
+> => {
+  const mutationKey = ['invoiceCreate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof invoiceCreate>>,
+    { data: CreateInvoiceDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getInvoiceCreateMutationOptions = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceCreate>>, TError,{data: CreateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof invoiceCreate>>, TError,{data: CreateInvoiceDto}, TContext> => {
+    return invoiceCreate(data, axiosOptions);
+  };
 
-const mutationKey = ['invoiceCreate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type InvoiceCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceCreate>>
+>;
+export type InvoiceCreateMutationBody = CreateInvoiceDto;
+export type InvoiceCreateMutationError = AxiosError<InvoiceResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceCreate>>, {data: CreateInvoiceDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  invoiceCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type InvoiceCreateMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceCreate>>>
-    export type InvoiceCreateMutationBody = CreateInvoiceDto
-    export type InvoiceCreateMutationError = AxiosError<InvoiceResponseDto>
-
-    /**
+/**
  * @summary Create invoice
  */
-export const useInvoiceCreate = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceCreate>>, TError,{data: CreateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof invoiceCreate>>,
-        TError,
-        {data: CreateInvoiceDto},
-        TContext
-      > => {
+export const useInvoiceCreate = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof invoiceCreate>>,
+      TError,
+      { data: CreateInvoiceDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof invoiceCreate>>,
+  TError,
+  { data: CreateInvoiceDto },
+  TContext
+> => {
+  const mutationOptions = getInvoiceCreateMutationOptions(options);
 
-      const mutationOptions = getInvoiceCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Update invoice
  */
 export const invoiceUpdate = (
-    updateInvoiceDto: UpdateInvoiceDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto>> => {
-    
-    
-    return axios.default.patch(
-      `/invoices`,
-      updateInvoiceDto,options
-    );
-  }
+  updateInvoiceDto: UpdateInvoiceDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto>> => {
+  return axios.default.patch(`/invoices`, updateInvoiceDto, options);
+};
 
+export const getInvoiceUpdateMutationOptions = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof invoiceUpdate>>,
+    TError,
+    { data: UpdateInvoiceDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof invoiceUpdate>>,
+  TError,
+  { data: UpdateInvoiceDto },
+  TContext
+> => {
+  const mutationKey = ['invoiceUpdate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof invoiceUpdate>>,
+    { data: UpdateInvoiceDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getInvoiceUpdateMutationOptions = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext> => {
+    return invoiceUpdate(data, axiosOptions);
+  };
 
-const mutationKey = ['invoiceUpdate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type InvoiceUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceUpdate>>
+>;
+export type InvoiceUpdateMutationBody = UpdateInvoiceDto;
+export type InvoiceUpdateMutationError = AxiosError<InvoiceResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceUpdate>>, {data: UpdateInvoiceDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  invoiceUpdate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type InvoiceUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceUpdate>>>
-    export type InvoiceUpdateMutationBody = UpdateInvoiceDto
-    export type InvoiceUpdateMutationError = AxiosError<InvoiceResponseDto>
-
-    /**
+/**
  * @summary Update invoice
  */
-export const useInvoiceUpdate = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdate>>, TError,{data: UpdateInvoiceDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof invoiceUpdate>>,
-        TError,
-        {data: UpdateInvoiceDto},
-        TContext
-      > => {
+export const useInvoiceUpdate = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof invoiceUpdate>>,
+      TError,
+      { data: UpdateInvoiceDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof invoiceUpdate>>,
+  TError,
+  { data: UpdateInvoiceDto },
+  TContext
+> => {
+  const mutationOptions = getInvoiceUpdateMutationOptions(options);
 
-      const mutationOptions = getInvoiceUpdateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary List invoices by company with filtering and pagination
  */
 export const invoiceListByCompany = (
-    params?: InvoiceListByCompanyParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PaginatedInvoiceResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/invoices/list`,{
+  params?: InvoiceListByCompanyParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<PaginatedInvoiceResponseDto>> => {
+  return axios.default.get(`/invoices/list`, {
     ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
+    params: { ...params, ...options?.params },
+  });
+};
 
-
-
-
-export const getInvoiceListByCompanyQueryKey = (params?: InvoiceListByCompanyParams,) => {
-    return [
-    `/invoices/list`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getInvoiceListByCompanyQueryOptions = <TData = Awaited<ReturnType<typeof invoiceListByCompany>>, TError = AxiosError<PaginatedInvoiceResponseDto>>(params?: InvoiceListByCompanyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getInvoiceListByCompanyQueryKey = (
+  params?: InvoiceListByCompanyParams,
 ) => {
+  return [`/invoices/list`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+export const getInvoiceListByCompanyQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceListByCompany>>,
+  TError = AxiosError<PaginatedInvoiceResponseDto>,
+>(
+  params?: InvoiceListByCompanyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceListByCompany>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceListByCompanyQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getInvoiceListByCompanyQueryKey(params);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof invoiceListByCompany>>
+  > = ({ signal }) => invoiceListByCompany(params, { signal, ...axiosOptions });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceListByCompany>>> = ({ signal }) => invoiceListByCompany(params, { signal, ...axiosOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceListByCompany>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type InvoiceListByCompanyQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceListByCompany>>
+>;
+export type InvoiceListByCompanyQueryError =
+  AxiosError<PaginatedInvoiceResponseDto>;
 
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceListByCompanyQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceListByCompany>>>
-export type InvoiceListByCompanyQueryError = AxiosError<PaginatedInvoiceResponseDto>
-
-
-export function useInvoiceListByCompany<TData = Awaited<ReturnType<typeof invoiceListByCompany>>, TError = AxiosError<PaginatedInvoiceResponseDto>>(
- params: undefined |  InvoiceListByCompanyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData>> & Pick<
+export function useInvoiceListByCompany<
+  TData = Awaited<ReturnType<typeof invoiceListByCompany>>,
+  TError = AxiosError<PaginatedInvoiceResponseDto>,
+>(
+  params: undefined | InvoiceListByCompanyParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceListByCompany>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceListByCompany>>,
           TError,
           Awaited<ReturnType<typeof invoiceListByCompany>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceListByCompany<TData = Awaited<ReturnType<typeof invoiceListByCompany>>, TError = AxiosError<PaginatedInvoiceResponseDto>>(
- params?: InvoiceListByCompanyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceListByCompany<
+  TData = Awaited<ReturnType<typeof invoiceListByCompany>>,
+  TError = AxiosError<PaginatedInvoiceResponseDto>,
+>(
+  params?: InvoiceListByCompanyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceListByCompany>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceListByCompany>>,
           TError,
           Awaited<ReturnType<typeof invoiceListByCompany>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceListByCompany<TData = Awaited<ReturnType<typeof invoiceListByCompany>>, TError = AxiosError<PaginatedInvoiceResponseDto>>(
- params?: InvoiceListByCompanyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceListByCompany<
+  TData = Awaited<ReturnType<typeof invoiceListByCompany>>,
+  TError = AxiosError<PaginatedInvoiceResponseDto>,
+>(
+  params?: InvoiceListByCompanyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceListByCompany>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List invoices by company with filtering and pagination
  */
 
-export function useInvoiceListByCompany<TData = Awaited<ReturnType<typeof invoiceListByCompany>>, TError = AxiosError<PaginatedInvoiceResponseDto>>(
- params?: InvoiceListByCompanyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceListByCompany>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceListByCompany<
+  TData = Awaited<ReturnType<typeof invoiceListByCompany>>,
+  TError = AxiosError<PaginatedInvoiceResponseDto>,
+>(
+  params?: InvoiceListByCompanyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceListByCompany>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceListByCompanyQueryOptions(params, options);
 
-  const queryOptions = getInvoiceListByCompanyQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Get count of invoices for the active company in current year
  */
 export const invoiceGetCount = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<number>> => {
-    
-    
-    return axios.default.get(
-      `/invoices/count`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<number>> => {
+  return axios.default.get(`/invoices/count`, options);
+};
 
 export const getInvoiceGetCountQueryKey = () => {
-    return [
-    `/invoices/count`
-    ] as const;
-    }
+  return [`/invoices/count`] as const;
+};
 
-    
-export const getInvoiceGetCountQueryOptions = <TData = Awaited<ReturnType<typeof invoiceGetCount>>, TError = AxiosError<number>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getInvoiceGetCountQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceGetCount>>,
+  TError = AxiosError<number>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getInvoiceGetCountQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceGetCountQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGetCount>>> = ({
+    signal,
+  }) => invoiceGetCount({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceGetCount>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGetCount>>> = ({ signal }) => invoiceGetCount({ signal, ...axiosOptions });
+export type InvoiceGetCountQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceGetCount>>
+>;
+export type InvoiceGetCountQueryError = AxiosError<number>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceGetCountQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceGetCount>>>
-export type InvoiceGetCountQueryError = AxiosError<number>
-
-
-export function useInvoiceGetCount<TData = Awaited<ReturnType<typeof invoiceGetCount>>, TError = AxiosError<number>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>> & Pick<
+export function useInvoiceGetCount<
+  TData = Awaited<ReturnType<typeof invoiceGetCount>>,
+  TError = AxiosError<number>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetCount>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetCount>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetCount>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetCount<TData = Awaited<ReturnType<typeof invoiceGetCount>>, TError = AxiosError<number>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetCount<
+  TData = Awaited<ReturnType<typeof invoiceGetCount>>,
+  TError = AxiosError<number>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetCount>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetCount>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetCount>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetCount<TData = Awaited<ReturnType<typeof invoiceGetCount>>, TError = AxiosError<number>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetCount<
+  TData = Awaited<ReturnType<typeof invoiceGetCount>>,
+  TError = AxiosError<number>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetCount>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get count of invoices for the active company in current year
  */
 
-export function useInvoiceGetCount<TData = Awaited<ReturnType<typeof invoiceGetCount>>, TError = AxiosError<number>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetCount>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceGetCount<
+  TData = Awaited<ReturnType<typeof invoiceGetCount>>,
+  TError = AxiosError<number>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetCount>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceGetCountQueryOptions(options);
 
-  const queryOptions = getInvoiceGetCountQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Get dashboard stats
  */
 export const invoiceGetStats = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<DashboardStatsResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/invoices/stats`,options
-    );
-  }
-
-
-
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<DashboardStatsResponseDto>> => {
+  return axios.default.get(`/invoices/stats`, options);
+};
 
 export const getInvoiceGetStatsQueryKey = () => {
-    return [
-    `/invoices/stats`
-    ] as const;
-    }
+  return [`/invoices/stats`] as const;
+};
 
-    
-export const getInvoiceGetStatsQueryOptions = <TData = Awaited<ReturnType<typeof invoiceGetStats>>, TError = AxiosError<DashboardStatsResponseDto>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getInvoiceGetStatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceGetStats>>,
+  TError = AxiosError<DashboardStatsResponseDto>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getInvoiceGetStatsQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceGetStatsQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGetStats>>> = ({
+    signal,
+  }) => invoiceGetStats({ signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceGetStats>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGetStats>>> = ({ signal }) => invoiceGetStats({ signal, ...axiosOptions });
+export type InvoiceGetStatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceGetStats>>
+>;
+export type InvoiceGetStatsQueryError = AxiosError<DashboardStatsResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceGetStatsQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceGetStats>>>
-export type InvoiceGetStatsQueryError = AxiosError<DashboardStatsResponseDto>
-
-
-export function useInvoiceGetStats<TData = Awaited<ReturnType<typeof invoiceGetStats>>, TError = AxiosError<DashboardStatsResponseDto>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>> & Pick<
+export function useInvoiceGetStats<
+  TData = Awaited<ReturnType<typeof invoiceGetStats>>,
+  TError = AxiosError<DashboardStatsResponseDto>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetStats>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetStats>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetStats>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetStats<TData = Awaited<ReturnType<typeof invoiceGetStats>>, TError = AxiosError<DashboardStatsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetStats<
+  TData = Awaited<ReturnType<typeof invoiceGetStats>>,
+  TError = AxiosError<DashboardStatsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetStats>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetStats>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetStats>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetStats<TData = Awaited<ReturnType<typeof invoiceGetStats>>, TError = AxiosError<DashboardStatsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetStats<
+  TData = Awaited<ReturnType<typeof invoiceGetStats>>,
+  TError = AxiosError<DashboardStatsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetStats>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get dashboard stats
  */
 
-export function useInvoiceGetStats<TData = Awaited<ReturnType<typeof invoiceGetStats>>, TError = AxiosError<DashboardStatsResponseDto>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetStats>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceGetStats<
+  TData = Awaited<ReturnType<typeof invoiceGetStats>>,
+  TError = AxiosError<DashboardStatsResponseDto>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetStats>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceGetStatsQueryOptions(options);
 
-  const queryOptions = getInvoiceGetStatsQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Get invoice by id
  */
 export const invoiceGet = (
-    id: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/invoices/${id}`,options
-    );
-  }
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto>> => {
+  return axios.default.get(`/invoices/${id}`, options);
+};
 
+export const getInvoiceGetQueryKey = (id?: string) => {
+  return [`/invoices/${id}`] as const;
+};
 
-
-
-export const getInvoiceGetQueryKey = (id?: string,) => {
-    return [
-    `/invoices/${id}`
-    ] as const;
-    }
-
-    
-export const getInvoiceGetQueryOptions = <TData = Awaited<ReturnType<typeof invoiceGet>>, TError = AxiosError<InvoiceResponseDto>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getInvoiceGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceGet>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getInvoiceGetQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceGetQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGet>>> = ({
+    signal,
+  }) => invoiceGet(id, { signal, ...axiosOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGet>>> = ({ signal }) => invoiceGet(id, { signal, ...axiosOptions });
+export type InvoiceGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceGet>>
+>;
+export type InvoiceGetQueryError = AxiosError<InvoiceResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceGetQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceGet>>>
-export type InvoiceGetQueryError = AxiosError<InvoiceResponseDto>
-
-
-export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TError = AxiosError<InvoiceResponseDto>>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>> & Pick<
+export function useInvoiceGet<
+  TData = Awaited<ReturnType<typeof invoiceGet>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGet>>,
           TError,
           Awaited<ReturnType<typeof invoiceGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TError = AxiosError<InvoiceResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGet<
+  TData = Awaited<ReturnType<typeof invoiceGet>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGet>>,
           TError,
           Awaited<ReturnType<typeof invoiceGet>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TError = AxiosError<InvoiceResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGet<
+  TData = Awaited<ReturnType<typeof invoiceGet>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get invoice by id
  */
 
-export function useInvoiceGet<TData = Awaited<ReturnType<typeof invoiceGet>>, TError = AxiosError<InvoiceResponseDto>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceGet<
+  TData = Awaited<ReturnType<typeof invoiceGet>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof invoiceGet>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceGetQueryOptions(id, options);
 
-  const queryOptions = getInvoiceGetQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
 
 /**
  * @summary Delete invoice by id
  */
 export const invoiceDelete = (
-    id: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<void>> => {
-    
-    
-    return axios.default.delete(
-      `/invoices/${id}`,options
-    );
-  }
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<void>> => {
+  return axios.default.delete(`/invoices/${id}`, options);
+};
 
+export const getInvoiceDeleteMutationOptions = <
+  TError = AxiosError<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof invoiceDelete>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof invoiceDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['invoiceDelete'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof invoiceDelete>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
-export const getInvoiceDeleteMutationOptions = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext> => {
+    return invoiceDelete(id, axiosOptions);
+  };
 
-const mutationKey = ['invoiceDelete'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type InvoiceDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceDelete>>
+>;
 
+export type InvoiceDeleteMutationError = AxiosError<unknown>;
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceDelete>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  invoiceDelete(id,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type InvoiceDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceDelete>>>
-    
-    export type InvoiceDeleteMutationError = AxiosError<unknown>
-
-    /**
+/**
  * @summary Delete invoice by id
  */
-export const useInvoiceDelete = <TError = AxiosError<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceDelete>>, TError,{id: string}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof invoiceDelete>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useInvoiceDelete = <
+  TError = AxiosError<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof invoiceDelete>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof invoiceDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getInvoiceDeleteMutationOptions(options);
 
-      const mutationOptions = getInvoiceDeleteMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Update invoice status
  */
 export const invoiceUpdateStatus = (
-    id: string,
-    updateInvoiceStatusDto: UpdateInvoiceStatusDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto>> => {
-    
-    
-    return axios.default.patch(
-      `/invoices/${id}/status`,
-      updateInvoiceStatusDto,options
-    );
-  }
+  id: string,
+  updateInvoiceStatusDto: UpdateInvoiceStatusDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto>> => {
+  return axios.default.patch(
+    `/invoices/${id}/status`,
+    updateInvoiceStatusDto,
+    options,
+  );
+};
 
+export const getInvoiceUpdateStatusMutationOptions = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+    TError,
+    { id: string; data: UpdateInvoiceStatusDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+  TError,
+  { id: string; data: UpdateInvoiceStatusDto },
+  TContext
+> => {
+  const mutationKey = ['invoiceUpdateStatus'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+    { id: string; data: UpdateInvoiceStatusDto }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
-export const getInvoiceUpdateStatusMutationOptions = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext> => {
+    return invoiceUpdateStatus(id, data, axiosOptions);
+  };
 
-const mutationKey = ['invoiceUpdateStatus'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type InvoiceUpdateStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceUpdateStatus>>
+>;
+export type InvoiceUpdateStatusMutationBody = UpdateInvoiceStatusDto;
+export type InvoiceUpdateStatusMutationError = AxiosError<InvoiceResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof invoiceUpdateStatus>>, {id: string;data: UpdateInvoiceStatusDto}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  invoiceUpdateStatus(id,data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type InvoiceUpdateStatusMutationResult = NonNullable<Awaited<ReturnType<typeof invoiceUpdateStatus>>>
-    export type InvoiceUpdateStatusMutationBody = UpdateInvoiceStatusDto
-    export type InvoiceUpdateStatusMutationError = AxiosError<InvoiceResponseDto>
-
-    /**
+/**
  * @summary Update invoice status
  */
-export const useInvoiceUpdateStatus = <TError = AxiosError<InvoiceResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof invoiceUpdateStatus>>, TError,{id: string;data: UpdateInvoiceStatusDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof invoiceUpdateStatus>>,
-        TError,
-        {id: string;data: UpdateInvoiceStatusDto},
-        TContext
-      > => {
+export const useInvoiceUpdateStatus = <
+  TError = AxiosError<InvoiceResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+      TError,
+      { id: string; data: UpdateInvoiceStatusDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof invoiceUpdateStatus>>,
+  TError,
+  { id: string; data: UpdateInvoiceStatusDto },
+  TContext
+> => {
+  const mutationOptions = getInvoiceUpdateStatusMutationOptions(options);
 
-      const mutationOptions = getInvoiceUpdateStatusMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Get invoice by number
  */
 export const invoiceGetByNumber = (
-    number: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<InvoiceResponseDto>> => {
-    
-    
-    return axios.default.get(
-      `/invoices/byNumber/${number}`,options
-    );
-  }
+  number: string,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<InvoiceResponseDto>> => {
+  return axios.default.get(`/invoices/byNumber/${number}`, options);
+};
 
+export const getInvoiceGetByNumberQueryKey = (number?: string) => {
+  return [`/invoices/byNumber/${number}`] as const;
+};
 
-
-
-export const getInvoiceGetByNumberQueryKey = (number?: string,) => {
-    return [
-    `/invoices/byNumber/${number}`
-    ] as const;
-    }
-
-    
-export const getInvoiceGetByNumberQueryOptions = <TData = Awaited<ReturnType<typeof invoiceGetByNumber>>, TError = AxiosError<InvoiceResponseDto>>(number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getInvoiceGetByNumberQueryOptions = <
+  TData = Awaited<ReturnType<typeof invoiceGetByNumber>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  number: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetByNumber>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getInvoiceGetByNumberQueryKey(number);
 
-  const queryKey =  queryOptions?.queryKey ?? getInvoiceGetByNumberQueryKey(number);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof invoiceGetByNumber>>
+  > = ({ signal }) => invoiceGetByNumber(number, { signal, ...axiosOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!number,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof invoiceGetByNumber>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof invoiceGetByNumber>>> = ({ signal }) => invoiceGetByNumber(number, { signal, ...axiosOptions });
+export type InvoiceGetByNumberQueryResult = NonNullable<
+  Awaited<ReturnType<typeof invoiceGetByNumber>>
+>;
+export type InvoiceGetByNumberQueryError = AxiosError<InvoiceResponseDto>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(number), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type InvoiceGetByNumberQueryResult = NonNullable<Awaited<ReturnType<typeof invoiceGetByNumber>>>
-export type InvoiceGetByNumberQueryError = AxiosError<InvoiceResponseDto>
-
-
-export function useInvoiceGetByNumber<TData = Awaited<ReturnType<typeof invoiceGetByNumber>>, TError = AxiosError<InvoiceResponseDto>>(
- number: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData>> & Pick<
+export function useInvoiceGetByNumber<
+  TData = Awaited<ReturnType<typeof invoiceGetByNumber>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  number: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetByNumber>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetByNumber>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetByNumber>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetByNumber<TData = Awaited<ReturnType<typeof invoiceGetByNumber>>, TError = AxiosError<InvoiceResponseDto>>(
- number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetByNumber<
+  TData = Awaited<ReturnType<typeof invoiceGetByNumber>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  number: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetByNumber>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof invoiceGetByNumber>>,
           TError,
           Awaited<ReturnType<typeof invoiceGetByNumber>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useInvoiceGetByNumber<TData = Awaited<ReturnType<typeof invoiceGetByNumber>>, TError = AxiosError<InvoiceResponseDto>>(
- number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useInvoiceGetByNumber<
+  TData = Awaited<ReturnType<typeof invoiceGetByNumber>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  number: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetByNumber>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get invoice by number
  */
 
-export function useInvoiceGetByNumber<TData = Awaited<ReturnType<typeof invoiceGetByNumber>>, TError = AxiosError<InvoiceResponseDto>>(
- number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof invoiceGetByNumber>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useInvoiceGetByNumber<
+  TData = Awaited<ReturnType<typeof invoiceGetByNumber>>,
+  TError = AxiosError<InvoiceResponseDto>,
+>(
+  number: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof invoiceGetByNumber>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getInvoiceGetByNumberQueryOptions(number, options);
 
-  const queryOptions = getInvoiceGetByNumberQueryOptions(number,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-

@@ -9,8 +9,9 @@
 /**
  * @nullable
  */
-export type InvoiceResponseDtoVatClaimType = typeof InvoiceResponseDtoVatClaimType[keyof typeof InvoiceResponseDtoVatClaimType] | null;
-
+export type InvoiceResponseDtoVatClaimType =
+  | (typeof InvoiceResponseDtoVatClaimType)[keyof typeof InvoiceResponseDtoVatClaimType]
+  | null;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceResponseDtoVatClaimType = {

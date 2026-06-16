@@ -37,7 +37,11 @@ export const InvoicePdfRenderer = ({
 
     void (async () => {
       try {
-        await generateInvoicePdf(invoice, company, `faktura-${invoice.number}.pdf`);
+        await generateInvoicePdf(
+          invoice,
+          company,
+          `faktura-${invoice.number}.pdf`,
+        );
       } finally {
         onDone();
       }

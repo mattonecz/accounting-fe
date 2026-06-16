@@ -5,10 +5,7 @@
  * Accounting API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,175 +18,236 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import * as axios from 'axios';
-import type {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
   CreateUserDto,
   EmailAvailableParams,
-  UserResponseDto
+  UserResponseDto,
 } from '.././model';
-
-
-
-
 
 /**
  * @summary Create user
  */
 export const userCreate = (
-    createUserDto: CreateUserDto, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<UserResponseDto>> => {
-    
-    
-    return axios.default.post(
-      `/users`,
-      createUserDto,options
-    );
-  }
+  createUserDto: CreateUserDto,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<UserResponseDto>> => {
+  return axios.default.post(`/users`, createUserDto, options);
+};
 
+export const getUserCreateMutationOptions = <
+  TError = AxiosError<UserResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof userCreate>>,
+    TError,
+    { data: CreateUserDto },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof userCreate>>,
+  TError,
+  { data: CreateUserDto },
+  TContext
+> => {
+  const mutationKey = ['userCreate'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof userCreate>>,
+    { data: CreateUserDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getUserCreateMutationOptions = <TError = AxiosError<UserResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userCreate>>, TError,{data: CreateUserDto}, TContext>, axios?: AxiosRequestConfig}
-): UseMutationOptions<Awaited<ReturnType<typeof userCreate>>, TError,{data: CreateUserDto}, TContext> => {
+    return userCreate(data, axiosOptions);
+  };
 
-const mutationKey = ['userCreate'];
-const {mutation: mutationOptions, axios: axiosOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, axios: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type UserCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof userCreate>>
+>;
+export type UserCreateMutationBody = CreateUserDto;
+export type UserCreateMutationError = AxiosError<UserResponseDto>;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof userCreate>>, {data: CreateUserDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  userCreate(data,axiosOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UserCreateMutationResult = NonNullable<Awaited<ReturnType<typeof userCreate>>>
-    export type UserCreateMutationBody = CreateUserDto
-    export type UserCreateMutationError = AxiosError<UserResponseDto>
-
-    /**
+/**
  * @summary Create user
  */
-export const useUserCreate = <TError = AxiosError<UserResponseDto>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userCreate>>, TError,{data: CreateUserDto}, TContext>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof userCreate>>,
-        TError,
-        {data: CreateUserDto},
-        TContext
-      > => {
+export const useUserCreate = <
+  TError = AxiosError<UserResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof userCreate>>,
+      TError,
+      { data: CreateUserDto },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof userCreate>>,
+  TError,
+  { data: CreateUserDto },
+  TContext
+> => {
+  const mutationOptions = getUserCreateMutationOptions(options);
 
-      const mutationOptions = getUserCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Check email available
  */
 export const emailAvailable = (
-    params: EmailAvailableParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
-    
-    
-    return axios.default.get(
-      `/users/emailAvailable`,{
+  params: EmailAvailableParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<boolean>> => {
+  return axios.default.get(`/users/emailAvailable`, {
     ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
+    params: { ...params, ...options?.params },
+  });
+};
 
+export const getEmailAvailableQueryKey = (params?: EmailAvailableParams) => {
+  return [`/users/emailAvailable`, ...(params ? [params] : [])] as const;
+};
 
-
-
-export const getEmailAvailableQueryKey = (params?: EmailAvailableParams,) => {
-    return [
-    `/users/emailAvailable`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getEmailAvailableQueryOptions = <TData = Awaited<ReturnType<typeof emailAvailable>>, TError = AxiosError<boolean>>(params: EmailAvailableParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>>, axios?: AxiosRequestConfig}
+export const getEmailAvailableQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailAvailable>>,
+  TError = AxiosError<boolean>,
+>(
+  params: EmailAvailableParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
 ) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailAvailableQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailAvailableQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailAvailable>>> = ({
+    signal,
+  }) => emailAvailable(params, { signal, ...axiosOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailAvailable>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailAvailable>>> = ({ signal }) => emailAvailable(params, { signal, ...axiosOptions });
+export type EmailAvailableQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailAvailable>>
+>;
+export type EmailAvailableQueryError = AxiosError<boolean>;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailAvailableQueryResult = NonNullable<Awaited<ReturnType<typeof emailAvailable>>>
-export type EmailAvailableQueryError = AxiosError<boolean>
-
-
-export function useEmailAvailable<TData = Awaited<ReturnType<typeof emailAvailable>>, TError = AxiosError<boolean>>(
- params: EmailAvailableParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>> & Pick<
+export function useEmailAvailable<
+  TData = Awaited<ReturnType<typeof emailAvailable>>,
+  TError = AxiosError<boolean>,
+>(
+  params: EmailAvailableParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailAvailable>>,
           TError,
           Awaited<ReturnType<typeof emailAvailable>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailAvailable<TData = Awaited<ReturnType<typeof emailAvailable>>, TError = AxiosError<boolean>>(
- params: EmailAvailableParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEmailAvailable<
+  TData = Awaited<ReturnType<typeof emailAvailable>>,
+  TError = AxiosError<boolean>,
+>(
+  params: EmailAvailableParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailAvailable>>,
           TError,
           Awaited<ReturnType<typeof emailAvailable>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailAvailable<TData = Awaited<ReturnType<typeof emailAvailable>>, TError = AxiosError<boolean>>(
- params: EmailAvailableParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEmailAvailable<
+  TData = Awaited<ReturnType<typeof emailAvailable>>,
+  TError = AxiosError<boolean>,
+>(
+  params: EmailAvailableParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Check email available
  */
 
-export function useEmailAvailable<TData = Awaited<ReturnType<typeof emailAvailable>>, TError = AxiosError<boolean>>(
- params: EmailAvailableParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailAvailable<
+  TData = Awaited<ReturnType<typeof emailAvailable>>,
+  TError = AxiosError<boolean>,
+>(
+  params: EmailAvailableParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailAvailable>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getEmailAvailableQueryOptions(params, options);
 
-  const queryOptions = getEmailAvailableQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-

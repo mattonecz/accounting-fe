@@ -128,7 +128,11 @@ const recomputeRow = (
     base = round2((total * 100) / (100 + rate));
     vat = round2(total - base);
   }
-  const next = { base: numToStr(base), vat: numToStr(vat), total: numToStr(total) };
+  const next = {
+    base: numToStr(base),
+    vat: numToStr(vat),
+    total: numToStr(total),
+  };
   // Preserve exactly what the user is typing in the edited column.
   next[field] = raw;
   return next;
@@ -788,7 +792,11 @@ const CreateIncomingInvoice = () => {
                           min={0}
                           placeholder="0"
                           value={row.base}
-                          onChange={handleRateChange(index, row.vatRate, 'base')}
+                          onChange={handleRateChange(
+                            index,
+                            row.vatRate,
+                            'base',
+                          )}
                           className={cellClass(row.base)}
                         />
                         <Input
@@ -856,7 +864,9 @@ const CreateIncomingInvoice = () => {
                       : t('invoices.create.received.totalDue')}
                   </p>
                   <p className="mt-0.5 text-sm font-medium tabular-nums">
-                    {formatCurrency(isVatPayer ? grandTotals.base : grandTotals.total)}
+                    {formatCurrency(
+                      isVatPayer ? grandTotals.base : grandTotals.total,
+                    )}
                   </p>
                 </div>
                 {isVatPayer && (

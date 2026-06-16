@@ -14,7 +14,13 @@ interface QueueItemProps {
   actions: QueueItemAction[];
 }
 
-export const QueueItem = ({ tag, tagClassName, title, meta, actions }: QueueItemProps) => (
+export const QueueItem = ({
+  tag,
+  tagClassName,
+  title,
+  meta,
+  actions,
+}: QueueItemProps) => (
   <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3 last:border-b-0">
     <div className="min-w-0">
       <span

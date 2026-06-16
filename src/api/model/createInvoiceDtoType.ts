@@ -9,8 +9,8 @@
 /**
  * Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE.
  */
-export type CreateInvoiceDtoType = typeof CreateInvoiceDtoType[keyof typeof CreateInvoiceDtoType];
-
+export type CreateInvoiceDtoType =
+  (typeof CreateInvoiceDtoType)[keyof typeof CreateInvoiceDtoType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateInvoiceDtoType = {

@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type DashboardInvoiceItemDtoStatus = typeof DashboardInvoiceItemDtoStatus[keyof typeof DashboardInvoiceItemDtoStatus];
-
+export type DashboardInvoiceItemDtoStatus =
+  (typeof DashboardInvoiceItemDtoStatus)[keyof typeof DashboardInvoiceItemDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DashboardInvoiceItemDtoStatus = {

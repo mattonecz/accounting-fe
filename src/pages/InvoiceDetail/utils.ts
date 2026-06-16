@@ -1,6 +1,9 @@
 import i18n from '@/i18n';
 import type { InvoiceResponseDto } from '@/api/model';
-import { formatDate as libFormatDate, formatMoney as libFormatMoney } from '@/lib/formatters';
+import {
+  formatDate as libFormatDate,
+  formatMoney as libFormatMoney,
+} from '@/lib/formatters';
 
 export const formatDate = (date?: string) => {
   if (!date) return '-';

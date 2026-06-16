@@ -15,7 +15,10 @@ interface BankAccountFormFieldsProps {
   getValues: UseFormGetValues<BankAccountFormValues>;
 }
 
-export const BankAccountFormFields = ({ control, getValues }: BankAccountFormFieldsProps) => {
+export const BankAccountFormFields = ({
+  control,
+  getValues,
+}: BankAccountFormFieldsProps) => {
   const { t } = useTranslation();
 
   return (
@@ -25,7 +28,11 @@ export const BankAccountFormFields = ({ control, getValues }: BankAccountFormFie
         name="name"
         label={t('bankAccounts.fields.name')}
         type="text"
-        rules={{ required: t('validation.required', { field: t('bankAccounts.fields.name') }) }}
+        rules={{
+          required: t('validation.required', {
+            field: t('bankAccounts.fields.name'),
+          }),
+        }}
         placeholder="ČSOB CZK"
       />
       <InputController
@@ -37,7 +44,8 @@ export const BankAccountFormFields = ({ control, getValues }: BankAccountFormFie
         rules={{
           validate: (value) => {
             const iban = getValues('iban');
-            if (!value && !iban) return t('bankAccounts.validation.numberOrIbanRequired');
+            if (!value && !iban)
+              return t('bankAccounts.validation.numberOrIbanRequired');
             return true;
           },
         }}
@@ -51,7 +59,8 @@ export const BankAccountFormFields = ({ control, getValues }: BankAccountFormFie
         rules={{
           validate: (value) => {
             const number = getValues('number');
-            if (!value && !number) return t('bankAccounts.validation.numberOrIbanRequired');
+            if (!value && !number)
+              return t('bankAccounts.validation.numberOrIbanRequired');
             return true;
           },
         }}
@@ -68,7 +77,11 @@ export const BankAccountFormFields = ({ control, getValues }: BankAccountFormFie
         name="currency"
         label={t('bankAccounts.fields.currency')}
         placeholder="CZK"
-        rules={{ required: t('validation.required', { field: t('bankAccounts.fields.currency') }) }}
+        rules={{
+          required: t('validation.required', {
+            field: t('bankAccounts.fields.currency'),
+          }),
+        }}
       />
     </>
   );

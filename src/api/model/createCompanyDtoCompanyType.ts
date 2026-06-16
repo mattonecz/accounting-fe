@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CreateCompanyDtoCompanyType = typeof CreateCompanyDtoCompanyType[keyof typeof CreateCompanyDtoCompanyType];
-
+export type CreateCompanyDtoCompanyType =
+  (typeof CreateCompanyDtoCompanyType)[keyof typeof CreateCompanyDtoCompanyType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateCompanyDtoCompanyType = {

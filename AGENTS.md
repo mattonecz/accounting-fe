@@ -35,16 +35,17 @@
 
 Use these shared components instead of writing raw `div` containers with Tailwind classes:
 
-| Component | Location | Purpose |
-|---|---|---|
-| `PageLayout` | `src/components/PageLayout.tsx` | Page shell wrapper (`flex-1 space-y-6 p-4 md:p-8`). Use on every page instead of a raw `<div>`. |
-| `PageHeader` | `src/components/PageHeader.tsx` | Page title, description, optional back button, optional action slot. |
-| `DataTableCard` | `src/components/DataTableCard.tsx` | Card-wrapped table with column definitions, loading/empty/error states, and optional row click. |
-| `FormCard` | `src/components/FormCard.tsx` | Card wrapper for form sections with title and optional action slot. |
-| `InputController` | `src/components/InputController/index.tsx` | Typed react-hook-form input with label, validation, and customizable className/step/onChange. |
+| Component          | Location                                    | Purpose                                                                                             |
+| ------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `PageLayout`       | `src/components/PageLayout.tsx`             | Page shell wrapper (`flex-1 space-y-6 p-4 md:p-8`). Use on every page instead of a raw `<div>`.     |
+| `PageHeader`       | `src/components/PageHeader.tsx`             | Page title, description, optional back button, optional action slot.                                |
+| `DataTableCard`    | `src/components/DataTableCard.tsx`          | Card-wrapped table with column definitions, loading/empty/error states, and optional row click.     |
+| `FormCard`         | `src/components/FormCard.tsx`               | Card wrapper for form sections with title and optional action slot.                                 |
+| `InputController`  | `src/components/InputController/index.tsx`  | Typed react-hook-form input with label, validation, and customizable className/step/onChange.       |
 | `SelectController` | `src/components/SelectController/index.tsx` | Typed react-hook-form select with label, options array, validation, and customizable trigger width. |
 
 When building a new page:
+
 1. Wrap in `<PageLayout>`.
 2. Use `<PageHeader>` for the title block.
 3. For data listing pages, use `<DataTableCard>` with column definitions.

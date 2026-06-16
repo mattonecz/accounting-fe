@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateInvoiceDtoVatClaimType = typeof UpdateInvoiceDtoVatClaimType[keyof typeof UpdateInvoiceDtoVatClaimType];
-
+export type UpdateInvoiceDtoVatClaimType =
+  (typeof UpdateInvoiceDtoVatClaimType)[keyof typeof UpdateInvoiceDtoVatClaimType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateInvoiceDtoVatClaimType = {

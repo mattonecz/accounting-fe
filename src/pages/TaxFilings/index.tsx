@@ -63,7 +63,10 @@ const TaxFilings = () => {
     {
       header: t('taxFilings.list.columns.submissionType'),
       cell: (filing: TaxFilingResponseDto) =>
-        t(`taxFilings.submissionTypes.${filing.submissionType}`, filing.submissionType),
+        t(
+          `taxFilings.submissionTypes.${filing.submissionType}`,
+          filing.submissionType,
+        ),
     },
     {
       header: t('taxFilings.list.columns.createdDate'),
@@ -80,19 +83,22 @@ const TaxFilings = () => {
       header: t('taxFilings.list.columns.outputVat'),
       headerClassName: 'text-right',
       cellClassName: 'text-right tabular-nums',
-      cell: (filing: TaxFilingResponseDto) => fmtMoney(filing.summary?.outputVat),
+      cell: (filing: TaxFilingResponseDto) =>
+        fmtMoney(filing.summary?.outputVat),
     },
     {
       header: t('taxFilings.list.columns.inputVat'),
       headerClassName: 'text-right',
       cellClassName: 'text-right tabular-nums',
-      cell: (filing: TaxFilingResponseDto) => fmtMoney(filing.summary?.inputVat),
+      cell: (filing: TaxFilingResponseDto) =>
+        fmtMoney(filing.summary?.inputVat),
     },
     {
       header: t('taxFilings.list.columns.result'),
       headerClassName: 'text-right',
       cellClassName: 'text-right font-semibold tabular-nums',
-      cell: (filing: TaxFilingResponseDto) => fmtMoney(filing.summary?.payableVat),
+      cell: (filing: TaxFilingResponseDto) =>
+        fmtMoney(filing.summary?.payableVat),
     },
   ];
 
@@ -112,7 +118,10 @@ const TaxFilings = () => {
               <Plug className="h-4 w-4" />
               {t('taxFilings.actions.testIsdsLogin')}
             </Button>
-            <Button className="gap-2" onClick={() => navigate('/tax-filings/create')}>
+            <Button
+              className="gap-2"
+              onClick={() => navigate('/tax-filings/create')}
+            >
               <Plus className="h-4 w-4" />
               {t('taxFilings.actions.create')}
             </Button>

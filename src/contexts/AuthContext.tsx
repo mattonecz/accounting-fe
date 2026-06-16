@@ -4,7 +4,11 @@ import * as axios from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import type { LoginResponseDto } from '@/api/model';
-import { refresh as refreshTokenApi, authListMemberships, logout as logoutApi } from '@/api/auth/auth';
+import {
+  refresh as refreshTokenApi,
+  authListMemberships,
+  logout as logoutApi,
+} from '@/api/auth/auth';
 
 // Configure axios baseURL
 axios.default.defaults.baseURL = import.meta.env.PUBLIC_API_BASE_URL;
@@ -33,11 +37,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<UserData | null>(null);
-  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(
-    () => localStorage.getItem('active_company_id'),
+  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(() =>
+    localStorage.getItem('active_company_id'),
   );
-  const isRefreshingRef = useRef(false);
-  const pendingRequestsRef = useRef<Array<(token: string | null) => void>>([]);
+  const refreshPromiseRef = useRef<Promise<string> | null>(null);
 
   const applyCompany = async () => {
     try {
@@ -78,6 +81,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     delete axios.default.defaults.headers.common['X-Company-Id'];
   };
 
+  // Single-flight refresh: concurrent callers (StrictMode double-mount, parallel
+  // 401s, multiple tabs' requests) share one in-flight request, so a rotated —
+  // and therefore already-revoked — refresh token is never replayed. Without this
+  // the second caller sends the old cookie and the server reports "Token reuse
+  // detected" and revokes every session for the user.
+  const performRefresh = (): Promise<string> => {
+    if (!refreshPromiseRef.current) {
+      refreshPromiseRef.current = (async () => {
+        const res = await refreshTokenApi();
+        await applyToken(res.data.accessToken, res.data.expiresAt);
+        return res.data.accessToken;
+      })().finally(() => {
+        refreshPromiseRef.current = null;
+      });
+    }
+    return refreshPromiseRef.current;
+  };
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -86,7 +107,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const storedCompanyId = localStorage.getItem('active_company_id');
 
         if (storedCompanyId) {
-          axios.default.defaults.headers.common['X-Company-Id'] = storedCompanyId;
+          axios.default.defaults.headers.common['X-Company-Id'] =
+            storedCompanyId;
         }
 
         if (storedToken) {
@@ -96,14 +118,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (isExpired) {
             try {
-              const res = await refreshTokenApi();
-              await applyToken(res.data.accessToken, res.data.expiresAt);
+              await performRefresh();
             } catch {
               clearAuth();
             }
           } else {
             setAccessToken(storedToken);
-            axios.default.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+            axios.default.defaults.headers.common['Authorization'] =
+              `Bearer ${storedToken}`;
             setUser(jwtDecode<UserData>(storedToken));
             await applyCompany();
           }
@@ -126,7 +148,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
         if (error.response?.status === 403) {
-          const data = error.response?.data as Record<string, unknown> | undefined;
+          const data = error.response?.data as
+            | Record<string, unknown>
+            | undefined;
           if (data?.message === 'Company context missing') {
             window.location.href = '/onboarding';
           }
@@ -138,37 +162,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           !originalRequest._retry &&
           !originalRequest.url?.includes('/auth/refresh')
         ) {
-          if (isRefreshingRef.current) {
-            return new Promise((resolve, reject) => {
-              pendingRequestsRef.current.push((token) => {
-                if (token) {
-                  originalRequest.headers['Authorization'] = `Bearer ${token}`;
-                  resolve(axios.default(originalRequest));
-                } else {
-                  reject(error);
-                }
-              });
-            });
-          }
-
           originalRequest._retry = true;
-          isRefreshingRef.current = true;
 
           try {
-            const res = await refreshTokenApi();
-            const newToken = res.data.accessToken;
-            await applyToken(newToken, res.data.expiresAt);
-            pendingRequestsRef.current.forEach((cb) => cb(newToken));
-            pendingRequestsRef.current = [];
+            const newToken = await performRefresh();
             originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
             return axios.default(originalRequest);
           } catch (refreshError) {
             clearAuth();
-            pendingRequestsRef.current.forEach((cb) => cb(null));
-            pendingRequestsRef.current = [];
             return Promise.reject(refreshError);
-          } finally {
-            isRefreshingRef.current = false;
           }
         }
 

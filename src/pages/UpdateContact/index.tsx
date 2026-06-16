@@ -32,7 +32,9 @@ const UpdateContact = () => {
   const contact = contactResponse?.data;
 
   const { mutate: updateContact, isPending } = useUpdateContact();
-  const form = useForm<ContactFormValues>({ defaultValues: { name: '', country: '' } });
+  const form = useForm<ContactFormValues>({
+    defaultValues: { name: '', country: '' },
+  });
 
   useEffect(() => {
     if (!contact) return;
@@ -54,15 +56,23 @@ const UpdateContact = () => {
       { data: { ...data, id } },
       {
         onSuccess: async () => {
-          enqueueSnackbar(t('contacts.messages.updated'), { variant: 'success' });
+          enqueueSnackbar(t('contacts.messages.updated'), {
+            variant: 'success',
+          });
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: getListContactsQueryKey() }),
-            queryClient.invalidateQueries({ queryKey: getGetContactQueryKey(id) }),
+            queryClient.invalidateQueries({
+              queryKey: getListContactsQueryKey(),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getGetContactQueryKey(id),
+            }),
           ]);
           navigate('/contacts');
         },
         onError: () => {
-          enqueueSnackbar(t('contacts.messages.updateFailed'), { variant: 'error' });
+          enqueueSnackbar(t('contacts.messages.updateFailed'), {
+            variant: 'error',
+          });
         },
       },
     );
@@ -79,18 +89,27 @@ const UpdateContact = () => {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
       ) : !contact ? (
-        <p className="text-sm text-muted-foreground">{t('contacts.edit.notFound')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('contacts.edit.notFound')}
+        </p>
       ) : (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormCard title={t('contacts.edit.title')} titleClassName="text-center">
+            <FormCard
+              title={t('contacts.edit.title')}
+              titleClassName="text-center"
+            >
               <div className="mx-auto max-w-3xl space-y-4">
                 <ContactFormFields control={form.control} />
               </div>
             </FormCard>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => navigate('/contacts')}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/contacts')}
+              >
                 {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
