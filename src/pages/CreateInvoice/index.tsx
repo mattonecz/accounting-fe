@@ -5,15 +5,14 @@ import {
   Control,
   FieldPath,
   UseControllerProps,
-  UseFormReturn,
 } from 'react-hook-form';
 import {
   ArrowLeft,
   Check,
   ChevronDown,
   Loader2,
+  Minus,
   Plus,
-  Trash2,
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
@@ -45,6 +44,8 @@ import {
   type InvoiceFormValues,
 } from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
+import { InvoiceItemsEditor } from '@/components/invoices/InvoiceItemsEditor';
+import { ContactCombobox } from '@/components/invoices/ContactCombobox';
 import {
   CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoVatClaimType,
@@ -56,18 +57,11 @@ import { cn } from '@/lib/utils';
 const labelClass = 'text-[11px] font-semibold text-foreground/80';
 const sectionLabelClass =
   'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
-const colHeadClass =
-  'text-[9px] font-semibold uppercase tracking-wider text-muted-foreground';
-// Borderless cells so each row reads like a line of text until focused.
-const cellInputClass =
-  'h-9 rounded-md border-0 bg-transparent px-1.5 text-sm shadow-none transition-colors hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:ring-0 focus-visible:ring-offset-0';
 
 type FieldName = FieldPath<InvoiceFormValues>;
 type FieldRules = UseControllerProps<InvoiceFormValues, FieldName>['rules'];
 
 const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
-const round2 = (value: number) => Math.round(value * 100) / 100;
 
 interface TextFieldProps {
   control: Control<InvoiceFormValues>;
@@ -188,192 +182,6 @@ const SelectField = ({
   />
 );
 
-interface InvoiceItemRowProps {
-  form: UseFormReturn<InvoiceFormValues>;
-  index: number;
-  isVatPayer: boolean;
-  gridTemplate: string;
-  onRecalculate: () => void;
-  onRemove: () => void;
-  canRemove: boolean;
-}
-
-const InvoiceItemRow = ({
-  form,
-  index,
-  isVatPayer,
-  gridTemplate,
-  onRecalculate,
-  onRemove,
-  canRemove,
-}: InvoiceItemRowProps) => {
-  const { t } = useTranslation();
-  // Raw text while the user edits the total directly; null means "derive it".
-  const [totalDraft, setTotalDraft] = useState<string | null>(null);
-
-  const quantity = form.watch(`items.${index}.quantity`) || 0;
-  const unitPrice = form.watch(`items.${index}.unitPrice`) || 0;
-  const vatRate = isVatPayer ? form.watch(`items.${index}.vatRate`) || 0 : 0;
-  const computedTotal = quantity * unitPrice * (1 + vatRate / 100);
-
-  const handleNumericChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    onChange: (value: number) => void,
-  ) => {
-    onChange(parseFloat(e.target.value) || 0);
-    onRecalculate();
-  };
-
-  // User typed a final (VAT-inclusive) total → back-calculate the unit price.
-  const handleTotalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    setTotalDraft(raw);
-    const newTotal = parseFloat(raw) || 0;
-    const divisor = quantity * (1 + vatRate / 100);
-    const newUnitPrice = divisor > 0 ? round2(newTotal / divisor) : 0;
-    form.setValue(`items.${index}.unitPrice`, newUnitPrice);
-    onRecalculate();
-  };
-
-  const totalValue =
-    totalDraft ?? (computedTotal ? round2(computedTotal).toString() : '0');
-
-  return (
-    <div
-      className="grid items-center gap-2.5 border-b px-3 py-2 last:border-b-0"
-      style={{ gridTemplateColumns: gridTemplate }}
-    >
-      <span className="text-xs tabular-nums text-muted-foreground">
-        {index + 1}.
-      </span>
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.name`}
-        rules={{ required: t('invoices.items.validation.descriptionRequired') }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                {...field}
-                placeholder={t('invoices.placeholders.itemDescription')}
-                className={cn(cellInputClass, 'placeholder:italic')}
-              />
-            </FormControl>
-            <FormMessage className="px-1.5 text-[11px]" />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.quantity`}
-        rules={{
-          required: t('invoices.items.validation.quantityRequired'),
-          min: { value: 0, message: t('validation.minZero') },
-        }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                type="number"
-                {...field}
-                className={cn(cellInputClass, 'text-right tabular-nums')}
-                onChange={(e) => handleNumericChange(e, field.onChange)}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.unit`}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                {...field}
-                value={(field.value as string | undefined) ?? ''}
-                placeholder={t('invoices.placeholders.itemUnit')}
-                className={cellInputClass}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.unitPrice`}
-        rules={{
-          required: t('invoices.items.validation.priceRequired'),
-          validate: (value) =>
-            Number(value) > 0 ||
-            t('invoices.items.validation.priceGreaterThanZero'),
-        }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                type="number"
-                step="1"
-                {...field}
-                className={cn(cellInputClass, 'text-right tabular-nums')}
-                onChange={(e) => handleNumericChange(e, field.onChange)}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      {isVatPayer && (
-        <FormField
-          control={form.control}
-          name={`items.${index}.vatRate`}
-          rules={{
-            min: { value: 0, message: t('validation.minZero') },
-            max: { value: 100, message: t('validation.maxN', { max: 100 }) },
-          }}
-          render={({ field }) => (
-            <FormItem className="space-y-1">
-              <FormControl>
-                <Input
-                  type="number"
-                  step="1"
-                  {...field}
-                  className={cn(cellInputClass, 'text-right tabular-nums')}
-                  onChange={(e) => handleNumericChange(e, field.onChange)}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      )}
-
-      <Input
-        type="number"
-        step="1"
-        value={totalValue}
-        onChange={handleTotalChange}
-        onBlur={() => setTotalDraft(null)}
-        className={cn(cellInputClass, 'text-right font-semibold tabular-nums')}
-      />
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-muted-foreground"
-        onClick={onRemove}
-        disabled={!canRemove}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
-    </div>
-  );
-};
-
 const CreateIssuedInvoice = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -397,10 +205,6 @@ const CreateIssuedInvoice = () => {
 
   const listRoute = isReceived ? '/incoming-invoices' : '/outgoing-invoices';
 
-  const contactOptions = sortedContacts.map((c) => ({
-    value: c.id,
-    label: c.name ?? '-',
-  }));
   const bankOptions = sortedBanks.map((b) => ({
     value: b.id,
     label: getBankAccountLabel(b),
@@ -434,10 +238,6 @@ const CreateIssuedInvoice = () => {
     vatRate: isVatPayer ? 21 : undefined,
     total: 0,
   };
-
-  const gridTemplate = isVatPayer
-    ? '20px minmax(0,1fr) 64px 56px 92px 56px 104px 28px'
-    : '20px minmax(0,1fr) 64px 56px 92px 104px 28px';
 
   // Issue date drives the tax date and the due date (via the payment term).
   const handleCreatedDateChange = (
@@ -498,6 +298,16 @@ const CreateIssuedInvoice = () => {
   const showVatClaim =
     isVatPayer && isReceived && vatMode === CreateInvoiceDtoVatMode.STANDARD;
 
+  const watchedContactId = form.watch('contactId');
+  const pendingContact = form.watch('pendingContact');
+  const contactLabel = isReceived
+    ? t('invoices.fields.supplier')
+    : t('invoices.fields.contact');
+  const selectedContactLabel =
+    pendingContact?.name ||
+    sortedContacts.find((c) => c.id === watchedContactId)?.name ||
+    undefined;
+
   return (
     <PageLayout>
       <Form {...form}>
@@ -535,28 +345,60 @@ const CreateIssuedInvoice = () => {
 
           {/* Customer / supplier */}
           <Card className="border-border/60 p-5 shadow-sm">
-            <SelectField
+            <FormField
               control={form.control}
               name="contactId"
-              required
-              label={
-                isReceived
-                  ? t('invoices.fields.supplier')
-                  : t('invoices.fields.contact')
-              }
-              placeholder={
-                isReceived
-                  ? t('invoices.placeholders.selectSupplier')
-                  : t('invoices.placeholders.selectContact')
-              }
-              options={contactOptions}
               rules={{
-                required: t('validation.required', {
-                  field: isReceived
-                    ? t('invoices.fields.supplier')
-                    : t('invoices.fields.contact'),
-                }),
+                validate: () =>
+                  !!form.getValues('contactId') ||
+                  !!form.getValues('pendingContact') ||
+                  t('validation.required', { field: contactLabel }),
               }}
+              render={({ fieldState }) => (
+                <FormItem className="space-y-1.5">
+                  <FormLabel className={labelClass}>
+                    {contactLabel}
+                    <RequiredMark />
+                  </FormLabel>
+                  <ContactCombobox
+                    contacts={sortedContacts}
+                    selectedContactId={watchedContactId}
+                    selectedLabel={selectedContactLabel}
+                    hasError={!!fieldState.error}
+                    placeholder={
+                      isReceived
+                        ? t('invoices.placeholders.selectSupplier')
+                        : t('invoices.placeholders.selectContact')
+                    }
+                    onSelectContact={(contact) => {
+                      form.setValue('contactId', contact.id, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                      form.setValue('pendingContact', null, {
+                        shouldDirty: true,
+                      });
+                    }}
+                    onSelectAres={(contact) => {
+                      form.setValue('pendingContact', contact, {
+                        shouldDirty: true,
+                      });
+                      form.setValue('contactId', '', {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }}
+                  />
+                  {pendingContact && (
+                    <p className="text-[11px] text-muted-foreground/80">
+                      {t('invoices.create.contactSearch.willCreate', {
+                        name: pendingContact.name,
+                      })}
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </Card>
 
@@ -698,7 +540,11 @@ const CreateIssuedInvoice = () => {
             <Card className="border-border/60 p-0 shadow-sm">
               <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
                 <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
-                  <Plus className="h-2.5 w-2.5" />
+                  {symbolsOpen ? (
+                    <Minus className="h-2.5 w-2.5" />
+                  ) : (
+                    <Plus className="h-2.5 w-2.5" />
+                  )}
                 </span>
                 <span className="flex-1">
                   <span className="block text-[13px] font-medium">
@@ -784,67 +630,16 @@ const CreateIssuedInvoice = () => {
 
           {/* Line items + summary */}
           <Card className="border-border/60 p-5 shadow-sm">
-            <div className="mb-2.5 flex items-center justify-between">
-              <p className={labelClass}>
-                {t('invoices.sections.items')}
-                <RequiredMark />
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1 px-2.5 text-[11px]"
-                onClick={() => append(defaultItem)}
-              >
-                <Plus className="h-3 w-3" />
-                {t('invoices.items.addItem')}
-              </Button>
-            </div>
-
-            <div className="overflow-hidden rounded-lg border">
-              <div
-                className="grid items-center gap-2.5 border-b bg-muted/50 px-3 py-2"
-                style={{ gridTemplateColumns: gridTemplate }}
-              >
-                <span className={colHeadClass}>#</span>
-                <span className={colHeadClass}>
-                  {t('invoices.items.columns.description')}
-                </span>
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.fields.quantity')}
-                </span>
-                <span className={colHeadClass}>
-                  {t('invoices.fields.unit')}
-                </span>
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.fields.unitPrice')}
-                </span>
-                {isVatPayer && (
-                  <span className={cn(colHeadClass, 'text-right')}>
-                    {t('invoices.items.columns.vatRatePct')}
-                  </span>
-                )}
-                <span className={cn(colHeadClass, 'text-right')}>
-                  {t('invoices.summary.total')}
-                </span>
-                <span />
-              </div>
-              {fields.map((field, index) => (
-                <InvoiceItemRow
-                  key={field.id}
-                  form={form}
-                  index={index}
-                  isVatPayer={isVatPayer}
-                  gridTemplate={gridTemplate}
-                  onRecalculate={calculateTotals}
-                  onRemove={() => {
-                    remove(index);
-                    calculateTotals();
-                  }}
-                  canRemove={fields.length > 1}
-                />
-              ))}
-            </div>
+            <InvoiceItemsEditor
+              fields={fields}
+              isVatPayer={isVatPayer}
+              onRecalculate={calculateTotals}
+              onAppend={() => append(defaultItem)}
+              onRemoveAt={(index) => {
+                remove(index);
+                calculateTotals();
+              }}
+            />
 
             {/* Summary inside the items card — one glance */}
             <div className="mt-4 flex items-end justify-between border-t pt-3.5">

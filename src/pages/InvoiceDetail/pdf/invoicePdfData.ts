@@ -9,6 +9,7 @@ import type {
   ContactSnapshotDto,
   InvoiceResponseDto,
 } from '@/api/model';
+import { parseRateItemName, rateItemLabelCs } from '@/lib/simpleInvoiceItems';
 
 const toNumber = (value: unknown): number => {
   const n = typeof value === 'string' ? Number(value) : value;
@@ -200,8 +201,10 @@ export const buildInvoicePdfModel = (
     duzpDate: date(invoice.duzpDate),
     items: invoice.items.map((item) => {
       const quantity = toNumber(item.quantity);
+      const rateFromName = parseRateItemName(item.name);
       return {
-        name: item.name,
+        name:
+          rateFromName !== null ? rateItemLabelCs(rateFromName) : item.name,
         quantityLabel: `${quantity}${item.unit ? ` ${item.unit}` : ''}`,
         vatRate: toNumber(item.vatRate),
         unitPrice: money(item.unitPrice, currency),

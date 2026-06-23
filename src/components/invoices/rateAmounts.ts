@@ -1,7 +1,8 @@
 import type { InvoiceItemDto } from '@/api/model';
+import { parseRateItemName, rateItemName } from '@/lib/simpleInvoiceItems';
 
-// Amounts-by-VAT-rate logic for editing a received invoice — local to the
-// UpdateInvoice page. One fixed row per current Czech VAT rate.
+// Amounts-by-VAT-rate logic shared across the received-invoice and simplified-
+// document forms. One fixed row per current Czech VAT rate.
 export const DEFAULT_RATES = [21, 12, 0];
 
 export type RateField = 'base' | 'vat' | 'total';
@@ -18,7 +19,7 @@ export const round2 = (value: number) => Math.round(value * 100) / 100;
 
 const numToStr = (value: number) => (value ? String(value) : '0');
 
-const toNumber = (value: unknown) => {
+export const toNumber = (value: unknown) => {
   const numericValue = typeof value === 'string' ? Number(value) : value;
   return Number.isFinite(numericValue as number) ? Number(numericValue) : 0;
 };
@@ -73,12 +74,13 @@ export const sumRates = (rows: RateRowValue[]) =>
     { base: 0, vat: 0, total: 0 },
   );
 
-// Rate rows → invoice line items. VAT payers split each line into base + rate;
+// Rate rows → invoice line items. Each item carries a stable rate token in its
+// name (VAT_RATE_<rate>) so the document is language-independent and the edit
+// form can fold it back by token. VAT payers split each line into base + rate;
 // non-VAT payers record the gross as the amount (no VAT mode, no deduction).
 export const ratesToInvoiceItems = (
   rows: RateRowValue[],
   isVatPayer: boolean,
-  lineName: (rate: number) => string,
 ): InvoiceItemDto[] =>
   rows
     .map((row) => ({
@@ -89,16 +91,18 @@ export const ratesToInvoiceItems = (
     }))
     .filter((line) => line.total > 0)
     .map((line) => ({
-      name: lineName(line.rate),
+      name: rateItemName(line.rate),
       quantity: 1,
       unitPrice: isVatPayer ? line.base : line.total,
       total: isVatPayer ? line.base : line.total,
       vatRate: isVatPayer ? line.rate : undefined,
     }));
 
-// Invoice line items → rate rows, for prefilling the edit form. Each item's
-// base (quantity × unit price) is folded into the matching fixed rate row;
-// for a non-VAT payer everything is gross and lives in the first row's total.
+// Invoice line items → rate rows, for prefilling the edit form. The rate is
+// recovered from the item's name token first, falling back to its vatRate for
+// documents created before the token. Each item's base (quantity × unit price)
+// is folded into the matching fixed rate row; for a non-VAT payer everything is
+// gross and lives in the first row's total.
 export const invoiceItemsToRates = (
   items: InvoiceItemDto[] | undefined,
   isVatPayer: boolean,
@@ -118,7 +122,7 @@ export const invoiceItemsToRates = (
   }
 
   for (const item of items) {
-    const rate = toNumber(item.vatRate);
+    const rate = parseRateItemName(item.name) ?? toNumber(item.vatRate);
     const index = rows.findIndex((row) => row.vatRate === rate);
     if (index === -1) continue; // non-standard rate — no fixed row for it
     const base = round2(

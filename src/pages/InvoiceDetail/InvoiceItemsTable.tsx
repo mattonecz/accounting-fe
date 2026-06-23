@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { InvoiceResponseDto } from '@/api/model';
 import { cn } from '@/lib/utils';
+import { parseRateItemName } from '@/lib/simpleInvoiceItems';
 import { DetailCard, SectionLabel } from './primitives';
 import { formatMoney } from './utils';
 import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
@@ -106,6 +107,11 @@ export const InvoiceItemsTable = ({
           const unitPrice = toNumber(item.unitPrice);
           const vatRate = toNumber(item.vatRate);
           const total = quantity * unitPrice * (1 + vatRate / 100);
+          const rateFromName = parseRateItemName(item.name);
+          const displayName =
+            rateFromName !== null
+              ? t('simpleInvoices.create.rates.lineName', { rate: rateFromName })
+              : item.name;
 
           return (
             <div
@@ -114,7 +120,7 @@ export const InvoiceItemsTable = ({
               style={{ gridTemplateColumns: GRID }}
             >
               <span className="text-sm font-medium text-foreground">
-                {item.name}
+                {displayName}
               </span>
               <span className="text-right text-sm tabular-nums text-foreground">
                 {quantity}

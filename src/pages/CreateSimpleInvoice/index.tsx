@@ -4,7 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ChevronDown, Loader2, Plus } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  Loader2,
+  Minus,
+  Plus,
+} from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
   Form,
@@ -15,7 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -50,20 +56,23 @@ import {
   InvoiceListByCompanyKind,
 } from '@/api/model';
 import { formatMoney } from '@/lib/formatters';
+import { rateItemName } from '@/lib/simpleInvoiceItems';
 import { cn } from '@/lib/utils';
+import {
+  DEFAULT_RATES,
+  getDefaultRateRows,
+  recomputeRow,
+  round2,
+  sumRates,
+  type RateField,
+  type RateRowValue,
+} from '@/components/invoices/rateAmounts';
+import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
 
 const MANUAL = '__manual__';
 const DEFAULT_VAT_RATE = 21;
-// One fixed row per current Czech VAT rate — the user only types totals.
-const DEFAULT_RATES = [21, 12, 0];
 // Legal limit for a simplified tax document (zjednodušený daňový doklad).
 const MAX_TOTAL_WITH_VAT = 10000;
-
-type RateRowValue = {
-  vatRate: number;
-  /** Total incl. VAT as typed; empty string means no amount for this rate. */
-  total: string;
-};
 
 type FormValues = {
   // counterparty (optional)
@@ -85,9 +94,6 @@ type FormValues = {
   vatClaimMonth: string;
 };
 
-const getDefaultRates = (): RateRowValue[] =>
-  DEFAULT_RATES.map((vatRate) => ({ vatRate, total: '' }));
-
 const getDefaultFormValues = (): FormValues => ({
   companySelect: MANUAL,
   companyName: '',
@@ -96,7 +102,7 @@ const getDefaultFormValues = (): FormValues => ({
   number: '',
   createdDate: new Date().toISOString().split('T')[0],
   duzpDate: new Date().toISOString().split('T')[0],
-  rates: getDefaultRates(),
+  rates: getDefaultRateRows(),
   description: '',
   shouldClaimVat: true,
   vatClaimType: CreateInvoiceDtoVatClaimType.FULL,
@@ -104,16 +110,7 @@ const getDefaultFormValues = (): FormValues => ({
   vatClaimMonth: new Date().toISOString().slice(0, 7),
 });
 
-const round2 = (value: number) => Math.round(value * 100) / 100;
-
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-// Base is derived from the typed total so the three amounts always add up.
-const computeLine = (row: RateRowValue) => {
-  const total = round2(Number(row.total) || 0);
-  const base = round2((total * 100) / (100 + row.vatRate));
-  return { base, vat: round2(total - base), total };
-};
 
 const buildRatesFromReceipt = (
   receipt: ReceiptParseDataDto,
@@ -149,10 +146,11 @@ const buildRatesFromReceipt = (
 
   return [...totals.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([vatRate, total]) => ({
-      vatRate,
-      total: total > 0 ? String(total) : '',
-    }));
+    .map(([vatRate, total]) =>
+      total > 0
+        ? { vatRate, ...recomputeRow(vatRate, 'total', String(total)) }
+        : { vatRate, base: '', vat: '', total: '' },
+    );
 };
 
 const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
@@ -259,21 +257,22 @@ const CreateSimpleInvoice = () => {
   ];
 
   const watchedRates = form.watch('rates') ?? [];
-  const lineTotals = watchedRates.map(computeLine);
-  const grandTotals = lineTotals.reduce(
-    (acc, line) => ({
-      base: round2(acc.base + line.base),
-      vat: round2(acc.vat + line.vat),
-      total: round2(acc.total + line.total),
-    }),
-    { base: 0, vat: 0, total: 0 },
-  );
+  const grandTotals = sumRates(watchedRates);
   const overLimit = grandTotals.total > MAX_TOTAL_WITH_VAT;
 
+  const handleRateCellChange = (
+    index: number,
+    field: RateField,
+    rawValue: string,
+  ) => {
+    const rate = form.getValues(`rates.${index}.vatRate`) ?? 0;
+    const next = recomputeRow(rate, field, rawValue);
+    form.setValue(`rates.${index}.base`, next.base);
+    form.setValue(`rates.${index}.vat`, next.vat);
+    form.setValue(`rates.${index}.total`, next.total);
+  };
+
   const formatCzk = (value: number) => formatMoney(value, 'CZK', i18n.language);
-  const numberFormat = new Intl.NumberFormat(i18n.language, {
-    maximumFractionDigits: 2,
-  });
 
   const shouldClaimVat = form.watch('shouldClaimVat');
   const vatClaimType = form.watch('vatClaimType');
@@ -311,7 +310,12 @@ const CreateSimpleInvoice = () => {
 
   const onSubmit = (data: FormValues) => {
     const lines = data.rates
-      .map((row) => ({ rate: row.vatRate, ...computeLine(row) }))
+      .map((row) => ({
+        rate: row.vatRate,
+        base: round2(Number(row.base) || 0),
+        vat: round2(Number(row.vat) || 0),
+        total: round2(Number(row.total) || 0),
+      }))
       .filter((line) => line.total > 0);
 
     if (lines.length === 0) {
@@ -341,7 +345,7 @@ const CreateSimpleInvoice = () => {
     }
 
     const items: InvoiceItemDto[] = lines.map((line) => ({
-      name: t('simpleInvoices.create.rates.lineName', { rate: line.rate }),
+      name: rateItemName(line.rate),
       quantity: 1,
       unitPrice: line.base,
       total: line.base,
@@ -573,76 +577,11 @@ const CreateSimpleInvoice = () => {
               {t('simpleInvoices.create.rates.title')}
               <RequiredMark />
             </p>
-            <div className="overflow-hidden rounded-lg border">
-              <div className="grid grid-cols-[72px_1fr_1fr_1fr] items-center gap-3 border-b bg-muted/50 px-3.5 py-2 sm:grid-cols-[90px_1fr_1fr_1fr]">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {t('simpleInvoices.create.rates.rate')}
-                </span>
-                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {t('simpleInvoices.create.rates.totalWithVat')}
-                </span>
-                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {t('simpleInvoices.create.rates.base')}
-                </span>
-                <span className="text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {t('simpleInvoices.create.rates.vat')}
-                </span>
-              </div>
-              {watchedRates.map((row, index) => {
-                const line = lineTotals[index] ?? { base: 0, vat: 0, total: 0 };
-                const isEmpty = line.total <= 0;
-                return (
-                  <div
-                    key={row.vatRate}
-                    className="grid grid-cols-[72px_1fr_1fr_1fr] items-center gap-3 border-b px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[90px_1fr_1fr_1fr]"
-                  >
-                    <span
-                      className={cn(
-                        'text-sm font-semibold tabular-nums',
-                        isEmpty && 'text-muted-foreground/70',
-                      )}
-                    >
-                      {row.vatRate} %
-                    </span>
-                    <FormField
-                      control={form.control}
-                      name={`rates.${index}.total`}
-                      rules={{
-                        validate: (value) =>
-                          value === '' ||
-                          Number(value) >= 0 ||
-                          t('simpleInvoices.create.validation.totalMin'),
-                      }}
-                      render={({ field }) => (
-                        <FormItem className="space-y-1">
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              inputMode="decimal"
-                              step="any"
-                              min={0}
-                              placeholder="0"
-                              className={cn(
-                                'h-8 text-right text-sm tabular-nums',
-                                isEmpty && 'border-dashed',
-                              )}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <span className="text-right text-xs tabular-nums text-muted-foreground">
-                      {isEmpty ? '—' : numberFormat.format(line.base)}
-                    </span>
-                    <span className="text-right text-xs tabular-nums text-muted-foreground">
-                      {isEmpty ? '—' : numberFormat.format(line.vat)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <RateAmountsTable
+              rates={watchedRates}
+              isVatPayer
+              onCellChange={handleRateCellChange}
+            />
             <p className="mt-1.5 text-xs text-muted-foreground/80">
               {t('simpleInvoices.create.rates.hint')}
             </p>
@@ -680,7 +619,11 @@ const CreateSimpleInvoice = () => {
             <Card className="border-border/60 p-0 shadow-sm">
               <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
                 <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
-                  <Plus className="h-2.5 w-2.5" />
+                  {companyOpen ? (
+                    <Minus className="h-2.5 w-2.5" />
+                  ) : (
+                    <Plus className="h-2.5 w-2.5" />
+                  )}
                 </span>
                 <span className="flex-1">
                   <span className="block text-[13px] font-medium">
@@ -872,7 +815,28 @@ const CreateSimpleInvoice = () => {
                         </FormItem>
                       )}
                     />
-                    {vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL && (
+                    <FormField
+                      control={form.control}
+                      name="vatClaimMonth"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormLabel className={labelClass}>
+                            {t('simpleInvoices.create.vatClaim.period')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="month"
+                              className="tabular-nums"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {vatClaimType === CreateInvoiceDtoVatClaimType.PARTIAL && (
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <FormField
                         control={form.control}
                         name="vatClaimRatio"
@@ -924,38 +888,8 @@ const CreateSimpleInvoice = () => {
                           </FormItem>
                         )}
                       />
-                    )}
-                  </div>
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="vatClaimMonth"
-                      render={({ field }) => (
-                        <FormItem className="space-y-1.5">
-                          <FormLabel className={labelClass}>
-                            {t('simpleInvoices.create.vatClaim.period')}
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="month"
-                              className="tabular-nums"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="space-y-1.5">
-                      <Label className={labelClass}>
-                        {t('simpleInvoices.create.vatClaim.khSection')}
-                      </Label>
-                      {/* The section is fixed for simplified receipts — shown for context only. */}
-                      <p className="flex h-10 items-center rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground">
-                        {t('simpleInvoices.create.vatClaim.khValue')}
-                      </p>
                     </div>
-                  </div>
+                  )}
                   <p className="mt-3 text-xs text-muted-foreground/80">
                     {t('simpleInvoices.create.vatClaim.hint')}
                   </p>

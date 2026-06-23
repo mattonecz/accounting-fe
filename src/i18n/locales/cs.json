@@ -104,6 +104,19 @@
         "title": "Platební symboly a poznámka",
         "subtitle": "Nepovinné – konstantní/specifický symbol, poznámka na faktuře"
       },
+      "contactSearch": {
+        "placeholder": "Zadejte název firmy nebo IČO…",
+        "contactsGroup": "Kontakty",
+        "empty": "Žádný kontakt nenalezen",
+        "searchAres": "Vyhledat „{{query}}“ v ARES",
+        "searchAresHint": "Začněte psát pro vyhledání v ARES",
+        "back": "Zpět na kontakty",
+        "aresLoading": "Hledám v ARES…",
+        "aresEmpty": "V ARES nic nenalezeno",
+        "aresGroup": "Výsledky z ARES",
+        "ico": "IČO: {{ico}}",
+        "willCreate": "Nový kontakt „{{name}}“ se vytvoří při uložení faktury."
+      },
       "status": {
         "section": "Stav a evidence",
         "markPaid": "Označit jako zaplacenou",
@@ -112,7 +125,6 @@
       "received": {
         "metaHint": "Datum plnění (DUZP) je standardně shodné s datem vystavení.",
         "ratesTitle": "Částky podle sazby DPH",
-        "rateLineName": "Plnění {{rate}} % DPH",
         "totalAmount": "Celková částka",
         "baseTotal": "Základ celkem",
         "vatTotal": "DPH celkem",
@@ -544,7 +556,7 @@
         "totalWithVat": "Celkem s DPH",
         "base": "Základ",
         "vat": "DPH",
-        "hint": "Zadejte částku s DPH – základ a daň dopočítáme.",
+        "hint": "Vyplňte základ, DPH nebo částku s DPH – zbývající hodnoty dopočítáme.",
         "lineName": "Plnění {{rate}}% DPH"
       },
       "total": {
@@ -560,8 +572,6 @@
         "claim": "Uplatnit odpočet DPH",
         "claimDescription": "Doklad vstoupí do přiznání DPH",
         "period": "Období",
-        "khSection": "Sekce kontrolního hlášení",
-        "khValue": "B.3 – přijatá plnění do 10 000 Kč",
         "hint": "Výchozí hodnoty podle typu dokladu – většinou není třeba měnit."
       },
       "actions": {

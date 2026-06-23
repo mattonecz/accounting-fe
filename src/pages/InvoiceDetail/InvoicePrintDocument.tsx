@@ -9,6 +9,7 @@ import type {
   InvoiceResponseDto,
 } from '@/api/model';
 import { formatDate, formatMoney } from './utils';
+import { parseRateItemName, rateItemLabelCs } from '@/lib/simpleInvoiceItems';
 import { toNumber } from '@/pages/UpdateInvoice/useUpdateInvoiceForm';
 
 interface InvoicePrintDocumentProps {
@@ -272,9 +273,14 @@ export const InvoicePrintDocument = ({
             {invoice.items.map((item, i) => {
               const quantity = toNumber(item.quantity);
               const base = quantity * toNumber(item.unitPrice);
+              const rateFromName = parseRateItemName(item.name);
+              const name =
+                rateFromName !== null
+                  ? rateItemLabelCs(rateFromName)
+                  : item.name;
               return (
                 <tr key={item.id ?? `${item.name}-${i}`}>
-                  <td className="l desc">{item.name}</td>
+                  <td className="l desc">{name}</td>
                   <td className="tnum">
                     {quantity}
                     {item.unit ? ` ${item.unit}` : ''}

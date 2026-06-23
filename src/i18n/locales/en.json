@@ -104,6 +104,19 @@
         "title": "Payment symbols & note",
         "subtitle": "Optional — constant/specific symbol, invoice note"
       },
+      "contactSearch": {
+        "placeholder": "Enter company name or CRN…",
+        "contactsGroup": "Contacts",
+        "empty": "No contact found",
+        "searchAres": "Search ARES for \"{{query}}\"",
+        "searchAresHint": "Start typing to search ARES",
+        "back": "Back to contacts",
+        "aresLoading": "Searching ARES…",
+        "aresEmpty": "Nothing found in ARES",
+        "aresGroup": "ARES results",
+        "ico": "CRN: {{ico}}",
+        "willCreate": "New contact \"{{name}}\" will be created when the invoice is saved."
+      },
       "status": {
         "section": "Status & bookkeeping",
         "markPaid": "Mark as paid",
@@ -112,7 +125,6 @@
       "received": {
         "metaHint": "The taxable date (DUZP) defaults to the issue date.",
         "ratesTitle": "Amounts by VAT rate",
-        "rateLineName": "{{rate}}% VAT supply",
         "totalAmount": "Total amount",
         "baseTotal": "Base total",
         "vatTotal": "VAT total",
@@ -543,7 +555,7 @@
         "totalWithVat": "Total incl. VAT",
         "base": "Base",
         "vat": "VAT",
-        "hint": "Enter the amount incl. VAT – base and tax are computed.",
+        "hint": "Enter the base, VAT or total incl. VAT – the remaining values are computed.",
         "lineName": "Supply at {{rate}}% VAT"
       },
       "total": {
@@ -559,8 +571,6 @@
         "claim": "Claim VAT deduction",
         "claimDescription": "The receipt enters the VAT return",
         "period": "Period",
-        "khSection": "Control report section",
-        "khValue": "B.3 – received supplies under CZK 10,000",
         "hint": "Defaults follow the document type – usually no need to change."
       },
       "actions": {

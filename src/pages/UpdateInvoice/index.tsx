@@ -5,15 +5,14 @@ import {
   Control,
   FieldPath,
   UseControllerProps,
-  UseFormReturn,
 } from 'react-hook-form';
 import {
   ArrowLeft,
   Check,
   ChevronDown,
   Loader2,
+  Minus,
   Plus,
-  Trash2,
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
@@ -49,7 +48,13 @@ import {
 } from '@/api/model';
 import { addDays, daysBetween } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import { recomputeRow, sumRates, type RateField } from './incomingRates';
+import {
+  recomputeRow,
+  sumRates,
+  type RateField,
+} from '@/components/invoices/rateAmounts';
+import { InvoiceItemsEditor } from '@/components/invoices/InvoiceItemsEditor';
+import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
 import {
   getbankSnapshotLabel,
   toNumber,
@@ -60,11 +65,6 @@ import {
 const labelClass = 'text-[11px] font-semibold text-foreground/80';
 const sectionLabelClass =
   'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
-const colHeadClass =
-  'text-[9px] font-semibold uppercase tracking-wider text-muted-foreground';
-// Borderless cells so each row reads like a line of text until focused.
-const cellInputClass =
-  'h-9 rounded-md border-0 bg-transparent px-1.5 text-sm shadow-none transition-colors hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:ring-0 focus-visible:ring-offset-0';
 
 type FieldName = FieldPath<UpdateInvoiceFormValues>;
 type FieldRules = UseControllerProps<
@@ -73,8 +73,6 @@ type FieldRules = UseControllerProps<
 >['rules'];
 
 const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
-const round2 = (value: number) => Math.round(value * 100) / 100;
 
 interface TextFieldProps {
   control: Control<UpdateInvoiceFormValues>;
@@ -195,197 +193,6 @@ const SelectField = ({
   />
 );
 
-interface InvoiceItemRowProps {
-  form: UseFormReturn<UpdateInvoiceFormValues>;
-  index: number;
-  isVatPayer: boolean;
-  gridTemplate: string;
-  onRecalculate: () => void;
-  onRemove: () => void;
-  canRemove: boolean;
-}
-
-const InvoiceItemRow = ({
-  form,
-  index,
-  isVatPayer,
-  gridTemplate,
-  onRecalculate,
-  onRemove,
-  canRemove,
-}: InvoiceItemRowProps) => {
-  const { t } = useTranslation();
-  // Raw text while the user edits the total directly; null means "derive it".
-  const [totalDraft, setTotalDraft] = useState<string | null>(null);
-
-  const quantity = toNumber(form.watch(`items.${index}.quantity`));
-  const unitPrice = toNumber(form.watch(`items.${index}.unitPrice`));
-  const vatRate = isVatPayer
-    ? toNumber(form.watch(`items.${index}.vatRate`))
-    : 0;
-  const computedTotal = quantity * unitPrice * (1 + vatRate / 100);
-
-  const handleNumericChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    onChange: (value: number) => void,
-  ) => {
-    onChange(toNumber(e.target.value));
-    onRecalculate();
-  };
-
-  // User typed a final (VAT-inclusive) total → back-calculate the unit price.
-  const handleTotalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    setTotalDraft(raw);
-    const newTotal = parseFloat(raw) || 0;
-    const divisor = quantity * (1 + vatRate / 100);
-    const newUnitPrice = divisor > 0 ? round2(newTotal / divisor) : 0;
-    form.setValue(`items.${index}.unitPrice`, newUnitPrice);
-    onRecalculate();
-  };
-
-  const totalValue =
-    totalDraft ?? (computedTotal ? round2(computedTotal).toString() : '0');
-
-  return (
-    <div
-      className="grid items-center gap-2.5 border-b px-3 py-2 last:border-b-0"
-      style={{ gridTemplateColumns: gridTemplate }}
-    >
-      <span className="text-xs tabular-nums text-muted-foreground">
-        {index + 1}.
-      </span>
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.name`}
-        rules={{ required: t('invoices.items.validation.descriptionRequired') }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                {...field}
-                placeholder={t('invoices.placeholders.itemDescription')}
-                className={cn(cellInputClass, 'placeholder:italic')}
-              />
-            </FormControl>
-            <FormMessage className="px-1.5 text-[11px]" />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.quantity`}
-        rules={{
-          required: t('invoices.items.validation.quantityRequired'),
-          min: { value: 0, message: t('validation.minZero') },
-        }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                type="number"
-                {...field}
-                value={field.value ?? 0}
-                className={cn(cellInputClass, 'text-right tabular-nums')}
-                onChange={(e) => handleNumericChange(e, field.onChange)}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.unit`}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                {...field}
-                value={(field.value as string | undefined) ?? ''}
-                placeholder={t('invoices.placeholders.itemUnit')}
-                className={cellInputClass}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`items.${index}.unitPrice`}
-        rules={{
-          required: t('invoices.items.validation.priceRequired'),
-          validate: (value) =>
-            Number(value) > 0 ||
-            t('invoices.items.validation.priceGreaterThanZero'),
-        }}
-        render={({ field }) => (
-          <FormItem className="space-y-1">
-            <FormControl>
-              <Input
-                type="number"
-                step="1"
-                {...field}
-                value={field.value ?? 0}
-                className={cn(cellInputClass, 'text-right tabular-nums')}
-                onChange={(e) => handleNumericChange(e, field.onChange)}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      {isVatPayer && (
-        <FormField
-          control={form.control}
-          name={`items.${index}.vatRate`}
-          rules={{
-            min: { value: 0, message: t('validation.minZero') },
-            max: { value: 100, message: t('validation.maxN', { max: 100 }) },
-          }}
-          render={({ field }) => (
-            <FormItem className="space-y-1">
-              <FormControl>
-                <Input
-                  type="number"
-                  step="1"
-                  {...field}
-                  value={field.value ?? 0}
-                  className={cn(cellInputClass, 'text-right tabular-nums')}
-                  onChange={(e) => handleNumericChange(e, field.onChange)}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      )}
-
-      <Input
-        type="number"
-        step="1"
-        value={totalValue}
-        onChange={handleTotalChange}
-        onBlur={() => setTotalDraft(null)}
-        className={cn(cellInputClass, 'text-right font-semibold tabular-nums')}
-      />
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-muted-foreground"
-        onClick={onRemove}
-        disabled={!canRemove}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
-    </div>
-  );
-};
-
 export default function UpdateInvoice() {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -458,10 +265,6 @@ export default function UpdateInvoice() {
       label: t('invoices.statuses.CANCELLED'),
     },
   ];
-
-  const gridTemplate = isVatPayer
-    ? '20px minmax(0,1fr) 64px 56px 92px 56px 104px 28px'
-    : '20px minmax(0,1fr) 64px 56px 92px 104px 28px';
 
   // Issue date drives the tax date and the due date (via the payment term).
   const handleCreatedDateChange = (
@@ -739,7 +542,11 @@ export default function UpdateInvoice() {
             <Card className="border-border/60 p-0 shadow-sm">
               <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
                 <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
-                  <Plus className="h-2.5 w-2.5" />
+                  {symbolsOpen ? (
+                    <Minus className="h-2.5 w-2.5" />
+                  ) : (
+                    <Plus className="h-2.5 w-2.5" />
+                  )}
                 </span>
                 <span className="flex-1">
                   <span className="block text-[13px] font-medium">
@@ -831,100 +638,12 @@ export default function UpdateInvoice() {
                 <RequiredMark />
               </p>
 
-              {isVatPayer ? (
-                <div className="overflow-hidden rounded-lg border">
-                  <div className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b bg-muted/50 px-3.5 py-2 sm:grid-cols-[80px_1fr_1fr_1fr]">
-                    <span className={colHeadClass}>
-                      {t('simpleInvoices.create.rates.rate')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.base')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.vat')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.totalWithVat')}
-                    </span>
-                  </div>
-                  {rates.map((row, index) => {
-                    const isEmpty = !(Number(row.total) > 0);
-                    const cellClass = (value: string) =>
-                      cn(
-                        'h-8 text-right text-sm tabular-nums',
-                        !value && 'border-dashed',
-                      );
-                    return (
-                      <div
-                        key={row.vatRate}
-                        className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[80px_1fr_1fr_1fr]"
-                      >
-                        <span
-                          className={cn(
-                            'text-sm font-semibold tabular-nums',
-                            isEmpty && 'text-muted-foreground/70',
-                          )}
-                        >
-                          {row.vatRate} %
-                        </span>
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.base}
-                          onChange={(e) =>
-                            handleRateCellChange(index, 'base', e.target.value)
-                          }
-                          className={cellClass(row.base)}
-                        />
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.vat}
-                          onChange={(e) =>
-                            handleRateCellChange(index, 'vat', e.target.value)
-                          }
-                          disabled={row.vatRate === 0}
-                          className={cellClass(row.vat)}
-                        />
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.total}
-                          onChange={(e) =>
-                            handleRateCellChange(index, 'total', e.target.value)
-                          }
-                          className={cellClass(row.total)}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  <p className={labelClass}>
-                    {t('invoices.create.received.totalAmount')}
-                  </p>
-                  <Input
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    min={0}
-                    placeholder="0"
-                    value={rates[0]?.total ?? ''}
-                    onChange={(e) => handleRateTotalOnlyChange(e.target.value)}
-                    className="text-right tabular-nums"
-                  />
-                </div>
-              )}
+              <RateAmountsTable
+                rates={rates}
+                isVatPayer={isVatPayer}
+                onCellChange={handleRateCellChange}
+                onTotalOnlyChange={handleRateTotalOnlyChange}
+              />
 
               {/* Totals */}
               <div className="mt-4 flex items-end justify-between border-t pt-3.5">
@@ -964,67 +683,16 @@ export default function UpdateInvoice() {
             </Card>
           ) : (
             <Card className="border-border/60 p-5 shadow-sm">
-              <div className="mb-2.5 flex items-center justify-between">
-                <p className={labelClass}>
-                  {t('invoices.sections.items')}
-                  <RequiredMark />
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 gap-1 px-2.5 text-[11px]"
-                  onClick={addItem}
-                >
-                  <Plus className="h-3 w-3" />
-                  {t('invoices.items.addItem')}
-                </Button>
-              </div>
-
-              <div className="overflow-hidden rounded-lg border">
-                <div
-                  className="grid items-center gap-2.5 border-b bg-muted/50 px-3 py-2"
-                  style={{ gridTemplateColumns: gridTemplate }}
-                >
-                  <span className={colHeadClass}>#</span>
-                  <span className={colHeadClass}>
-                    {t('invoices.items.columns.description')}
-                  </span>
-                  <span className={cn(colHeadClass, 'text-right')}>
-                    {t('invoices.fields.quantity')}
-                  </span>
-                  <span className={colHeadClass}>
-                    {t('invoices.fields.unit')}
-                  </span>
-                  <span className={cn(colHeadClass, 'text-right')}>
-                    {t('invoices.fields.unitPrice')}
-                  </span>
-                  {isVatPayer && (
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('invoices.items.columns.vatRatePct')}
-                    </span>
-                  )}
-                  <span className={cn(colHeadClass, 'text-right')}>
-                    {t('invoices.summary.total')}
-                  </span>
-                  <span />
-                </div>
-                {fields.map((field, index) => (
-                  <InvoiceItemRow
-                    key={field.id}
-                    form={form}
-                    index={index}
-                    isVatPayer={isVatPayer}
-                    gridTemplate={gridTemplate}
-                    onRecalculate={calculateInvoiceTotals}
-                    onRemove={() => {
-                      removeItem(index);
-                      calculateInvoiceTotals();
-                    }}
-                    canRemove={fields.length > 1}
-                  />
-                ))}
-              </div>
+              <InvoiceItemsEditor
+                fields={fields}
+                isVatPayer={isVatPayer}
+                onRecalculate={calculateInvoiceTotals}
+                onAppend={addItem}
+                onRemoveAt={(index) => {
+                  removeItem(index);
+                  calculateInvoiceTotals();
+                }}
+              />
 
               {/* Summary inside the items card — one glance */}
               <div className="mt-4 flex items-end justify-between border-t pt-3.5">

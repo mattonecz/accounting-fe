@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { useQueryClient } from '@tanstack/react-query';
 import i18n from '@/i18n';
 import { addDays } from '@/lib/formatters';
 import {
+  CreateContactDto,
   CreateInvoiceDto,
   CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoStatus,
@@ -20,8 +22,17 @@ export type InvoiceFormValues = CreateInvoiceDto & {
   paymentDays?: number;
   /** Helper field – when true, `paidDate` is sent and the invoice is created as PAID. */
   isPaid?: boolean;
+  /**
+   * Helper field – a counterparty picked from ARES that does not exist as a
+   * Contact yet. It is created on submit and then referenced via `contactId`.
+   */
+  pendingContact?: CreateContactDto | null;
 };
-import { useListContacts } from '@/api/contacts/contacts';
+import {
+  getListContactsQueryKey,
+  useCreateContact,
+  useListContacts,
+} from '@/api/contacts/contacts';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
@@ -64,6 +75,7 @@ export const useInvoiceForm = () => {
     : CreateInvoiceDtoType.ISSUED;
 
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
   const { data: invoiceNumber } = useInvoiceGetCount();
@@ -71,6 +83,8 @@ export const useInvoiceForm = () => {
   const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const { mutate: createInvoice, isPending: isCreatingInvoice } =
     useInvoiceCreate();
+  const { mutateAsync: createContactAsync, isPending: isCreatingContact } =
+    useCreateContact();
   const [submitMode, setSubmitMode] = useState<InvoiceSubmitMode>('issued');
 
   const isVatPayer = !!companyResponse?.data?.vatPayer;
@@ -103,6 +117,7 @@ export const useInvoiceForm = () => {
       vatClaimRatio: undefined,
       vatClaimMonth: new Date().toISOString().slice(0, 7),
       vatClaimNote: '',
+      pendingContact: null,
     },
   });
 
@@ -208,7 +223,10 @@ export const useInvoiceForm = () => {
     });
   };
 
-  const submitInvoice = (data: InvoiceFormValues, mode: InvoiceSubmitMode) => {
+  const submitInvoice = async (
+    data: InvoiceFormValues,
+    mode: InvoiceSubmitMode,
+  ) => {
     setSubmitMode(mode);
 
     const {
@@ -218,12 +236,31 @@ export const useInvoiceForm = () => {
       shouldClaimVat,
       isPaid,
       paymentDays: _paymentDays,
+      pendingContact,
       vatClaimType,
       vatClaimRatio,
       vatClaimMonth,
       vatClaimNote,
       ...rest
     } = data;
+
+    // A counterparty picked from ARES is created as a Contact first, then
+    // referenced by its id on the invoice.
+    let contactId = rest.contactId;
+    if (!contactId && pendingContact) {
+      try {
+        const created = await createContactAsync({ data: pendingContact });
+        contactId = created.data.id;
+        await queryClient.invalidateQueries({
+          queryKey: getListContactsQueryKey(),
+        });
+      } catch {
+        enqueueSnackbar(i18n.t('contacts.messages.createFailed'), {
+          variant: 'error',
+        });
+        return;
+      }
+    }
 
     const cleanedSnapshot = isReceived
       ? buildBankSnapshot(bankSnapshot)
@@ -269,6 +306,7 @@ export const useInvoiceForm = () => {
 
     const invoicePayload: CreateInvoiceDto = {
       ...rest,
+      contactId,
       vatMode: finalVatMode,
       items: finalItems,
       bankId: finalBankId,
@@ -318,7 +356,7 @@ export const useInvoiceForm = () => {
     form,
     fieldArray,
     submitMode,
-    isCreatingInvoice,
+    isCreatingInvoice: isCreatingInvoice || isCreatingContact,
     isReceived,
     isVatPayer,
     selectedCurrency,

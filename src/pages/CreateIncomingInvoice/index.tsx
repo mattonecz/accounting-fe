@@ -8,7 +8,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ChevronDown, Loader2, Plus } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  Loader2,
+  Minus,
+  Plus,
+} from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
   Form,
@@ -38,7 +45,7 @@ import { useListContacts } from '@/api/contacts/contacts';
 import { useInvoiceCreate } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ContactResponseDto, InvoiceItemDto } from '@/api/model';
+import type { ContactResponseDto } from '@/api/model';
 import {
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatClaimType,
@@ -46,26 +53,21 @@ import {
 } from '@/api/model';
 import { addDays, formatMoney } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
+import {
+  getDefaultRateRows,
+  ratesToInvoiceItems,
+  recomputeRow,
+  sumRates,
+  type RateField,
+  type RateRowValue,
+} from '@/components/invoices/rateAmounts';
+import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
 
 const labelClass = 'text-[11px] font-semibold text-foreground/80';
 const sectionLabelClass =
   'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
-const colHeadClass =
-  'text-[9px] font-semibold uppercase tracking-wider text-muted-foreground';
 
-// One fixed row per current Czech VAT rate.
-const DEFAULT_RATES = [21, 12, 0];
 const DEFAULT_PAYMENT_DAYS = 14;
-
-type RateField = 'base' | 'vat' | 'total';
-
-type RateRowValue = {
-  vatRate: number;
-  // base / VAT / total are all editable; empty strings mean no amount for this rate.
-  base: string;
-  vat: string;
-  total: string;
-};
 
 type FormValues = {
   contactId: string;
@@ -97,47 +99,6 @@ type FormValues = {
   vatClaimMonth: string;
 };
 
-const round2 = (value: number) => Math.round(value * 100) / 100;
-
-const numToStr = (value: number) => (value ? String(value) : '0');
-
-// The VAT rate links base/VAT/total: editing any one re-derives the other two.
-// Returns the three columns as strings; the edited column keeps the raw input.
-const recomputeRow = (
-  rate: number,
-  field: RateField,
-  raw: string,
-): { base: string; vat: string; total: string } => {
-  if (raw.trim() === '' || Number.isNaN(Number(raw))) {
-    return { base: '', vat: '', total: '' };
-  }
-  const num = round2(Number(raw));
-  let base: number;
-  let vat: number;
-  let total: number;
-  if (field === 'base') {
-    base = num;
-    vat = round2((base * rate) / 100);
-    total = round2(base + vat);
-  } else if (field === 'vat') {
-    vat = num;
-    base = rate > 0 ? round2((vat * 100) / rate) : 0;
-    total = round2(base + vat);
-  } else {
-    total = num;
-    base = round2((total * 100) / (100 + rate));
-    vat = round2(total - base);
-  }
-  const next = {
-    base: numToStr(base),
-    vat: numToStr(vat),
-    total: numToStr(total),
-  };
-  // Preserve exactly what the user is typing in the edited column.
-  next[field] = raw;
-  return next;
-};
-
 const getDefaultValues = (): FormValues => {
   const today = new Date().toISOString().split('T')[0];
   return {
@@ -152,12 +113,7 @@ const getDefaultValues = (): FormValues => {
     currency: 'CZK',
     vatMode: CreateInvoiceDtoVatMode.STANDARD,
     exchangeRate: '',
-    rates: DEFAULT_RATES.map((vatRate) => ({
-      vatRate,
-      base: '',
-      vat: '',
-      total: '',
-    })),
+    rates: getDefaultRateRows(),
     variableSymbol: '',
     specificSymbol: '',
     konstantSymbol: '',
@@ -347,14 +303,17 @@ const CreateIncomingInvoice = () => {
     formatMoney(value, currency, i18n.language);
 
   // Editing base/VAT/total in a row re-derives the other two from the rate.
-  const handleRateChange =
-    (index: number, rate: number, field: RateField) =>
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const next = recomputeRow(rate, field, e.target.value);
-      form.setValue(`rates.${index}.base`, next.base);
-      form.setValue(`rates.${index}.vat`, next.vat);
-      form.setValue(`rates.${index}.total`, next.total);
-    };
+  const handleRateCellChange = (
+    index: number,
+    field: RateField,
+    rawValue: string,
+  ) => {
+    const rate = form.getValues(`rates.${index}.vatRate`) ?? 0;
+    const next = recomputeRow(rate, field, rawValue);
+    form.setValue(`rates.${index}.base`, next.base);
+    form.setValue(`rates.${index}.vat`, next.vat);
+    form.setValue(`rates.${index}.total`, next.total);
+  };
 
   // Keep the taxable, due and paid dates in step with the issue date until the
   // user touches them, and clear a stale exchange rate when switching to CZK.
@@ -400,14 +359,7 @@ const CreateIncomingInvoice = () => {
   }, [isCzkCurrency, form]);
 
   const watchedRates = form.watch('rates') ?? [];
-  const grandTotals = watchedRates.reduce(
-    (acc, row) => ({
-      base: round2(acc.base + (Number(row.base) || 0)),
-      vat: round2(acc.vat + (Number(row.vat) || 0)),
-      total: round2(acc.total + (Number(row.total) || 0)),
-    }),
-    { base: 0, vat: 0, total: 0 },
-  );
+  const grandTotals = sumRates(watchedRates);
 
   const vatMode = form.watch('vatMode');
   const shouldClaimVat = form.watch('shouldClaimVat');
@@ -438,31 +390,14 @@ const CreateIncomingInvoice = () => {
   });
 
   const onSubmit = (data: FormValues) => {
-    const lines = data.rates
-      .map((row) => ({
-        rate: row.vatRate,
-        base: round2(Number(row.base) || 0),
-        vat: round2(Number(row.vat) || 0),
-        total: round2(Number(row.total) || 0),
-      }))
-      .filter((line) => line.total > 0);
+    const items = ratesToInvoiceItems(data.rates, isVatPayer);
 
-    if (lines.length === 0) {
+    if (items.length === 0) {
       enqueueSnackbar(t('invoices.create.received.amountRequired'), {
         variant: 'error',
       });
       return;
     }
-
-    // VAT payers split each line into base + rate; non-VAT payers record the
-    // gross as the amount (no VAT mode, no deduction).
-    const items: InvoiceItemDto[] = lines.map((line) => ({
-      name: t('invoices.create.received.rateLineName', { rate: line.rate }),
-      quantity: 1,
-      unitPrice: isVatPayer ? line.base : line.total,
-      total: isVatPayer ? line.base : line.total,
-      vatRate: isVatPayer ? line.rate : undefined,
-    }));
 
     const finalVatMode = isVatPayer
       ? data.vatMode
@@ -659,7 +594,11 @@ const CreateIncomingInvoice = () => {
             <Card className="border-border/60 p-0 shadow-sm">
               <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
                 <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
-                  <Plus className="h-2.5 w-2.5" />
+                  {symbolsOpen ? (
+                    <Minus className="h-2.5 w-2.5" />
+                  ) : (
+                    <Plus className="h-2.5 w-2.5" />
+                  )}
                 </span>
                 <span className="flex-1">
                   <span className="block text-[13px] font-medium">
@@ -748,111 +687,14 @@ const CreateIncomingInvoice = () => {
               <RequiredMark />
             </p>
 
-            {isVatPayer ? (
-              <>
-                <div className="overflow-hidden rounded-lg border">
-                  <div className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b bg-muted/50 px-3.5 py-2 sm:grid-cols-[80px_1fr_1fr_1fr]">
-                    <span className={colHeadClass}>
-                      {t('simpleInvoices.create.rates.rate')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.base')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.vat')}
-                    </span>
-                    <span className={cn(colHeadClass, 'text-right')}>
-                      {t('simpleInvoices.create.rates.totalWithVat')}
-                    </span>
-                  </div>
-                  {watchedRates.map((row, index) => {
-                    const isEmpty = !(Number(row.total) > 0);
-                    const cellClass = (value: string) =>
-                      cn(
-                        'h-8 text-right text-sm tabular-nums',
-                        !value && 'border-dashed',
-                      );
-                    return (
-                      <div
-                        key={row.vatRate}
-                        className="grid grid-cols-[64px_1fr_1fr_1fr] items-center gap-3 border-b px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[80px_1fr_1fr_1fr]"
-                      >
-                        <span
-                          className={cn(
-                            'text-sm font-semibold tabular-nums',
-                            isEmpty && 'text-muted-foreground/70',
-                          )}
-                        >
-                          {row.vatRate} %
-                        </span>
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.base}
-                          onChange={handleRateChange(
-                            index,
-                            row.vatRate,
-                            'base',
-                          )}
-                          className={cellClass(row.base)}
-                        />
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.vat}
-                          onChange={handleRateChange(index, row.vatRate, 'vat')}
-                          disabled={row.vatRate === 0}
-                          className={cellClass(row.vat)}
-                        />
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          step="any"
-                          min={0}
-                          placeholder="0"
-                          value={row.total}
-                          onChange={handleRateChange(
-                            index,
-                            row.vatRate,
-                            'total',
-                          )}
-                          className={cellClass(row.total)}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <FormField
-                control={form.control}
-                name="rates.0.total"
-                render={({ field }) => (
-                  <FormItem className="space-y-1.5">
-                    <FormLabel className={labelClass}>
-                      {t('invoices.create.received.totalAmount')}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        inputMode="decimal"
-                        step="any"
-                        min={0}
-                        placeholder="0"
-                        className="text-right tabular-nums"
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+            <RateAmountsTable
+              rates={watchedRates}
+              isVatPayer={isVatPayer}
+              onCellChange={handleRateCellChange}
+              onTotalOnlyChange={(value) =>
+                form.setValue('rates.0.total', value)
+              }
+            />
 
             {/* Totals */}
             <div className="mt-4 flex items-end justify-between border-t pt-3.5">

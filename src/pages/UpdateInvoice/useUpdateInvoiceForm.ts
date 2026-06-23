@@ -20,7 +20,7 @@ import {
   invoiceItemsToRates,
   ratesToInvoiceItems,
   type RateRowValue,
-} from './incomingRates';
+} from '@/components/invoices/rateAmounts';
 import {
   InvoiceBankAccountSnapshotDto,
   InvoiceResponseDto,
@@ -381,9 +381,7 @@ export function useUpdateInvoiceForm(id: string) {
     // Received invoices are edited as amounts-by-VAT-rate and converted back to
     // line items (mirroring create); issued invoices use the line-item editor.
     const finalItems = isReceived
-      ? ratesToInvoiceItems(rates ?? [], isVatPayer, (rate) =>
-          i18n.t('invoices.create.received.rateLineName', { rate }),
-        )
+      ? ratesToInvoiceItems(rates ?? [], isVatPayer)
       : rest.items?.map((item) => ({
           ...item,
           unit: trimOrUndefined(item.unit),
