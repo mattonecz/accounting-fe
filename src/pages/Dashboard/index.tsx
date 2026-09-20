@@ -1,6 +1,8 @@
+import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  ArrowDownRight,
   ArrowUpRight,
   CheckCircle2,
   Inbox,
@@ -18,15 +20,14 @@ import { useInvoiceGetStats } from '@/api/invoices/invoices';
 import type { DashboardInvoiceItemDto } from '@/api/model';
 import { formatMoney } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import { CashflowCard } from './CashflowCard';
+// Recharts is a heavy dependency and only this card needs it.
+const CashflowCard = lazy(() =>
+  import('./CashflowCard').then((m) => ({ default: m.CashflowCard })),
+);
 import { QueueItem } from './QueueItem';
-import {
-  MOCK_CASH,
-  MOCK_CURRENCY,
-  MOCK_DRAFTS,
-  MOCK_OVERDUE,
-  MOCK_TAXES,
-} from './mockData';
+import { useDashboardQueue } from './useDashboardQueue';
+
+const DEFAULT_CURRENCY = 'CZK';
 
 const getGreetingKey = (hour: number) => {
   if (hour < 12) return 'dashboard.greeting.morning';
@@ -40,9 +41,29 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useInvoiceGetStats();
   const stats = data?.data;
+  const summary = stats?.summary;
+  const queue = useDashboardQueue();
 
-  const fmt = (amount: number, currency = MOCK_CURRENCY) =>
+  const fmt = (amount: number, currency = DEFAULT_CURRENCY) =>
     formatMoney(amount, currency, i18n.language);
+
+  const ChangeBadge = ({ value }: { value: number | undefined }) => {
+    if (value == null) return null;
+    const positive = value >= 0;
+    const Icon = positive ? ArrowUpRight : ArrowDownRight;
+    return (
+      <span
+        className={cn(
+          'flex items-center gap-0.5 text-xs font-semibold',
+          positive ? 'text-success' : 'text-destructive',
+        )}
+      >
+        <Icon className="h-3.5 w-3.5" />
+        {positive ? '+' : ''}
+        {value}%
+      </span>
+    );
+  };
 
   const now = new Date();
   const weekday = new Intl.DateTimeFormat(i18n.language, {
@@ -56,8 +77,7 @@ export default function Dashboard() {
   const dateLine = `${weekday} · ${longDate}`.toUpperCase();
 
   const firstName = (user?.name || user?.email || '').split(' ')[0];
-  const queueCount =
-    MOCK_OVERDUE.length + MOCK_DRAFTS.length + MOCK_TAXES.length;
+  const queueCount = queue.items.length;
 
   const latestInvoices: DashboardInvoiceItemDto[] = [
     ...(stats?.recentOutgoingInvoices ?? []),
@@ -134,45 +154,46 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Hero metric — available cash (mock data) */}
+      {/* Hero metric — invoiced balance from /invoices/stats */}
       <Card className="border-border/60 p-5 shadow-sm md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {t('dashboard.hero.availableCash')}
+              {t('dashboard.hero.netBalance')}
             </p>
             <div className="mt-1.5 flex items-baseline gap-3">
               <span className="text-3xl font-bold tracking-tight tabular-nums md:text-4xl">
-                {fmt(MOCK_CASH.available)}
+                {summary ? fmt(summary.netBalance) : '—'}
               </span>
-              <span className="flex items-center gap-0.5 text-xs font-semibold text-success">
-                <ArrowUpRight className="h-3.5 w-3.5" />+{MOCK_CASH.trendPct}%
-              </span>
+              <ChangeBadge value={summary?.netChangePct} />
             </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('dashboard.hero.changeHint')}
+            </p>
           </div>
           <div className="flex flex-wrap gap-x-8 gap-y-3">
             <div className="sm:text-right">
               <p className="text-xs text-muted-foreground">
-                {t('dashboard.hero.inAccounts')}
-              </p>
-              <p className="mt-0.5 text-sm font-medium tabular-nums">
-                {fmt(MOCK_CASH.inAccounts)}
-              </p>
-            </div>
-            <div className="sm:text-right">
-              <p className="text-xs text-muted-foreground">
-                {t('dashboard.hero.expected30d')}
+                {t('dashboard.hero.income')}
               </p>
               <p className="mt-0.5 text-sm font-medium tabular-nums text-success">
-                {fmt(MOCK_CASH.expected30d)}
+                {summary ? fmt(summary.totalIncome) : '—'}
               </p>
             </div>
             <div className="sm:text-right">
               <p className="text-xs text-muted-foreground">
-                {t('dashboard.hero.obligations')}
+                {t('dashboard.hero.expenses')}
               </p>
               <p className="mt-0.5 text-sm font-medium tabular-nums text-destructive">
-                −{fmt(MOCK_CASH.obligations)}
+                {summary ? `−${fmt(summary.totalExpenses)}` : '—'}
+              </p>
+            </div>
+            <div className="sm:text-right">
+              <p className="text-xs text-muted-foreground">
+                {t('dashboard.hero.activeClients')}
+              </p>
+              <p className="mt-0.5 text-sm font-medium tabular-nums">
+                {summary?.activeClients ?? '—'}
               </p>
             </div>
           </div>
@@ -181,7 +202,11 @@ export default function Dashboard() {
 
       {/* Cash-flow chart | action queue */}
       <div className="grid items-stretch gap-6 lg:grid-cols-2">
-        <CashflowCard />
+        <Suspense
+          fallback={<Card className="h-full border-border/60 p-5 shadow-sm" />}
+        >
+          <CashflowCard />
+        </Suspense>
 
         <Card className="flex flex-col overflow-hidden border-border/60 p-0 shadow-sm">
           <div className="flex items-center justify-between border-b border-border/60 px-5 py-3.5">
@@ -201,52 +226,40 @@ export default function Dashboard() {
           </div>
           {queueCount > 0 ? (
             <div className="flex-1 overflow-auto">
-              {MOCK_OVERDUE.map((inv) => (
+              {queue.items.map((item) => (
                 <QueueItem
-                  key={inv.num}
-                  tag={t('dashboard.queue.tags.overdue')}
-                  tagClassName="text-destructive"
-                  title={`${inv.num} · ${inv.client}`}
-                  meta={t('dashboard.queue.overdueMeta', {
-                    count: inv.days,
-                    amount: fmt(inv.amount),
-                  })}
-                  actions={[
-                    { label: t('dashboard.queue.actionRemind'), primary: true },
-                    { label: t('dashboard.queue.actionPaid') },
-                  ]}
-                />
-              ))}
-              {MOCK_DRAFTS.map((draft) => (
-                <QueueItem
-                  key={draft.client}
-                  tag={t('dashboard.queue.tags.draft')}
-                  tagClassName="text-muted-foreground"
-                  title={draft.client}
-                  meta={t('dashboard.queue.draftMeta', {
-                    count: draft.items,
-                    amount: fmt(draft.amount),
-                  })}
-                  actions={[
-                    { label: t('dashboard.queue.actionSend'), primary: true },
-                    { label: t('dashboard.queue.actionEdit') },
-                  ]}
-                />
-              ))}
-              {MOCK_TAXES.map((tax) => (
-                <QueueItem
-                  key={tax.kindKey}
-                  tag={t('dashboard.queue.tags.tax')}
-                  tagClassName="text-muted-foreground"
-                  title={t(`dashboard.queue.${tax.kindKey}`)}
-                  meta={t('dashboard.queue.taxMeta', {
-                    count: tax.days,
-                    amount: fmt(tax.amount),
-                  })}
+                  key={`${item.kind}-${item.id}`}
+                  tag={t(`dashboard.queue.tags.${item.kind}`)}
+                  tagClassName={
+                    item.kind === 'overdue'
+                      ? 'text-destructive'
+                      : 'text-muted-foreground'
+                  }
+                  title={item.title}
+                  meta={
+                    item.kind === 'overdue'
+                      ? t('dashboard.queue.overdueMeta', {
+                          count: item.daysOverdue ?? 0,
+                          amount: fmt(item.amount, item.currency),
+                        })
+                      : item.kind === 'draft'
+                        ? t('dashboard.queue.draftMetaAmount', {
+                            amount: fmt(item.amount, item.currency),
+                          })
+                        : t('dashboard.queue.filingMeta', {
+                            amount: fmt(item.amount, item.currency),
+                          })
+                  }
                   actions={[
                     {
-                      label: t('dashboard.queue.actionPrepare'),
+                      label:
+                        item.kind === 'draft'
+                          ? t('dashboard.queue.actionEdit')
+                          : item.kind === 'filing'
+                            ? t('dashboard.queue.actionPrepare')
+                            : t('invoices.actions.detail'),
                       primary: true,
+                      onClick: () => navigate(item.route),
                     },
                   ]}
                 />
@@ -294,7 +307,7 @@ export default function Dashboard() {
                 </span>
                 <span className="truncate text-sm">{invoice.companyName}</span>
                 <span className="text-right text-sm font-medium tabular-nums">
-                  {fmt(invoice.amount, invoice.currency || MOCK_CURRENCY)}
+                  {fmt(invoice.amount, invoice.currency || DEFAULT_CURRENCY)}
                 </span>
                 <span
                   className={cn(

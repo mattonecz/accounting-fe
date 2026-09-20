@@ -2,11 +2,6 @@ import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Control,
-  FieldPath,
-  UseControllerProps,
-} from 'react-hook-form';
-import {
   ArrowLeft,
   Check,
   ChevronDown,
@@ -16,6 +11,13 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
+  RequiredMark,
+  SelectField,
+  TextField,
+  labelClass,
+  sectionLabelClass,
+} from '@/components/invoices/formFields';
+import {
   Form,
   FormControl,
   FormField,
@@ -23,14 +25,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
@@ -39,10 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import {
-  useInvoiceForm,
-  type InvoiceFormValues,
-} from '@/components/invoices/useInvoiceForm';
+import { useInvoiceForm } from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
 import { InvoiceItemsEditor } from '@/components/invoices/InvoiceItemsEditor';
 import { ContactCombobox } from '@/components/invoices/ContactCombobox';
@@ -53,134 +44,6 @@ import {
 } from '@/api/model';
 import { addDays, daysBetween } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-
-const labelClass = 'text-[11px] font-semibold text-foreground/80';
-const sectionLabelClass =
-  'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
-
-type FieldName = FieldPath<InvoiceFormValues>;
-type FieldRules = UseControllerProps<InvoiceFormValues, FieldName>['rules'];
-
-const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
-interface TextFieldProps {
-  control: Control<InvoiceFormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  rules?: FieldRules;
-  type?: string;
-  step?: string;
-  placeholder?: string;
-  className?: string;
-  hint?: string;
-  onChangeOverride?: (
-    e: ChangeEvent<HTMLInputElement>,
-    onChange: (...event: unknown[]) => void,
-  ) => void;
-}
-
-const TextField = ({
-  control,
-  name,
-  label,
-  required,
-  rules,
-  type,
-  step,
-  placeholder,
-  className,
-  hint,
-  onChangeOverride,
-}: TextFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <FormControl>
-          <Input
-            name={field.name}
-            ref={field.ref}
-            onBlur={field.onBlur}
-            value={(field.value as string | number | undefined) ?? ''}
-            type={type}
-            step={step}
-            placeholder={placeholder}
-            className={className}
-            onChange={
-              onChangeOverride
-                ? (e) => onChangeOverride(e, field.onChange)
-                : field.onChange
-            }
-          />
-        </FormControl>
-        {hint && <p className="text-[11px] text-muted-foreground/80">{hint}</p>}
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
-interface SelectFieldProps {
-  control: Control<InvoiceFormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  rules?: FieldRules;
-  placeholder?: string;
-  options: { value: string; label: string }[];
-  disabled?: boolean;
-}
-
-const SelectField = ({
-  control,
-  name,
-  label,
-  required,
-  rules,
-  placeholder,
-  options,
-  disabled,
-}: SelectFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <Select
-          value={(field.value as string) ?? ''}
-          onValueChange={field.onChange}
-          disabled={disabled}
-        >
-          <FormControl>
-            <SelectTrigger>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
 
 const CreateIssuedInvoice = () => {
   const { t } = useTranslation();

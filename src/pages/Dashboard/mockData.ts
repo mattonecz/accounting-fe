@@ -1,16 +1,10 @@
-// Mock data for dashboard sections the backend does not provide yet
-// (cash position, cash-flow history, action queue). Replace with real
-// API data once the corresponding endpoints exist.
+// Sample series for the cash-flow chart. The backend has no endpoint for a
+// monthly income/expense history yet (`/vat/summary-by-month` returns the
+// invoices of a single month), so the chart is rendered from this placeholder
+// and is labelled as sample data in the UI. Replace it once such an endpoint
+// exists; everything else on the dashboard already runs on real data.
 
 export const MOCK_CURRENCY = 'CZK';
-
-export const MOCK_CASH = {
-  available: 384200,
-  trendPct: 12.4,
-  inAccounts: 312400,
-  expected30d: 119620,
-  obligations: 47820,
-};
 
 export const MOCK_CASHFLOW: { income: number; expenses: number }[] = [
   { income: 52000, expenses: 21000 },
@@ -25,36 +19,4 @@ export const MOCK_CASHFLOW: { income: number; expenses: number }[] = [
   { income: 98000, expenses: 33500 },
   { income: 104200, expenses: 35800 },
   { income: 99000, expenses: 34100 },
-];
-
-export interface MockOverdueInvoice {
-  num: string;
-  client: string;
-  amount: number;
-  days: number;
-}
-
-export interface MockDraft {
-  client: string;
-  amount: number;
-  items: number;
-}
-
-export interface MockTaxDeadline {
-  kindKey: 'vatQ2';
-  days: number;
-  amount: number;
-}
-
-export const MOCK_OVERDUE: MockOverdueInvoice[] = [
-  { num: '2026-0040', client: 'Bílek Design', amount: 22000, days: 12 },
-  { num: '2026-0036', client: 'Bílek Design', amount: 18000, days: 24 },
-];
-
-export const MOCK_DRAFTS: MockDraft[] = [
-  { client: 'Acme Studio s.r.o.', amount: 48500, items: 3 },
-];
-
-export const MOCK_TAXES: MockTaxDeadline[] = [
-  { kindKey: 'vatQ2', days: 43, amount: 47820 },
 ];

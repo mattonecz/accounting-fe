@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import type { ContactResponseDto } from '@/api/model';
 import { useListContacts } from '@/api/contacts/contacts';
 import { PageLayout } from '@/components/PageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { DataTableCard } from '@/components/DataTableCard';
+import { DeleteContactDialog } from '@/components/contacts/DeleteContactDialog';
 
 const formatAddress = (
   contact: Pick<ContactResponseDto, 'street' | 'city' | 'psc' | 'country'>,
@@ -19,6 +21,9 @@ export default function Contacts() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: contactsResponse } = useListContacts();
+  const [deleteTarget, setDeleteTarget] = useState<ContactResponseDto | null>(
+    null,
+  );
 
   const columns = [
     {
@@ -42,19 +47,34 @@ export default function Contacts() {
       headerClassName: 'text-right',
       cellClassName: 'text-right',
       cell: (c: ContactResponseDto) => (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="gap-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/contacts/${c.id}/edit`);
-          }}
-        >
-          <Pencil className="h-4 w-4" />
-          {t('common.edit')}
-        </Button>
+        <div className="flex justify-end gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/contacts/${c.id}/edit`);
+            }}
+          >
+            <Pencil className="h-4 w-4" />
+            {t('common.edit')}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-destructive"
+            aria-label={t('contacts.actions.delete')}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteTarget(c);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -79,6 +99,11 @@ export default function Contacts() {
         columns={columns}
         data={contactsResponse?.data}
         onRowClick={(contact) => navigate(`/contacts/${contact.id}`)}
+      />
+
+      <DeleteContactDialog
+        contact={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
       />
     </PageLayout>
   );

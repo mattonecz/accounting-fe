@@ -2,11 +2,6 @@ import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Control,
-  FieldPath,
-  UseControllerProps,
-} from 'react-hook-form';
-import {
   ArrowLeft,
   Check,
   ChevronDown,
@@ -16,21 +11,21 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
+  RequiredMark,
+  SelectField,
+  TextField,
+  labelClass,
+  sectionLabelClass,
+} from '@/components/invoices/formFields';
+import { InvoiceLockedNotice } from '@/components/invoices/InvoiceLockedNotice';
+import { isInvoiceLocked } from '@/lib/invoiceLock';
+import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
@@ -59,139 +54,7 @@ import {
   getbankSnapshotLabel,
   toNumber,
   useUpdateInvoiceForm,
-  type UpdateInvoiceFormValues,
 } from './useUpdateInvoiceForm';
-
-const labelClass = 'text-[11px] font-semibold text-foreground/80';
-const sectionLabelClass =
-  'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
-
-type FieldName = FieldPath<UpdateInvoiceFormValues>;
-type FieldRules = UseControllerProps<
-  UpdateInvoiceFormValues,
-  FieldName
->['rules'];
-
-const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
-interface TextFieldProps {
-  control: Control<UpdateInvoiceFormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  rules?: FieldRules;
-  type?: string;
-  step?: string;
-  placeholder?: string;
-  className?: string;
-  hint?: string;
-  onChangeOverride?: (
-    e: ChangeEvent<HTMLInputElement>,
-    onChange: (...event: unknown[]) => void,
-  ) => void;
-}
-
-const TextField = ({
-  control,
-  name,
-  label,
-  required,
-  rules,
-  type,
-  step,
-  placeholder,
-  className,
-  hint,
-  onChangeOverride,
-}: TextFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <FormControl>
-          <Input
-            name={field.name}
-            ref={field.ref}
-            onBlur={field.onBlur}
-            value={(field.value as string | number | undefined) ?? ''}
-            type={type}
-            step={step}
-            placeholder={placeholder}
-            className={className}
-            onChange={
-              onChangeOverride
-                ? (e) => onChangeOverride(e, field.onChange)
-                : field.onChange
-            }
-          />
-        </FormControl>
-        {hint && <p className="text-[11px] text-muted-foreground/80">{hint}</p>}
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
-interface SelectFieldProps {
-  control: Control<UpdateInvoiceFormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  rules?: FieldRules;
-  placeholder?: string;
-  options: { value: string; label: string }[];
-  disabled?: boolean;
-}
-
-const SelectField = ({
-  control,
-  name,
-  label,
-  required,
-  rules,
-  placeholder,
-  options,
-  disabled,
-}: SelectFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <Select
-          value={(field.value as string) ?? ''}
-          onValueChange={field.onChange}
-          disabled={disabled}
-        >
-          <FormControl>
-            <SelectTrigger>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
 
 export default function UpdateInvoice() {
   const { t } = useTranslation();
@@ -347,6 +210,9 @@ export default function UpdateInvoice() {
       return (
         <p className="text-destructive">{t('invoices.detail.loadError')}</p>
       );
+    }
+    if (isInvoiceLocked(invoiceResponse.data)) {
+      return <InvoiceLockedNotice invoiceId={invoiceResponse.data.id} />;
     }
 
     return (

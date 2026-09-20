@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 interface QueueItemAction {
   label: string;
   primary?: boolean;
+  onClick?: () => void;
 }
 
 interface QueueItemProps {
@@ -41,6 +42,7 @@ export const QueueItem = ({
           size="sm"
           variant={action.primary ? 'default' : 'ghost'}
           className="h-7 px-2.5 text-xs"
+          onClick={action.onClick}
         >
           {action.label}
         </Button>

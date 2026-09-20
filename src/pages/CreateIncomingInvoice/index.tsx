@@ -1,10 +1,5 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import {
-  useForm,
-  type Control,
-  type FieldPath,
-  type UseControllerProps,
-} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -18,21 +13,19 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
+  RequiredMark,
+  SelectField,
+  TextField,
+  labelClass,
+  sectionLabelClass,
+} from '@/components/invoices/formFields';
+import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Collapsible,
   CollapsibleContent,
@@ -62,10 +55,6 @@ import {
   type RateRowValue,
 } from '@/components/invoices/rateAmounts';
 import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
-
-const labelClass = 'text-[11px] font-semibold text-foreground/80';
-const sectionLabelClass =
-  'text-[10px] font-semibold uppercase tracking-wider text-muted-foreground';
 
 const DEFAULT_PAYMENT_DAYS = 14;
 
@@ -130,131 +119,10 @@ const getDefaultValues = (): FormValues => {
   };
 };
 
-const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
 const trimOrUndefined = (value: string | undefined) => {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
 };
-
-type FieldName = FieldPath<FormValues>;
-type FieldRules = UseControllerProps<FormValues, FieldName>['rules'];
-
-interface TextFieldProps {
-  control: Control<FormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  type?: string;
-  placeholder?: string;
-  className?: string;
-  hint?: string;
-  rules?: FieldRules;
-  onChangeOverride?: (
-    e: ChangeEvent<HTMLInputElement>,
-    onChange: (...event: unknown[]) => void,
-  ) => void;
-}
-
-const TextField = ({
-  control,
-  name,
-  label,
-  required,
-  type,
-  placeholder,
-  className,
-  hint,
-  rules,
-  onChangeOverride,
-}: TextFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <FormControl>
-          <Input
-            name={field.name}
-            ref={field.ref}
-            onBlur={field.onBlur}
-            value={(field.value as string | undefined) ?? ''}
-            type={type}
-            placeholder={placeholder}
-            className={className}
-            onChange={
-              onChangeOverride
-                ? (e) => onChangeOverride(e, field.onChange)
-                : field.onChange
-            }
-          />
-        </FormControl>
-        {hint && <p className="text-[11px] text-muted-foreground/80">{hint}</p>}
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
-interface SelectFieldProps {
-  control: Control<FormValues>;
-  name: FieldName;
-  label: string;
-  required?: boolean;
-  placeholder?: string;
-  options: { value: string; label: string }[];
-  rules?: FieldRules;
-  disabled?: boolean;
-}
-
-const SelectField = ({
-  control,
-  name,
-  label,
-  required,
-  placeholder,
-  options,
-  rules,
-  disabled,
-}: SelectFieldProps) => (
-  <FormField
-    control={control}
-    name={name}
-    rules={rules}
-    render={({ field }) => (
-      <FormItem className="space-y-1.5">
-        <FormLabel className={labelClass}>
-          {label}
-          {required && <RequiredMark />}
-        </FormLabel>
-        <Select
-          value={(field.value as string) ?? ''}
-          onValueChange={field.onChange}
-          disabled={disabled}
-        >
-          <FormControl>
-            <SelectTrigger>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
 
 const CreateIncomingInvoice = () => {
   const { t, i18n } = useTranslation();

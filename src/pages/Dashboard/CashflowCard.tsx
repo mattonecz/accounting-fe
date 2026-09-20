@@ -52,9 +52,14 @@ export const CashflowCard = () => {
   return (
     <Card className="flex flex-col border-border/60 p-5 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {t('dashboard.cashflow.title')}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('dashboard.cashflow.title')}
+          </p>
+          <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            {t('dashboard.cashflow.sampleData')}
+          </span>
+        </div>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-sm bg-brand" />

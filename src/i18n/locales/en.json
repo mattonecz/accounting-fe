@@ -18,7 +18,9 @@
       "previous": "Previous",
       "next": "Next",
       "pageOf": "Page {{page}} of {{totalPages}}"
-    }
+    },
+    "confirm": "Confirm",
+    "deleting": "Deleting…"
   },
   "validation": {
     "required": "{{field}} is required",
@@ -41,7 +43,8 @@
     "sectionBilling": "Billing",
     "sectionData": "Data",
     "sectionReports": "Reports",
-    "sectionMessages": "Data Messages"
+    "sectionMessages": "Data Messages",
+    "openMenu": "Open menu"
   },
   "topbar": {
     "search": "Search…"
@@ -219,7 +222,8 @@
           "vat": "VAT",
           "total": "Total"
         }
-      }
+      },
+      "loadError": "The invoice could not be loaded."
     },
     "list": {
       "columns": {
@@ -378,7 +382,9 @@
       "cancel": "Cancel",
       "saveChanges": "Save Changes",
       "savingChanges": "Saving changes...",
-      "creating": "Creating..."
+      "creating": "Creating...",
+      "delete": "Delete invoice",
+      "deleteAriaLabel": "Delete invoice {{number}}"
     },
     "messages": {
       "created": "Invoice created successfully",
@@ -441,6 +447,18 @@
         "CLAIMED": "Claimed",
         "SKIPPED": "Skipped"
       }
+    },
+    "locked": {
+      "badge": "Locked by a submitted filing",
+      "title": "Invoice is locked",
+      "description": "This invoice is part of a submitted VAT filing. It cannot be edited or deleted until the filing is cancelled."
+    },
+    "delete": {
+      "title": "Delete invoice?",
+      "description": "Invoice {{number}} will be permanently deleted, including its items and payments. This cannot be undone.",
+      "confirm": "Delete invoice",
+      "success": "Invoice deleted.",
+      "failed": "Deleting the invoice failed."
     }
   },
   "payments": {
@@ -453,22 +471,40 @@
       "method": "Payment Method"
     },
     "placeholders": {
-      "selectMethod": "Select payment method"
+      "selectMethod": "Select payment method",
+      "method": "Select payment method"
     },
     "actions": {
       "record": "Record Payment",
       "save": "Save Payment",
       "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "edit": "Edit payment",
+      "delete": "Delete payment",
+      "update": "Save changes",
+      "editAriaLabel": "Edit payment",
+      "deleteAriaLabel": "Delete payment"
     },
     "messages": {
       "success": "Payment recorded successfully",
-      "error": "Failed to record payment"
+      "error": "Failed to record payment",
+      "recordSuccess": "Payment recorded.",
+      "recordError": "Recording the payment failed.",
+      "updateSuccess": "Payment updated.",
+      "updateError": "Updating the payment failed.",
+      "deleteSuccess": "Payment deleted.",
+      "deleteError": "Deleting the payment failed."
     },
     "validation": {
       "amountRequired": "Amount is required",
       "dateRequired": "Payment date is required",
       "referenceRequired": "Variable symbol is required"
+    },
+    "editTitle": "Edit payment",
+    "delete": {
+      "title": "Delete payment?",
+      "description": "The payment of {{amount}} from {{date}} will be deleted.",
+      "confirm": "Delete payment"
     }
   },
   "simpleInvoices": {
@@ -527,7 +563,9 @@
     },
     "actions": {
       "refresh": "Refresh",
-      "create": "New Document"
+      "create": "New Document",
+      "delete": "Delete document",
+      "deleteAriaLabel": "Delete document {{number}}"
     },
     "create": {
       "title": "New simplified receipt",
@@ -539,15 +577,16 @@
         "number": "Document number",
         "createdDate": "Issue date",
         "duzpDate": "Taxable supply date (DUZP)",
-        "companySelect": "Company",
-        "companyName": "Company name",
+        "companySelect": "Supplier",
+        "companyName": "Supplier name",
         "companyIco": "Company ID",
         "companyDic": "VAT ID"
       },
       "placeholders": {
         "description": "e.g. Office supplies – Alza",
         "number": "Optional",
-        "companySelect": "Select company"
+        "companySelect": "Pick a contact or enter manually",
+        "companyName": "e.g. Albert Česká republika, s.r.o."
       },
       "rates": {
         "title": "Amounts by VAT rate",
@@ -556,15 +595,17 @@
         "base": "Base",
         "vat": "VAT",
         "hint": "Enter the base, VAT or total incl. VAT – the remaining values are computed.",
-        "lineName": "Supply at {{rate}}% VAT"
+        "lineName": "Supply at {{rate}}% VAT",
+        "showMore": "More rates ({{rates}})",
+        "hideMore": "Hide other rates"
       },
       "total": {
         "label": "Total",
         "vatIncluded": "incl. VAT {{amount}}"
       },
       "company": {
-        "add": "Add company",
-        "subtitle": "Optional – supplier ID, VAT ID and name"
+        "identifiers": "Add company ID and VAT ID",
+        "identifiersHint": "Optional"
       },
       "vatClaim": {
         "section": "VAT return & control report",
@@ -586,7 +627,7 @@
         "amountRequired": "Enter at least one amount",
         "totalMin": "Amount must be a positive number or zero",
         "totalLimitExceeded": "Total with VAT on a simplified document must not exceed CZK 10,000",
-        "companyNameRequired": "Add the company name when filling in the company or VAT ID"
+        "companyNameRequired": "Enter the supplier name"
       },
       "messages": {
         "created": "Simple invoice created successfully.",
@@ -607,8 +648,22 @@
       "messages": {
         "updated": "Changes saved.",
         "updateFailed": "Failed to save changes."
-      }
-    }
+      },
+      "contactLocked": "This document is linked to a contact — the supplier can only be changed by picking another contact."
+    },
+    "locked": {
+      "badge": "Locked by a submitted filing",
+      "title": "Document is locked",
+      "description": "This document is part of a submitted VAT filing. It cannot be edited or deleted until the filing is cancelled."
+    },
+    "delete": {
+      "title": "Delete simplified document?",
+      "description": "Document {{number}} will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete document",
+      "success": "Document deleted.",
+      "failed": "Deleting the document failed."
+    },
+    "back": "Back to simplified documents"
   },
   "bankAccounts": {
     "title": "Bank Accounts",
@@ -729,7 +784,8 @@
       "edit": "Edit",
       "cancel": "Cancel",
       "create": "Add Contact",
-      "save": "Save Changes"
+      "save": "Save Changes",
+      "delete": "Delete contact"
     },
     "create": {
       "title": "Add New Contact",
@@ -745,6 +801,16 @@
       "createFailed": "Failed to create contact",
       "updated": "Contact updated successfully",
       "updateFailed": "Failed to update contact"
+    },
+    "delete": {
+      "title": "Delete contact?",
+      "description": "Contact {{name}} will be permanently deleted.",
+      "confirm": "Delete contact",
+      "checking": "Checking linked documents…",
+      "blocked_one": "This contact is linked to {{count}} document and cannot be deleted.",
+      "blocked_other": "This contact is linked to {{count}} documents and cannot be deleted.",
+      "success": "Contact deleted.",
+      "failed": "Deleting the contact failed."
     }
   },
   "taxReport": {
@@ -899,7 +965,16 @@
       "submitting": "Submitting…",
       "submitSuccess": "Filing submitted to the tax office",
       "submitFailed": "Submission to the tax office failed: {{message}}",
-      "submitError": "Failed to submit to the tax office"
+      "submitError": "Failed to submit to the tax office",
+      "cancelFiling": "Cancel filing",
+      "cancelling": "Cancelling…",
+      "cancelConfirmTitle": "Cancel filing?",
+      "cancelConfirmDescription": "The filing for {{period}} will be marked as cancelled. Its documents stay available for a new filing.",
+      "cancelSuccess": "Filing cancelled.",
+      "cancelError": "Cancelling the filing failed.",
+      "submitConfirmTitle": "Submit the VAT return via data box?",
+      "submitConfirmDescription": "The return for {{period}} will be sent to the tax office via data box. This cannot be undone and the documents in the filing become locked against edits and deletion.",
+      "submitConfirm": "Submit return"
     }
   },
   "dataMessages": {
@@ -1174,15 +1249,17 @@
       "newContact": "New contact"
     },
     "hero": {
-      "availableCash": "Available cash",
-      "inAccounts": "In accounts",
-      "expected30d": "+ Expected (30d)",
-      "obligations": "− Obligations"
+      "netBalance": "Invoiced balance",
+      "changeHint": "Change against last month",
+      "income": "Issued invoices",
+      "expenses": "Received invoices",
+      "activeClients": "Active clients"
     },
     "cashflow": {
       "title": "Cash flow · 12 months",
       "income": "Income",
-      "expenses": "Expenses"
+      "expenses": "Expenses",
+      "sampleData": "Sample data"
     },
     "queue": {
       "title": "Action queue",
@@ -1192,22 +1269,17 @@
       "tags": {
         "overdue": "Overdue",
         "draft": "Draft",
-        "tax": "Tax"
+        "tax": "Tax",
+        "filing": "VAT filing"
       },
       "overdueMeta_one": "{{count}} day overdue · {{amount}}",
       "overdueMeta_other": "{{count}} days overdue · {{amount}}",
-      "draftMeta_one": "{{count}} item · {{amount}} · ready",
-      "draftMeta_other": "{{count}} items · {{amount}} · ready",
-      "taxMeta_one": "Due in {{count}} day · {{amount}}",
-      "taxMeta_other": "Due in {{count}} days · {{amount}}",
-      "vatQ2": "VAT · Q2 2026",
-      "actionRemind": "Remind",
-      "actionPaid": "Paid",
-      "actionSend": "Send",
       "actionEdit": "Edit",
       "actionPrepare": "Prepare",
       "emptyTitle": "All caught up",
-      "emptyDesc": "No overdue, no drafts, no deadlines."
+      "emptyDesc": "No overdue, no drafts, no deadlines.",
+      "draftMetaAmount": "Unfinished document · {{amount}}",
+      "filingMeta": "Ready to submit · VAT {{amount}}"
     },
     "latest": {
       "title": "Latest invoices",
@@ -1369,5 +1441,18 @@
       "receiptFailed": "Receipt parsing failed"
     },
     "receiptFailedMessage": "Receipt parsing failed."
+  },
+  "errors": {
+    "invoiceLocked": "This document is locked by a submitted VAT filing. Cancel the filing first.",
+    "invoiceNumberTaken": "A document with this number already exists.",
+    "invoiceNumberRequired": "The document number cannot be cleared.",
+    "filingSubmitted": "Submitted filings cannot be cancelled.",
+    "filingAlreadyCancelled": "The filing is already cancelled.",
+    "filingNotReady": "The filing is not ready to be submitted.",
+    "contactNotFound": "The selected contact was not found.",
+    "bankNotFound": "The selected bank account was not found.",
+    "notFound": "The record was not found.",
+    "invoiceContactLinked": "This document is linked to a contact — change the supplier by picking another contact.",
+    "supplierRequired": "A simplified document needs a supplier."
   }
 }

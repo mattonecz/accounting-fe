@@ -1,23 +1,29 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   ArrowLeft,
   Download,
+  Lock,
   MoreHorizontal,
   Pencil,
   Printer,
+  Trash2,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useInvoiceGet } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
 import { PageLayout } from '@/components/PageLayout';
+import { DeleteInvoiceDialog } from '@/components/invoices/DeleteInvoiceDialog';
+import { isInvoiceLocked } from '@/lib/invoiceLock';
 import { getPaidAmount } from './utils';
 import { generateInvoicePdf } from './generatePdf';
 import { InvoicePrintDocument } from './InvoicePrintDocument';
@@ -33,6 +39,7 @@ const InvoiceDetail = () => {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useInvoiceGet(id || '');
   const invoiceRef = useRef<HTMLDivElement | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const invoice = data?.data;
   const { data: companyResponse } = useCompanyGet(invoice?.companyId ?? '', {
@@ -71,10 +78,16 @@ const InvoiceDetail = () => {
 
     const isReceived = invoice.type === 'RECEIVED';
     const isSimple = invoice.kind === 'SIMPLE';
-    const listRoute = isReceived ? '/incoming-invoices' : '/outgoing-invoices';
+    const listRoute = isSimple
+      ? '/invoices/simple'
+      : isReceived
+        ? '/incoming-invoices'
+        : '/outgoing-invoices';
     const editRoute = isSimple
       ? `/invoices/simple/${invoice.id}/edit`
       : `/invoices/${invoice.id}/edit`;
+    const ns = isSimple ? 'simpleInvoices' : 'invoices';
+    const locked = isInvoiceLocked(invoice);
 
     return (
       <>
@@ -97,9 +110,11 @@ const InvoiceDetail = () => {
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              {isReceived
-                ? t('invoices.detail.backIncoming')
-                : t('invoices.detail.backOutgoing')}
+              {isSimple
+                ? t('simpleInvoices.back')
+                : isReceived
+                  ? t('invoices.detail.backIncoming')
+                  : t('invoices.detail.backOutgoing')}
             </button>
 
             <div className="flex items-center gap-2">
@@ -107,6 +122,7 @@ const InvoiceDetail = () => {
                 variant="outline"
                 size="sm"
                 className="gap-1.5"
+                disabled={locked}
                 onClick={() => navigate(editRoute)}
               >
                 <Pencil className="h-3.5 w-3.5" />
@@ -132,10 +148,29 @@ const InvoiceDetail = () => {
                     <Download className="mr-2 h-4 w-4" />
                     {t('invoices.actions.downloadPdf')}
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    disabled={locked}
+                    className="text-destructive focus:text-destructive"
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t(`${ns}.actions.delete`)}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
+
+          {locked && (
+            <Alert>
+              <Lock className="h-4 w-4" />
+              <AlertTitle>{t(`${ns}.locked.title`)}</AlertTitle>
+              <AlertDescription>
+                {t(`${ns}.locked.description`)}
+              </AlertDescription>
+            </Alert>
+          )}
 
           <InvoiceHeroSection
             invoice={invoice}
@@ -156,6 +191,12 @@ const InvoiceDetail = () => {
             invoice={invoice}
             company={company}
             invoiceRef={invoiceRef}
+          />
+
+          <DeleteInvoiceDialog
+            invoice={deleteOpen ? invoice : null}
+            onClose={() => setDeleteOpen(false)}
+            onDeleted={() => navigate(listRoute)}
           />
         </div>
       </>

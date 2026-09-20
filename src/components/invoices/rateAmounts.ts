@@ -5,6 +5,14 @@ import { parseRateItemName, rateItemName } from '@/lib/simpleInvoiceItems';
 // document forms. One fixed row per current Czech VAT rate.
 export const DEFAULT_RATES = [21, 12, 0];
 
+/**
+ * Rates shown up front; the rest stay behind a toggle in the table so the
+ * common case (21 % / 12 %) is not buried among rows that are almost always
+ * zero. This is display-only — every rate in DEFAULT_RATES keeps its row in
+ * the form state either way.
+ */
+export const PRIMARY_RATES = [21, 12];
+
 export type RateField = 'base' | 'vat' | 'total';
 
 export type RateRowValue = {

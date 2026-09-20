@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  Ban,
   Calculator,
   Download,
   Send,
@@ -15,8 +16,11 @@ import {
   downloadTaxFilingKhXml,
   downloadTaxFilingVatXml,
   getGetTaxFilingQueryKey,
+  getListTaxFilingsQueryKey,
+  useCancelTaxFiling,
   useGetTaxFiling,
 } from '@/api/tax-filings/tax-filings';
+import { getInvoiceListByCompanyQueryKey } from '@/api/invoices/invoices';
 import {
   TaxFilingInvoiceDetailDtoRole,
   TaxFilingResponseDtoStatus,
@@ -29,6 +33,8 @@ import { TaxFilingStatusBadge } from '@/components/TaxFilingStatusBadge';
 import { TaxFilingInvoiceTables } from '@/components/TaxFilingInvoiceTables';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { formatDate, formatMoney } from '@/lib/formatters';
 
 const InfoRow = ({
@@ -52,7 +58,10 @@ const TaxFilingDetail = () => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const [downloading, setDownloading] = useState<XmlKind | null>(null);
+  const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const submitTax = useDataMessagesSubmitTax();
+  const cancelFiling = useCancelTaxFiling();
 
   const { data, isLoading, isError } = useGetTaxFiling(id || '', {
     query: {
@@ -107,8 +116,46 @@ const TaxFilingDetail = () => {
     filing.status === TaxFilingResponseDtoStatus.READY ||
     filing.status === TaxFilingResponseDtoStatus.SUBMITTED;
   const canSubmit = filing.status === TaxFilingResponseDtoStatus.READY;
+  // Mirrors the backend rule: a filing already sent to the tax office (or one
+  // that was cancelled before) can no longer be cancelled.
+  const canCancel =
+    filing.status !== TaxFilingResponseDtoStatus.SUBMITTED &&
+    filing.status !== TaxFilingResponseDtoStatus.CANCELLED;
+
+  const handleCancelFiling = () => {
+    cancelFiling.mutate(
+      { id: filing.id },
+      {
+        onSuccess: async () => {
+          enqueueSnackbar(t('taxFilings.detail.cancelSuccess'), {
+            variant: 'success',
+          });
+          await Promise.all([
+            queryClient.invalidateQueries({
+              queryKey: getGetTaxFilingQueryKey(filing.id),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getListTaxFilingsQueryKey(),
+            }),
+            // Documents released by the cancelled filing change their lock state.
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceListByCompanyQueryKey(),
+            }),
+          ]);
+          setCancelConfirmOpen(false);
+        },
+        onError: (error) => {
+          enqueueSnackbar(
+            getApiErrorMessage(error, t, 'taxFilings.detail.cancelError'),
+            { variant: 'error' },
+          );
+        },
+      },
+    );
+  };
 
   const handleSubmit = async () => {
+    setSubmitConfirmOpen(false);
     try {
       const response = await submitTax.mutateAsync({ taxFilingId: filing.id });
       if (response.data.success) {
@@ -187,11 +234,24 @@ const TaxFilingDetail = () => {
                 </Button>
               </>
             )}
+            {canCancel && (
+              <Button
+                variant="outline"
+                className="gap-2 text-destructive hover:text-destructive"
+                disabled={cancelFiling.isPending}
+                onClick={() => setCancelConfirmOpen(true)}
+              >
+                <Ban className="h-4 w-4" />
+                {cancelFiling.isPending
+                  ? t('taxFilings.detail.cancelling')
+                  : t('taxFilings.detail.cancelFiling')}
+              </Button>
+            )}
             {canSubmit && (
               <Button
                 className="gap-2"
                 disabled={submitTax.isPending}
-                onClick={() => void handleSubmit()}
+                onClick={() => setSubmitConfirmOpen(true)}
               >
                 <Send className="h-4 w-4" />
                 {submitTax.isPending
@@ -274,6 +334,33 @@ const TaxFilingDetail = () => {
       <TaxFilingInvoiceTables
         issued={issuedInvoices}
         received={receivedInvoices}
+      />
+
+      <ConfirmDialog
+        open={submitConfirmOpen}
+        onOpenChange={setSubmitConfirmOpen}
+        title={t('taxFilings.detail.submitConfirmTitle')}
+        description={t('taxFilings.detail.submitConfirmDescription', {
+          period,
+        })}
+        confirmLabel={t('taxFilings.detail.submitConfirm')}
+        isPending={submitTax.isPending}
+        onConfirm={() => void handleSubmit()}
+      />
+
+      <ConfirmDialog
+        open={cancelConfirmOpen}
+        onOpenChange={(next) => {
+          if (!next && !cancelFiling.isPending) setCancelConfirmOpen(false);
+        }}
+        title={t('taxFilings.detail.cancelConfirmTitle')}
+        description={t('taxFilings.detail.cancelConfirmDescription', {
+          period,
+        })}
+        confirmLabel={t('taxFilings.detail.cancelFiling')}
+        destructive
+        isPending={cancelFiling.isPending}
+        onConfirm={handleCancelFiling}
       />
     </PageLayout>
   );

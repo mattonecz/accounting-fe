@@ -1,18 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import {
-  ArrowLeft,
-  Check,
-  ChevronDown,
-  Loader2,
-  Minus,
-  Plus,
-} from 'lucide-react';
+import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
+import { RequiredMark, labelClass } from '@/components/invoices/formFields';
+import {
+  MANUAL_SUPPLIER,
+  SupplierFields,
+} from '@/components/invoices/SupplierFields';
 import {
   Form,
   FormControl,
@@ -29,11 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -55,6 +48,7 @@ import {
   CreateInvoiceDtoVatClaimType,
   InvoiceListByCompanyKind,
 } from '@/api/model';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { formatMoney } from '@/lib/formatters';
 import { rateItemName } from '@/lib/simpleInvoiceItems';
 import { cn } from '@/lib/utils';
@@ -69,7 +63,6 @@ import {
 } from '@/components/invoices/rateAmounts';
 import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
 
-const MANUAL = '__manual__';
 const DEFAULT_VAT_RATE = 21;
 // Legal limit for a simplified tax document (zjednodušený daňový doklad).
 const MAX_TOTAL_WITH_VAT = 10000;
@@ -95,7 +88,7 @@ type FormValues = {
 };
 
 const getDefaultFormValues = (): FormValues => ({
-  companySelect: MANUAL,
+  companySelect: MANUAL_SUPPLIER,
   companyName: '',
   companyIco: '',
   companyDic: '',
@@ -173,10 +166,6 @@ const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
   };
 };
 
-const labelClass = 'text-[11px] font-semibold text-foreground/80';
-
-const RequiredMark = () => <span className="ml-0.5 text-destructive">*</span>;
-
 const CreateSimpleInvoice = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -193,15 +182,6 @@ const CreateSimpleInvoice = () => {
       ? buildDefaultsFromReceipt(receiptFromState)
       : getDefaultFormValues(),
   });
-
-  const [companyOpen, setCompanyOpen] = useState(
-    () =>
-      !!(
-        receiptFromState?.vendor?.trim() ||
-        receiptFromState?.ico?.trim() ||
-        receiptFromState?.dic?.trim()
-      ),
-  );
 
   const prefillAppliedRef = useRef(false);
   useEffect(() => {
@@ -222,7 +202,7 @@ const CreateSimpleInvoice = () => {
   });
 
   const companySelect = form.watch('companySelect');
-  const isManual = companySelect === MANUAL;
+  const isManual = companySelect === MANUAL_SUPPLIER;
 
   // Mirror the selected contact's identifiers into the (disabled) company
   // fields, and clear them when the user switches back to manual entry.
@@ -230,7 +210,7 @@ const CreateSimpleInvoice = () => {
   useEffect(() => {
     if (prevCompanySelectRef.current === companySelect) return;
     prevCompanySelectRef.current = companySelect;
-    if (companySelect === MANUAL) {
+    if (companySelect === MANUAL_SUPPLIER) {
       form.setValue('companyName', '');
       form.setValue('companyIco', '');
       form.setValue('companyDic', '');
@@ -250,11 +230,6 @@ const CreateSimpleInvoice = () => {
     if (claimMonthDirty) return;
     form.setValue('vatClaimMonth', duzpDate.slice(0, 7));
   }, [duzpDate, form]);
-
-  const companyOptions = [
-    { value: MANUAL, label: t('simpleInvoices.create.manualOption') },
-    ...contacts.map((contact) => ({ value: contact.id, label: contact.name })),
-  ];
 
   const watchedRates = form.watch('rates') ?? [];
   const grandTotals = sumRates(watchedRates);
@@ -293,17 +268,21 @@ const CreateSimpleInvoice = () => {
         if (createAnotherRef.current) {
           createAnotherRef.current = false;
           form.reset(getDefaultFormValues());
-          prevCompanySelectRef.current = MANUAL;
-          setCompanyOpen(false);
+          prevCompanySelectRef.current = MANUAL_SUPPLIER;
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         navigate('/invoices/simple');
       },
-      onError: () => {
-        enqueueSnackbar(t('simpleInvoices.create.messages.createFailed'), {
-          variant: 'error',
-        });
+      onError: (error) => {
+        enqueueSnackbar(
+          getApiErrorMessage(
+            error,
+            t,
+            'simpleInvoices.create.messages.createFailed',
+          ),
+          { variant: 'error' },
+        );
       },
     },
   });
@@ -318,13 +297,6 @@ const CreateSimpleInvoice = () => {
       }))
       .filter((line) => line.total > 0);
 
-    if (lines.length === 0) {
-      enqueueSnackbar(t('simpleInvoices.create.validation.amountRequired'), {
-        variant: 'error',
-      });
-      return;
-    }
-
     const totals = lines.reduce(
       (acc, line) => ({
         total: round2(acc.total + line.base),
@@ -334,16 +306,6 @@ const CreateSimpleInvoice = () => {
       { total: 0, totalTax: 0, totalWithTax: 0 },
     );
 
-    if (totals.totalWithTax > MAX_TOTAL_WITH_VAT) {
-      enqueueSnackbar(
-        t('simpleInvoices.create.validation.totalLimitExceeded'),
-        {
-          variant: 'error',
-        },
-      );
-      return;
-    }
-
     const items: InvoiceItemDto[] = lines.map((line) => ({
       name: rateItemName(line.rate),
       quantity: 1,
@@ -352,20 +314,18 @@ const CreateSimpleInvoice = () => {
       vatRate: line.rate,
     }));
 
-    // Counterparty is optional on a simplified receipt — send it only when
-    // a contact is selected or a manual name was entered.
-    const manualName = data.companyName.trim();
+    // The backend needs a counterparty: either a contact id or a snapshot with
+    // a name. Which one it is comes from the supplier select; the name itself is
+    // already required by the form, so neither branch can end up empty here.
     const counterparty = !isManual
       ? { contactId: data.companySelect }
-      : manualName
-        ? {
-            contact: {
-              name: manualName,
-              ico: data.companyIco.trim() || undefined,
-              dic: data.companyDic.trim() || undefined,
-            } satisfies ContactSnapshotDto,
-          }
-        : {};
+      : {
+          contact: {
+            name: data.companyName.trim(),
+            ico: data.companyIco.trim() || undefined,
+            dic: data.companyDic.trim() || undefined,
+          } satisfies ContactSnapshotDto,
+        };
 
     const sendVatClaim = isVatPayer && data.shouldClaimVat;
 
@@ -471,6 +431,14 @@ const CreateSimpleInvoice = () => {
 
           {/* Main card: description + dates + amounts */}
           <Card className="border-border/60 p-5 shadow-sm">
+            <SupplierFields
+              form={form}
+              contacts={contacts}
+              isContactsLoading={isContactsLoading}
+            />
+
+            <div className="my-4 border-t" />
+
             <FormField
               control={form.control}
               name="description"
@@ -562,6 +530,7 @@ const CreateSimpleInvoice = () => {
                   <FormItem className="space-y-1.5">
                     <FormLabel className={labelClass}>
                       {t('simpleInvoices.create.fields.duzpDate')}
+                      <RequiredMark />
                     </FormLabel>
                     <FormControl>
                       <Input {...field} type="date" className="tabular-nums" />
@@ -573,18 +542,41 @@ const CreateSimpleInvoice = () => {
             </div>
 
             {/* Amounts per VAT rate */}
-            <p className={cn(labelClass, 'mb-1.5 mt-5')}>
-              {t('simpleInvoices.create.rates.title')}
-              <RequiredMark />
-            </p>
-            <RateAmountsTable
-              rates={watchedRates}
-              isVatPayer
-              onCellChange={handleRateCellChange}
+            <FormField
+              control={form.control}
+              name="rates"
+              rules={{
+                validate: (rows: RateRowValue[]) => {
+                  const totals = sumRates(rows);
+                  if (!(totals.total > 0)) {
+                    return t('simpleInvoices.create.validation.amountRequired');
+                  }
+                  if (totals.total > MAX_TOTAL_WITH_VAT) {
+                    return t(
+                      'simpleInvoices.create.validation.totalLimitExceeded',
+                    );
+                  }
+                  return true;
+                },
+              }}
+              render={() => (
+                <FormItem className="mt-5 space-y-1.5">
+                  <FormLabel className={labelClass}>
+                    {t('simpleInvoices.create.rates.title')}
+                    <RequiredMark />
+                  </FormLabel>
+                  <RateAmountsTable
+                    rates={watchedRates}
+                    isVatPayer
+                    onCellChange={handleRateCellChange}
+                  />
+                  <p className="text-xs text-muted-foreground/80">
+                    {t('simpleInvoices.create.rates.hint')}
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <p className="mt-1.5 text-xs text-muted-foreground/80">
-              {t('simpleInvoices.create.rates.hint')}
-            </p>
 
             {/* Total */}
             <div className="mt-4 flex items-baseline justify-between border-t pt-3.5">
@@ -613,138 +605,6 @@ const CreateSimpleInvoice = () => {
               </p>
             )}
           </Card>
-
-          {/* Optional company — collapsed by default */}
-          <Collapsible open={companyOpen} onOpenChange={setCompanyOpen}>
-            <Card className="border-border/60 p-0 shadow-sm">
-              <CollapsibleTrigger className="flex w-full items-center gap-3 px-5 py-3.5 text-left">
-                <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-[1.5px] border-dashed border-muted-foreground/60 text-muted-foreground">
-                  {companyOpen ? (
-                    <Minus className="h-2.5 w-2.5" />
-                  ) : (
-                    <Plus className="h-2.5 w-2.5" />
-                  )}
-                </span>
-                <span className="flex-1">
-                  <span className="block text-[13px] font-medium">
-                    {t('simpleInvoices.create.company.add')}
-                  </span>
-                  <span className="block text-xs text-muted-foreground/80">
-                    {t('simpleInvoices.create.company.subtitle')}
-                  </span>
-                </span>
-                <ChevronDown
-                  className={cn(
-                    'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
-                    companyOpen && 'rotate-180',
-                  )}
-                />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="space-y-4 px-5 pb-5 pt-1">
-                  <FormField
-                    control={form.control}
-                    name="companySelect"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1.5">
-                        <FormLabel className={labelClass}>
-                          {t('simpleInvoices.create.fields.companySelect')}
-                        </FormLabel>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isContactsLoading}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={t(
-                                  'simpleInvoices.create.placeholders.companySelect',
-                                )}
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {companyOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="companyName"
-                    rules={{
-                      validate: (value) => {
-                        if (!isManual) return true;
-                        const hasIdentifiers =
-                          !!form.getValues('companyIco').trim() ||
-                          !!form.getValues('companyDic').trim();
-                        return (
-                          !hasIdentifiers ||
-                          !!value.trim() ||
-                          t(
-                            'simpleInvoices.create.validation.companyNameRequired',
-                          )
-                        );
-                      },
-                    }}
-                    render={({ field }) => (
-                      <FormItem className="space-y-1.5">
-                        <FormLabel className={labelClass}>
-                          {t('simpleInvoices.create.fields.companyName')}
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} disabled={!isManual} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="companyIco"
-                      render={({ field }) => (
-                        <FormItem className="space-y-1.5">
-                          <FormLabel className={labelClass}>
-                            {t('simpleInvoices.create.fields.companyIco')}
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={!isManual} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="companyDic"
-                      render={({ field }) => (
-                        <FormItem className="space-y-1.5">
-                          <FormLabel className={labelClass}>
-                            {t('simpleInvoices.create.fields.companyDic')}
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={!isManual} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
 
           {/* VAT return & control report */}
           {isVatPayer && (

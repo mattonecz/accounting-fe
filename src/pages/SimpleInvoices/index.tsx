@@ -10,6 +10,8 @@ import {
   Download,
   Search,
   Receipt,
+  Trash2,
+  Lock,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -31,11 +33,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { PageLayout } from '@/components/PageLayout';
 import { UploadReceiptButton } from '@/components/UploadReceiptButton';
 import { InvoicePdfRenderer } from '@/components/InvoicePdfRenderer';
+import {
+  DeleteInvoiceDialog,
+  type DeletableInvoice,
+} from '@/components/invoices/DeleteInvoiceDialog';
 import { useInvoiceListByCompany } from '@/api/invoices/invoices';
 import {
   InvoiceListByCompanyKind,
@@ -43,6 +55,7 @@ import {
   InvoiceListByCompanySortOrder,
 } from '@/api/model';
 import { formatDate, formatMoney } from '@/lib/formatters';
+import { isInvoiceLocked } from '@/lib/invoiceLock';
 import { cn } from '@/lib/utils';
 
 const PAGE_SIZE = 15;
@@ -64,6 +77,9 @@ const SimpleInvoices = () => {
   );
   const [page, setPage] = useState(1);
   const [pdfInvoiceId, setPdfInvoiceId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DeletableInvoice | null>(
+    null,
+  );
 
   // Debounce the search box, resetting to the first page on each new term.
   useEffect(() => {
@@ -206,79 +222,104 @@ const SimpleInvoices = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((invoice) => (
-            <TableRow
-              key={invoice.id}
-              className="cursor-pointer"
-              onClick={() => navigate(`/invoices/${invoice.id}`)}
-            >
-              <TableCell className="py-3 font-mono text-sm font-semibold">
-                {invoice.number || '-'}
-              </TableCell>
-              <TableCell className="py-3 text-sm">
-                {invoice.contactSnapshot?.name || '-'}
-              </TableCell>
-              <TableCell className="py-3 font-mono text-xs text-muted-foreground">
-                {formatDate(invoice.createdDate, lang)}
-              </TableCell>
-              <TableCell className="py-3 font-mono text-xs text-muted-foreground">
-                {formatDate(invoice.duzpDate, lang)}
-              </TableCell>
-              <TableCell className="py-3 text-right font-mono text-sm font-semibold tabular-nums">
-                {formatMoney(
-                  invoice.totalWithTax,
-                  invoice.currency || 'CZK',
-                  lang,
-                )}
-              </TableCell>
-              <TableCell className="py-2 text-right">
-                <div
-                  className="flex justify-end gap-1.5"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() =>
-                      navigate(`/invoices/simple/${invoice.id}/edit`)
-                    }
-                    aria-label={t('invoices.actions.edit')}
+          {rows.map((invoice) => {
+            const locked = isInvoiceLocked(invoice);
+            return (
+              <TableRow
+                key={invoice.id}
+                className="cursor-pointer"
+                onClick={() => navigate(`/invoices/${invoice.id}`)}
+              >
+                <TableCell className="py-3 font-mono text-sm font-semibold">
+                  {invoice.number || '-'}
+                </TableCell>
+                <TableCell className="py-3 text-sm">
+                  {invoice.contactSnapshot?.name || '-'}
+                </TableCell>
+                <TableCell className="py-3 font-mono text-xs text-muted-foreground">
+                  {formatDate(invoice.createdDate, lang)}
+                </TableCell>
+                <TableCell className="py-3 font-mono text-xs text-muted-foreground">
+                  {formatDate(invoice.duzpDate, lang)}
+                </TableCell>
+                <TableCell className="py-3 text-right font-mono text-sm font-semibold tabular-nums">
+                  {formatMoney(
+                    invoice.totalWithTax,
+                    invoice.currency || 'CZK',
+                    lang,
+                  )}
+                </TableCell>
+                <TableCell className="py-2 text-right">
+                  <div
+                    className="flex items-center justify-end gap-1.5"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        aria-label={t('invoices.actions.moreAriaLabel', {
-                          number: invoice.number,
-                        })}
-                      >
-                        <MoreHorizontal className="h-3.5 w-3.5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem
-                        onClick={() => navigate(`/invoices/${invoice.id}`)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        {t('invoices.actions.detail')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setPdfInvoiceId(invoice.id)}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        {t('invoices.actions.downloadPdf')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                    {locked && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="flex h-7 w-7 items-center justify-center text-muted-foreground">
+                            <Lock className="h-3.5 w-3.5" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {t('simpleInvoices.locked.badge')}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-7 w-7"
+                      disabled={locked}
+                      onClick={() =>
+                        navigate(`/invoices/simple/${invoice.id}/edit`)
+                      }
+                      aria-label={t('invoices.actions.edit')}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7"
+                          aria-label={t('invoices.actions.moreAriaLabel', {
+                            number: invoice.number,
+                          })}
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => navigate(`/invoices/${invoice.id}`)}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          {t('invoices.actions.detail')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setPdfInvoiceId(invoice.id)}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          {t('invoices.actions.downloadPdf')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          disabled={locked}
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => setDeleteTarget(invoice)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {t('simpleInvoices.actions.delete')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     );
@@ -372,6 +413,11 @@ const SimpleInvoices = () => {
           onDone={() => setPdfInvoiceId(null)}
         />
       )}
+
+      <DeleteInvoiceDialog
+        invoice={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+      />
     </PageLayout>
   );
 };

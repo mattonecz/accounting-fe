@@ -9,6 +9,7 @@ import { Landmark } from 'lucide-react';
 
 import {
   usePaymentCreate,
+  usePaymentUpdate,
   getPaymentListByInvoiceQueryKey,
 } from '@/api/payments/payments';
 import {
@@ -18,7 +19,9 @@ import {
 import {
   CreatePaymentDtoPaymentMethod,
   type InvoiceResponseDto,
+  type PaymentResponseDto,
 } from '@/api/model';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -68,6 +71,8 @@ type InvoicePaymentSource = InvoiceResponseDto & {
 
 interface RecordPaymentDialogProps {
   invoice: InvoicePaymentSource;
+  /** When given, the dialog edits that payment instead of creating a new one. */
+  payment?: PaymentResponseDto;
   onSuccess?: () => void;
   triggerClassName?: string;
   triggerSize?: 'default' | 'sm';
@@ -101,6 +106,7 @@ const getDefaultPaymentMethod = (
 
 export function RecordPaymentDialog({
   invoice,
+  payment,
   onSuccess,
   triggerClassName,
   triggerSize = 'sm',
@@ -122,7 +128,10 @@ export function RecordPaymentDialog({
   };
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
-  const { mutate: createPayment, isPending } = usePaymentCreate();
+  const isEdit = !!payment;
+  const { mutate: createPayment, isPending: isCreating } = usePaymentCreate();
+  const { mutate: updatePayment, isPending: isUpdating } = usePaymentUpdate();
+  const isPending = isCreating || isUpdating;
 
   const paymentSchema = z.object({
     amount: z.string().min(1, t('payments.validation.amountRequired')),
@@ -132,13 +141,24 @@ export function RecordPaymentDialog({
   });
 
   const defaultValues = useMemo<PaymentFormValues>(
-    () => ({
-      amount: getDefaultAmount(invoice),
-      paymentDate: getTodayDate(),
-      paymentMethod: getDefaultPaymentMethod(invoice),
-      reference: invoice.number ?? '',
-    }),
-    [invoice],
+    () =>
+      payment
+        ? {
+            amount: payment.amount.toFixed(2),
+            paymentDate: payment.paymentDate.split('T')[0],
+            paymentMethod: getDefaultPaymentMethod({
+              ...invoice,
+              paymentMethod: payment.paymentMethod,
+            }),
+            reference: payment.reference ?? '',
+          }
+        : {
+            amount: getDefaultAmount(invoice),
+            paymentDate: getTodayDate(),
+            paymentMethod: getDefaultPaymentMethod(invoice),
+            reference: invoice.number ?? '',
+          },
+    [invoice, payment],
   );
 
   const form = useForm<PaymentFormValues>({
@@ -172,6 +192,63 @@ export function RecordPaymentDialog({
   ];
 
   const handleSubmit = (values: PaymentFormValues) => {
+    const mutationOptions = {
+      onSuccess: async () => {
+        enqueueSnackbar(
+          t(
+            isEdit
+              ? 'payments.messages.updateSuccess'
+              : 'payments.messages.recordSuccess',
+          ),
+          { variant: 'success' },
+        );
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: getInvoiceListByCompanyQueryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: getInvoiceGetQueryKey(invoice.id),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: getPaymentListByInvoiceQueryKey(invoice.id),
+          }),
+        ]);
+
+        onSuccess?.();
+        setOpen(false);
+        form.reset(defaultValues);
+      },
+      onError: (error: unknown) => {
+        enqueueSnackbar(
+          getApiErrorMessage(
+            error,
+            t,
+            isEdit
+              ? 'payments.messages.updateError'
+              : 'payments.messages.recordError',
+          ),
+          { variant: 'error' },
+        );
+      },
+    };
+
+    if (payment) {
+      updatePayment(
+        {
+          data: {
+            id: payment.id,
+            amount: Number(values.amount),
+            paymentDate: values.paymentDate,
+            paymentMethod: values.paymentMethod,
+            reference: values.reference,
+          },
+        },
+        mutationOptions,
+      );
+      return;
+    }
+
     createPayment(
       {
         data: {
@@ -182,34 +259,7 @@ export function RecordPaymentDialog({
           reference: values.reference,
         },
       },
-      {
-        onSuccess: async () => {
-          enqueueSnackbar(t('payments.messages.recordSuccess'), {
-            variant: 'success',
-          });
-
-          await Promise.all([
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceListByCompanyQueryKey(),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: getInvoiceGetQueryKey(invoice.id),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: getPaymentListByInvoiceQueryKey(invoice.id),
-            }),
-          ]);
-
-          onSuccess?.();
-          setOpen(false);
-          form.reset(defaultValues);
-        },
-        onError: () => {
-          enqueueSnackbar(t('payments.messages.recordError'), {
-            variant: 'error',
-          });
-        },
-      },
+      mutationOptions,
     );
   };
 
@@ -233,7 +283,9 @@ export function RecordPaymentDialog({
       )}
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>{t('payments.actions.record')}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t('payments.editTitle') : t('payments.actions.record')}
+          </DialogTitle>
           <DialogDescription>
             {t('invoices.fields.number')} {invoice.number}
           </DialogDescription>
@@ -328,7 +380,11 @@ export function RecordPaymentDialog({
                 {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? t('common.saving') : t('payments.actions.save')}
+                {isPending
+                  ? t('common.saving')
+                  : isEdit
+                    ? t('payments.actions.update')
+                    : t('payments.actions.save')}
               </Button>
             </div>
           </form>

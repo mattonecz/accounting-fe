@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { labelClass } from '@/components/invoices/formFields';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { InvoiceItemRow } from './InvoiceItemRow';
 
-const labelClass = 'text-[11px] font-semibold text-foreground/80';
 const colHeadClass =
   'text-[9px] font-semibold uppercase tracking-wider text-muted-foreground';
 

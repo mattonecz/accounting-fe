@@ -18,7 +18,9 @@
       "previous": "Předchozí",
       "next": "Další",
       "pageOf": "Strana {{page}} z {{totalPages}}"
-    }
+    },
+    "confirm": "Potvrdit",
+    "deleting": "Mažu…"
   },
   "validation": {
     "required": "{{field}} je povinné",
@@ -41,7 +43,8 @@
     "sectionBilling": "Fakturace",
     "sectionData": "Data",
     "sectionReports": "Přehledy",
-    "sectionMessages": "Datové zprávy"
+    "sectionMessages": "Datové zprávy",
+    "openMenu": "Otevřít menu"
   },
   "topbar": {
     "search": "Hledat…"
@@ -220,7 +223,8 @@
           "vat": "DPH",
           "total": "Celkem"
         }
-      }
+      },
+      "loadError": "Nepodařilo se načíst fakturu."
     },
     "list": {
       "columns": {
@@ -379,7 +383,9 @@
       "cancel": "Zrušit",
       "saveChanges": "Uložit změny",
       "savingChanges": "Ukládám změny...",
-      "creating": "Vytvářím..."
+      "creating": "Vytvářím...",
+      "delete": "Smazat fakturu",
+      "deleteAriaLabel": "Smazat fakturu {{number}}"
     },
     "messages": {
       "created": "Faktura byla úspěšně vytvořena",
@@ -442,6 +448,18 @@
         "CLAIMED": "Uplatněno",
         "SKIPPED": "Přeskočeno"
       }
+    },
+    "locked": {
+      "badge": "Uzamčeno podaným přiznáním",
+      "title": "Faktura je uzamčená",
+      "description": "Faktura je zahrnutá v podaném přiznání k DPH. Úpravy ani smazání nejsou možné, dokud podání nestornujete."
+    },
+    "delete": {
+      "title": "Smazat fakturu?",
+      "description": "Faktura {{number}} bude trvale smazaná včetně položek a plateb. Tuto akci nelze vrátit.",
+      "confirm": "Smazat fakturu",
+      "success": "Faktura byla smazaná.",
+      "failed": "Smazání faktury se nepodařilo."
     }
   },
   "payments": {
@@ -454,22 +472,40 @@
       "method": "Forma úhrady"
     },
     "placeholders": {
-      "selectMethod": "Vyberte metodu platby"
+      "selectMethod": "Vyberte metodu platby",
+      "method": "Vyberte formu úhrady"
     },
     "actions": {
       "record": "Zaznamenat platbu",
       "save": "Uložit platbu",
       "saving": "Ukládám...",
-      "cancel": "Zrušit"
+      "cancel": "Zrušit",
+      "edit": "Upravit platbu",
+      "delete": "Smazat platbu",
+      "update": "Uložit změny",
+      "editAriaLabel": "Upravit platbu",
+      "deleteAriaLabel": "Smazat platbu"
     },
     "messages": {
       "success": "Platba byla úspěšně zaznamenána",
-      "error": "Zaznamenání platby se nezdařilo"
+      "error": "Zaznamenání platby se nezdařilo",
+      "recordSuccess": "Platba byla zaznamenána.",
+      "recordError": "Zaznamenání platby se nepodařilo.",
+      "updateSuccess": "Platba byla upravena.",
+      "updateError": "Úprava platby se nepodařila.",
+      "deleteSuccess": "Platba byla smazaná.",
+      "deleteError": "Smazání platby se nepodařilo."
     },
     "validation": {
       "amountRequired": "Částka je povinná",
       "dateRequired": "Datum platby je povinné",
       "referenceRequired": "Variabilní symbol je povinný"
+    },
+    "editTitle": "Upravit platbu",
+    "delete": {
+      "title": "Smazat platbu?",
+      "description": "Platba {{amount}} ze dne {{date}} bude smazaná.",
+      "confirm": "Smazat platbu"
     }
   },
   "simpleInvoices": {
@@ -528,7 +564,9 @@
     },
     "actions": {
       "refresh": "Obnovit",
-      "create": "Nový doklad"
+      "create": "Nový doklad",
+      "delete": "Smazat doklad",
+      "deleteAriaLabel": "Smazat doklad {{number}}"
     },
     "create": {
       "title": "Nový zjednodušený doklad",
@@ -540,15 +578,16 @@
         "number": "Číslo dokladu",
         "createdDate": "Datum vystavení",
         "duzpDate": "Datum zdanitelného plnění (DUZP)",
-        "companySelect": "Firma",
-        "companyName": "Název firmy",
+        "companySelect": "Dodavatel",
+        "companyName": "Název dodavatele",
         "companyIco": "IČO",
         "companyDic": "DIČ"
       },
       "placeholders": {
         "description": "např. Kancelářské potřeby – Alza",
         "number": "Nepovinné",
-        "companySelect": "Vyberte firmu"
+        "companySelect": "Vyberte kontakt nebo zadejte ručně",
+        "companyName": "např. Albert Česká republika, s.r.o."
       },
       "rates": {
         "title": "Částky podle sazby DPH",
@@ -557,15 +596,17 @@
         "base": "Základ",
         "vat": "DPH",
         "hint": "Vyplňte základ, DPH nebo částku s DPH – zbývající hodnoty dopočítáme.",
-        "lineName": "Plnění {{rate}}% DPH"
+        "lineName": "Plnění {{rate}}% DPH",
+        "showMore": "Další sazby ({{rates}})",
+        "hideMore": "Skrýt další sazby"
       },
       "total": {
         "label": "Celkem",
         "vatIncluded": "z toho DPH {{amount}}"
       },
       "company": {
-        "add": "Přidat firmu",
-        "subtitle": "Nepovinné – IČO, DIČ a název dodavatele"
+        "identifiers": "Doplnit IČO a DIČ",
+        "identifiersHint": "Nepovinné"
       },
       "vatClaim": {
         "section": "Uplatnění v DPH a kontrolním hlášení",
@@ -587,7 +628,7 @@
         "amountRequired": "Zadejte alespoň jednu částku",
         "totalMin": "Částka musí být kladné číslo nebo nula",
         "totalLimitExceeded": "Celková částka s DPH nesmí u zjednodušeného dokladu překročit 10 000 Kč",
-        "companyNameRequired": "Při vyplnění IČO nebo DIČ doplňte i název firmy"
+        "companyNameRequired": "Zadejte název dodavatele"
       },
       "messages": {
         "created": "Zjednodušený doklad byl vytvořen.",
@@ -608,8 +649,22 @@
       "messages": {
         "updated": "Změny byly uloženy.",
         "updateFailed": "Uložení změn se nepodařilo."
-      }
-    }
+      },
+      "contactLocked": "Doklad je navázaný na kontakt – dodavatele lze změnit jen výběrem jiného kontaktu."
+    },
+    "locked": {
+      "badge": "Uzamčeno podaným přiznáním",
+      "title": "Doklad je uzamčený",
+      "description": "Doklad je zahrnutý v podaném přiznání k DPH. Úpravy ani smazání nejsou možné, dokud podání nestornujete."
+    },
+    "delete": {
+      "title": "Smazat zjednodušený doklad?",
+      "description": "Doklad {{number}} bude trvale smazaný. Tuto akci nelze vrátit.",
+      "confirm": "Smazat doklad",
+      "success": "Doklad byl smazaný.",
+      "failed": "Smazání dokladu se nepodařilo."
+    },
+    "back": "Zpět na zjednodušené doklady"
   },
   "bankAccounts": {
     "title": "Bankovní účty",
@@ -730,7 +785,8 @@
       "edit": "Upravit",
       "cancel": "Zrušit",
       "create": "Přidat kontakt",
-      "save": "Uložit změny"
+      "save": "Uložit změny",
+      "delete": "Smazat kontakt"
     },
     "create": {
       "title": "Přidat nový kontakt",
@@ -746,6 +802,18 @@
       "createFailed": "Vytvoření kontaktu se nepodařilo",
       "updated": "Kontakt byl úspěšně aktualizován",
       "updateFailed": "Aktualizace kontaktu se nepodařila"
+    },
+    "delete": {
+      "title": "Smazat kontakt?",
+      "description": "Kontakt {{name}} bude trvale smazaný.",
+      "confirm": "Smazat kontakt",
+      "checking": "Kontroluji navázané doklady…",
+      "blocked_one": "Kontakt je navázaný na {{count}} doklad, proto ho nelze smazat.",
+      "blocked_few": "Kontakt je navázaný na {{count}} doklady, proto ho nelze smazat.",
+      "blocked_many": "Kontakt je navázaný na {{count}} dokladů, proto ho nelze smazat.",
+      "blocked_other": "Kontakt je navázaný na {{count}} dokladů, proto ho nelze smazat.",
+      "success": "Kontakt byl smazaný.",
+      "failed": "Smazání kontaktu se nepodařilo."
     }
   },
   "taxReport": {
@@ -900,7 +968,16 @@
       "submitting": "Odesílám…",
       "submitSuccess": "Podání bylo odesláno na finanční úřad",
       "submitFailed": "Odeslání na finanční úřad selhalo: {{message}}",
-      "submitError": "Odeslání na finanční úřad se nepodařilo"
+      "submitError": "Odeslání na finanční úřad se nepodařilo",
+      "cancelFiling": "Stornovat podání",
+      "cancelling": "Stornuji…",
+      "cancelConfirmTitle": "Stornovat podání?",
+      "cancelConfirmDescription": "Podání za období {{period}} bude označené jako stornované. Doklady v něm zůstanou dostupné pro nové podání.",
+      "cancelSuccess": "Podání bylo stornované.",
+      "cancelError": "Storno podání se nepodařilo.",
+      "submitConfirmTitle": "Odeslat přiznání datovou schránkou?",
+      "submitConfirmDescription": "Přiznání za období {{period}} se odešle datovou schránkou na finanční úřad. Odeslání nelze vzít zpět a doklady v podání se uzamknou proti úpravám i smazání.",
+      "submitConfirm": "Odeslat přiznání"
     }
   },
   "dataMessages": {
@@ -1177,15 +1254,17 @@
       "newContact": "Nový kontakt"
     },
     "hero": {
-      "availableCash": "Dostupné prostředky",
-      "inAccounts": "Na účtech",
-      "expected30d": "+ Očekávané (30 d)",
-      "obligations": "− Závazky"
+      "netBalance": "Bilance fakturace",
+      "changeHint": "Změna proti minulému měsíci",
+      "income": "Vydané faktury",
+      "expenses": "Přijaté faktury",
+      "activeClients": "Aktivní klienti"
     },
     "cashflow": {
       "title": "Cash flow · 12 měsíců",
       "income": "Příjmy",
-      "expenses": "Výdaje"
+      "expenses": "Výdaje",
+      "sampleData": "Ukázková data"
     },
     "queue": {
       "title": "Fronta akcí",
@@ -1197,28 +1276,19 @@
       "tags": {
         "overdue": "Po splatnosti",
         "draft": "Koncept",
-        "tax": "Daň"
+        "tax": "Daň",
+        "filing": "Přiznání"
       },
       "overdueMeta_one": "{{count}} den po splatnosti · {{amount}}",
       "overdueMeta_few": "{{count}} dny po splatnosti · {{amount}}",
       "overdueMeta_many": "{{count}} dní po splatnosti · {{amount}}",
       "overdueMeta_other": "{{count}} dní po splatnosti · {{amount}}",
-      "draftMeta_one": "{{count}} položka · {{amount}} · připraveno",
-      "draftMeta_few": "{{count}} položky · {{amount}} · připraveno",
-      "draftMeta_many": "{{count}} položek · {{amount}} · připraveno",
-      "draftMeta_other": "{{count}} položek · {{amount}} · připraveno",
-      "taxMeta_one": "Termín za {{count}} den · {{amount}}",
-      "taxMeta_few": "Termín za {{count}} dny · {{amount}}",
-      "taxMeta_many": "Termín za {{count}} dní · {{amount}}",
-      "taxMeta_other": "Termín za {{count}} dní · {{amount}}",
-      "vatQ2": "DPH · 2. čtvrtletí 2026",
-      "actionRemind": "Upomínka",
-      "actionPaid": "Zaplaceno",
-      "actionSend": "Odeslat",
       "actionEdit": "Upravit",
       "actionPrepare": "Připravit",
       "emptyTitle": "Máte vše vyřízeno",
-      "emptyDesc": "Žádné po splatnosti, žádné koncepty, žádné termíny."
+      "emptyDesc": "Žádné po splatnosti, žádné koncepty, žádné termíny.",
+      "draftMetaAmount": "Rozpracovaný doklad · {{amount}}",
+      "filingMeta": "Připraveno k odeslání · DPH {{amount}}"
     },
     "latest": {
       "title": "Nejnovější faktury",
@@ -1380,5 +1450,18 @@
       "receiptFailed": "Parsování účtenky selhalo"
     },
     "receiptFailedMessage": "Parsování účtenky selhalo."
+  },
+  "errors": {
+    "invoiceLocked": "Doklad je uzamčený podaným přiznáním k DPH. Nejdřív stornujte podání.",
+    "invoiceNumberTaken": "Doklad s tímto číslem už ve firmě existuje.",
+    "invoiceNumberRequired": "Číslo dokladu nelze odebrat.",
+    "filingSubmitted": "Odeslané podání nelze stornovat.",
+    "filingAlreadyCancelled": "Podání už je stornované.",
+    "filingNotReady": "Podání není ve stavu připraveno k odeslání.",
+    "contactNotFound": "Vybraný kontakt nebyl nalezen.",
+    "bankNotFound": "Vybraný bankovní účet nebyl nalezen.",
+    "notFound": "Záznam nebyl nalezen.",
+    "invoiceContactLinked": "Doklad je navázaný na kontakt – dodavatele lze změnit jen výběrem jiného kontaktu.",
+    "supplierRequired": "U zjednodušeného dokladu je potřeba vyplnit dodavatele."
   }
 }

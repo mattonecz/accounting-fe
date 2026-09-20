@@ -1,8 +1,21 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Landmark } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from 'notistack';
+import { Landmark, Pencil, Trash2 } from 'lucide-react';
 import type { InvoiceResponseDto, PaymentResponseDto } from '@/api/model';
+import {
+  getPaymentListByInvoiceQueryKey,
+  usePaymentDelete,
+} from '@/api/payments/payments';
+import {
+  getInvoiceGetQueryKey,
+  getInvoiceListByCompanyQueryKey,
+} from '@/api/invoices/invoices';
+import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { RecordPaymentDialog } from '@/components/RecordPaymentDialog';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { DetailCard, MetaField, SectionLabel } from './primitives';
 import { formatDate, formatMoney, getPaymentMethodLabel } from './utils';
 
@@ -18,7 +31,48 @@ export const PaymentsCard = ({
   currency,
 }: PaymentsCardProps) => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const [recordOpen, setRecordOpen] = useState(false);
+  const [editPayment, setEditPayment] = useState<PaymentResponseDto | null>(
+    null,
+  );
+  const [deletePayment, setDeletePayment] = useState<PaymentResponseDto | null>(
+    null,
+  );
+  const { mutate: removePayment, isPending: isDeleting } = usePaymentDelete();
+
+  const handleDelete = () => {
+    if (!deletePayment) return;
+    removePayment(
+      { id: deletePayment.id },
+      {
+        onSuccess: async () => {
+          enqueueSnackbar(t('payments.messages.deleteSuccess'), {
+            variant: 'success',
+          });
+          await Promise.all([
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceGetQueryKey(invoice.id),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getPaymentListByInvoiceQueryKey(invoice.id),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: getInvoiceListByCompanyQueryKey(),
+            }),
+          ]);
+          setDeletePayment(null);
+        },
+        onError: (error) => {
+          enqueueSnackbar(
+            getApiErrorMessage(error, t, 'payments.messages.deleteError'),
+            { variant: 'error' },
+          );
+        },
+      },
+    );
+  };
 
   const isReceived = invoice.type === 'RECEIVED';
   const bank = invoice.bankSnapshot;
@@ -129,9 +183,29 @@ export const PaymentsCard = ({
                   </>
                 )}
               </div>
-              <span className="text-sm font-semibold tabular-nums text-success">
-                {formatMoney(payment.amount, payment.currency || currency)}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-semibold tabular-nums text-success">
+                  {formatMoney(payment.amount, payment.currency || currency)}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground"
+                  aria-label={t('payments.actions.editAriaLabel')}
+                  onClick={() => setEditPayment(payment)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                  aria-label={t('payments.actions.deleteAriaLabel')}
+                  onClick={() => setDeletePayment(payment)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
@@ -142,6 +216,39 @@ export const PaymentsCard = ({
         hideTrigger
         open={recordOpen}
         onOpenChange={setRecordOpen}
+      />
+
+      {editPayment && (
+        <RecordPaymentDialog
+          invoice={invoice}
+          payment={editPayment}
+          hideTrigger
+          open
+          onOpenChange={(next) => {
+            if (!next) setEditPayment(null);
+          }}
+        />
+      )}
+
+      <ConfirmDialog
+        open={!!deletePayment}
+        onOpenChange={(next) => {
+          if (!next && !isDeleting) setDeletePayment(null);
+        }}
+        title={t('payments.delete.title')}
+        description={t('payments.delete.description', {
+          amount: deletePayment
+            ? formatMoney(
+                deletePayment.amount,
+                deletePayment.currency || currency,
+              )
+            : '',
+          date: deletePayment ? formatDate(deletePayment.paymentDate) : '',
+        })}
+        confirmLabel={t('payments.delete.confirm')}
+        destructive
+        isPending={isDeleting}
+        onConfirm={handleDelete}
       />
     </DetailCard>
   );
