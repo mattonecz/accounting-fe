@@ -118,7 +118,7 @@
         "aresEmpty": "Nothing found in ARES",
         "aresGroup": "ARES results",
         "ico": "CRN: {{ico}}",
-        "willCreate": "New contact \"{{name}}\" will be created when the invoice is saved."
+        "createNew": "Enter a new contact manually"
       },
       "status": {
         "section": "Status & bookkeeping",
@@ -143,6 +143,13 @@
         "saveAndNew": "Save & new",
         "save": "Save invoice",
         "submitting": "Saving…"
+      },
+      "newContact": {
+        "title": "New contact",
+        "hint": "Check the details – the contact is created when the invoice is saved.",
+        "cancel": "Cancel",
+        "duplicate": "You already have a contact with this IČO: {{name}}.",
+        "useExisting": "Use existing"
       }
     },
     "update": {
@@ -1452,6 +1459,7 @@
     "bankNotFound": "The selected bank account was not found.",
     "notFound": "The record was not found.",
     "invoiceContactLinked": "This document is linked to a contact — change the supplier by picking another contact.",
-    "supplierRequired": "A simplified document needs a supplier."
+    "supplierRequired": "A simplified document needs a supplier.",
+    "contactIcoTaken": "A contact with this IČO already exists."
   }
 }

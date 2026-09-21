@@ -38,7 +38,7 @@ import { useListContacts } from '@/api/contacts/contacts';
 import { useInvoiceCreate } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ContactResponseDto } from '@/api/model';
+import type { ContactResponseDto, CreateContactDto } from '@/api/model';
 import {
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatClaimType,
@@ -55,11 +55,14 @@ import {
   type RateRowValue,
 } from '@/components/invoices/rateAmounts';
 import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
+import { InvoiceContactField } from '@/components/invoices/InvoiceContactField';
+import { useResolveContactId } from '@/components/invoices/useResolveContactId';
 
 const DEFAULT_PAYMENT_DAYS = 14;
 
 type FormValues = {
   contactId: string;
+  pendingContact: CreateContactDto | null;
   number: string;
   originalNumber: string;
   createdDate: string;
@@ -92,6 +95,7 @@ const getDefaultValues = (): FormValues => {
   const today = new Date().toISOString().split('T')[0];
   return {
     contactId: '',
+    pendingContact: null,
     number: '',
     originalNumber: '',
     createdDate: today,
@@ -144,10 +148,6 @@ const CreateIncomingInvoice = () => {
   const sortedContacts = [...contacts].sort((a, b) =>
     (a.name ?? '').localeCompare(b.name ?? '', 'cs', { sensitivity: 'base' }),
   );
-  const contactOptions = sortedContacts.map((c) => ({
-    value: c.id,
-    label: c.name ?? '-',
-  }));
 
   const currencyOptions = [
     { value: 'CZK', label: t('currencies.CZK') },
@@ -257,7 +257,9 @@ const CreateIncomingInvoice = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
+  const { resolveContactId, isCreatingContact } = useResolveContactId();
+
+  const onSubmit = async (data: FormValues) => {
     const items = ratesToInvoiceItems(data.rates, isVatPayer);
 
     if (items.length === 0) {
@@ -284,10 +286,24 @@ const CreateIncomingInvoice = () => {
       finalVatMode === CreateInvoiceDtoVatMode.STANDARD &&
       data.shouldClaimVat;
 
+    // A new supplier (ARES / typed by hand) is created as a Contact first.
+    const contactId = await resolveContactId(
+      data.contactId,
+      data.pendingContact,
+      sortedContacts,
+    );
+    if (!contactId) return;
+    if (data.pendingContact) {
+      // Point the form at the created contact, so a retry after a failed
+      // invoice save does not create the supplier a second time.
+      form.setValue('contactId', contactId);
+      form.setValue('pendingContact', null);
+    }
+
     createMutation.mutate({
       data: {
         type: CreateInvoiceDtoType.RECEIVED,
-        contactId: data.contactId,
+        contactId,
         number: data.number.trim(),
         originalNumber: trimOrUndefined(data.originalNumber),
         currency: data.currency,
@@ -325,7 +341,7 @@ const CreateIncomingInvoice = () => {
     });
   };
 
-  const isPending = createMutation.isPending;
+  const isPending = createMutation.isPending || isCreatingContact;
 
   return (
     <PageLayout>
@@ -358,16 +374,12 @@ const CreateIncomingInvoice = () => {
 
           {/* Supplier */}
           <Card className="border-border/60 p-5 shadow-sm">
-            <SelectField
-              control={form.control}
-              name="contactId"
-              required
+            <InvoiceContactField
+              form={form}
+              contacts={sortedContacts}
               label={t('invoices.fields.supplier')}
               placeholder={t('invoices.placeholders.selectSupplier')}
-              options={contactOptions}
-              rules={{
-                required: t('invoices.validation.supplierRequired'),
-              }}
+              requiredMessage={t('invoices.validation.supplierRequired')}
             />
           </Card>
 

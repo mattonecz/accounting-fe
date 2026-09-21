@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useQueryClient } from '@tanstack/react-query';
 import i18n from '@/i18n';
 import { addDays } from '@/lib/formatters';
 import {
@@ -23,16 +22,14 @@ export type InvoiceFormValues = CreateInvoiceDto & {
   /** Helper field – when true, `paidDate` is sent and the invoice is created as PAID. */
   isPaid?: boolean;
   /**
-   * Helper field – a counterparty picked from ARES that does not exist as a
-   * Contact yet. It is created on submit and then referenced via `contactId`.
+   * Helper field – a counterparty picked from ARES or typed by hand that does
+   * not exist as a Contact yet. It is created on submit and then referenced
+   * via `contactId` (see InvoiceContactField).
    */
   pendingContact?: CreateContactDto | null;
 };
-import {
-  getListContactsQueryKey,
-  useCreateContact,
-  useListContacts,
-} from '@/api/contacts/contacts';
+import { useListContacts } from '@/api/contacts/contacts';
+import { useResolveContactId } from '@/components/invoices/useResolveContactId';
 import { useBankListByCompany } from '@/api/bank/bank';
 import { useInvoiceCreate, useInvoiceGetCount } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
@@ -75,7 +72,6 @@ export const useInvoiceForm = () => {
     : CreateInvoiceDtoType.ISSUED;
 
   const { enqueueSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
   const { data: contacts } = useListContacts();
   const { data: banks } = useBankListByCompany();
   const { data: invoiceNumber } = useInvoiceGetCount();
@@ -83,8 +79,7 @@ export const useInvoiceForm = () => {
   const { data: companyResponse } = useCompanyGet(activeCompanyId ?? '');
   const { mutate: createInvoice, isPending: isCreatingInvoice } =
     useInvoiceCreate();
-  const { mutateAsync: createContactAsync, isPending: isCreatingContact } =
-    useCreateContact();
+  const { resolveContactId, isCreatingContact } = useResolveContactId();
   const [submitMode, setSubmitMode] = useState<InvoiceSubmitMode>('issued');
 
   const isVatPayer = !!companyResponse?.data?.vatPayer;
@@ -244,22 +239,19 @@ export const useInvoiceForm = () => {
       ...rest
     } = data;
 
-    // A counterparty picked from ARES is created as a Contact first, then
-    // referenced by its id on the invoice.
-    let contactId = rest.contactId;
-    if (!contactId && pendingContact) {
-      try {
-        const created = await createContactAsync({ data: pendingContact });
-        contactId = created.data.id;
-        await queryClient.invalidateQueries({
-          queryKey: getListContactsQueryKey(),
-        });
-      } catch {
-        enqueueSnackbar(i18n.t('contacts.messages.createFailed'), {
-          variant: 'error',
-        });
-        return;
-      }
+    // A new counterparty (ARES / typed by hand) is created as a Contact first,
+    // then referenced by its id on the invoice.
+    const contactId = await resolveContactId(
+      rest.contactId,
+      pendingContact,
+      sortedContacts,
+    );
+    if (!contactId) return;
+    if (pendingContact) {
+      // Point the form at the created contact, so a retry after a failed
+      // invoice save does not create the contact a second time.
+      form.setValue('contactId', contactId);
+      form.setValue('pendingContact', null);
     }
 
     const cleanedSnapshot = isReceived

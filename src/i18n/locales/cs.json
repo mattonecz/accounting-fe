@@ -118,7 +118,7 @@
         "aresEmpty": "V ARES nic nenalezeno",
         "aresGroup": "Výsledky z ARES",
         "ico": "IČO: {{ico}}",
-        "willCreate": "Nový kontakt „{{name}}“ se vytvoří při uložení faktury."
+        "createNew": "Zadat nový kontakt ručně"
       },
       "status": {
         "section": "Stav a evidence",
@@ -143,6 +143,13 @@
         "saveAndNew": "Uložit a nová",
         "save": "Uložit fakturu",
         "submitting": "Ukládám…"
+      },
+      "newContact": {
+        "title": "Nový kontakt",
+        "hint": "Zkontrolujte údaje – kontakt se vytvoří při uložení faktury.",
+        "cancel": "Zrušit",
+        "duplicate": "Kontakt s tímto IČO už máte: {{name}}.",
+        "useExisting": "Použít existující"
       }
     },
     "update": {
@@ -1461,6 +1468,7 @@
     "bankNotFound": "Vybraný bankovní účet nebyl nalezen.",
     "notFound": "Záznam nebyl nalezen.",
     "invoiceContactLinked": "Doklad je navázaný na kontakt – dodavatele lze změnit jen výběrem jiného kontaktu.",
-    "supplierRequired": "U zjednodušeného dokladu je potřeba vyplnit dodavatele."
+    "supplierRequired": "U zjednodušeného dokladu je potřeba vyplnit dodavatele.",
+    "contactIcoTaken": "Kontakt s tímto IČO už existuje."
   }
 }

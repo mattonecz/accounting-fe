@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { Loader2 } from 'lucide-react';
 import type { CreateContactDto } from '@/api/model';
 import {
@@ -43,10 +44,11 @@ const CreateContact = () => {
           });
           navigate('/contacts');
         },
-        onError: () => {
-          enqueueSnackbar(t('contacts.messages.createFailed'), {
-            variant: 'error',
-          });
+        onError: (error) => {
+          enqueueSnackbar(
+            getApiErrorMessage(error, t, 'contacts.messages.createFailed'),
+            { variant: 'error' },
+          );
         },
       },
     );

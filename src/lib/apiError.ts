@@ -37,6 +37,7 @@ const KNOWN_MESSAGES: [RegExp, string][] = [
     /contact\.name is required|contact \(with a name\) is required/i,
     'errors.supplierRequired',
   ],
+  [/Contact with this ICO already exists/i, 'errors.contactIcoTaken'],
   [/Selected contact was not found/i, 'errors.contactNotFound'],
   [/Selected bank account was not found/i, 'errors.bankNotFound'],
   [/(Invoice|Contact|Payment|Tax filing) not found/i, 'errors.notFound'],

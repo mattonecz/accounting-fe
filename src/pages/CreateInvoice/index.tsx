@@ -11,10 +11,8 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
 import {
-  RequiredMark,
   SelectField,
   TextField,
-  labelClass,
   sectionLabelClass,
 } from '@/components/invoices/formFields';
 import {
@@ -23,7 +21,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import {
   Collapsible,
@@ -36,7 +33,7 @@ import { Switch } from '@/components/ui/switch';
 import { useInvoiceForm } from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
 import { InvoiceItemsEditor } from '@/components/invoices/InvoiceItemsEditor';
-import { ContactCombobox } from '@/components/invoices/ContactCombobox';
+import { InvoiceContactField } from '@/components/invoices/InvoiceContactField';
 import {
   CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoVatClaimType,
@@ -161,15 +158,9 @@ const CreateIssuedInvoice = () => {
   const showVatClaim =
     isVatPayer && isReceived && vatMode === CreateInvoiceDtoVatMode.STANDARD;
 
-  const watchedContactId = form.watch('contactId');
-  const pendingContact = form.watch('pendingContact');
   const contactLabel = isReceived
     ? t('invoices.fields.supplier')
     : t('invoices.fields.contact');
-  const selectedContactLabel =
-    pendingContact?.name ||
-    sortedContacts.find((c) => c.id === watchedContactId)?.name ||
-    undefined;
 
   return (
     <PageLayout>
@@ -208,60 +199,18 @@ const CreateIssuedInvoice = () => {
 
           {/* Customer / supplier */}
           <Card className="border-border/60 p-5 shadow-sm">
-            <FormField
-              control={form.control}
-              name="contactId"
-              rules={{
-                validate: () =>
-                  !!form.getValues('contactId') ||
-                  !!form.getValues('pendingContact') ||
-                  t('validation.required', { field: contactLabel }),
-              }}
-              render={({ fieldState }) => (
-                <FormItem className="space-y-1.5">
-                  <FormLabel className={labelClass}>
-                    {contactLabel}
-                    <RequiredMark />
-                  </FormLabel>
-                  <ContactCombobox
-                    contacts={sortedContacts}
-                    selectedContactId={watchedContactId}
-                    selectedLabel={selectedContactLabel}
-                    hasError={!!fieldState.error}
-                    placeholder={
-                      isReceived
-                        ? t('invoices.placeholders.selectSupplier')
-                        : t('invoices.placeholders.selectContact')
-                    }
-                    onSelectContact={(contact) => {
-                      form.setValue('contactId', contact.id, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
-                      form.setValue('pendingContact', null, {
-                        shouldDirty: true,
-                      });
-                    }}
-                    onSelectAres={(contact) => {
-                      form.setValue('pendingContact', contact, {
-                        shouldDirty: true,
-                      });
-                      form.setValue('contactId', '', {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
-                    }}
-                  />
-                  {pendingContact && (
-                    <p className="text-[11px] text-muted-foreground/80">
-                      {t('invoices.create.contactSearch.willCreate', {
-                        name: pendingContact.name,
-                      })}
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
+            <InvoiceContactField
+              form={form}
+              contacts={sortedContacts}
+              label={contactLabel}
+              placeholder={
+                isReceived
+                  ? t('invoices.placeholders.selectSupplier')
+                  : t('invoices.placeholders.selectContact')
+              }
+              requiredMessage={t('validation.required', {
+                field: contactLabel,
+              })}
             />
           </Card>
 

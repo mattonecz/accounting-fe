@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ChevronsUpDown, Loader2, Search } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Plus,
+  Search,
+} from 'lucide-react';
 import {
   Command,
   CommandGroup,
@@ -57,6 +64,11 @@ interface ContactComboboxProps {
   hasError?: boolean;
   onSelectContact: (contact: ContactResponseDto) => void;
   onSelectAres: (contact: CreateContactDto) => void;
+  /**
+   * Starts a new contact typed by hand. Receives what was typed in the search
+   * box as a seed (as IČO when it is all digits, otherwise as the name).
+   */
+  onCreateNew?: (seed: Partial<CreateContactDto>) => void;
 }
 
 const MAX_CONTACTS = 50;
@@ -70,6 +82,7 @@ export function ContactCombobox({
   hasError,
   onSelectContact,
   onSelectAres,
+  onCreateNew,
 }: ContactComboboxProps) {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
@@ -122,6 +135,14 @@ export function ContactCombobox({
     reset();
   };
 
+  const handleCreateNew = () => {
+    onCreateNew?.(
+      /^[0-9]+$/.test(trimmed) ? { ico: trimmed } : { name: trimmed },
+    );
+    setOpen(false);
+    reset();
+  };
+
   const handleSelectAres = (result: RegistrationDataResponseDto) => {
     onSelectAres(aresToContact(result));
     setOpen(false);
@@ -142,7 +163,10 @@ export function ContactCombobox({
           )}
         >
           <span
-            className={cn('truncate', !selectedLabel && 'text-muted-foreground')}
+            className={cn(
+              'truncate',
+              !selectedLabel && 'text-muted-foreground',
+            )}
           >
             {selectedLabel || placeholder}
           </span>
@@ -217,6 +241,17 @@ export function ContactCombobox({
                         : t('invoices.create.contactSearch.searchAresHint')}
                     </span>
                   </CommandItem>
+                  {onCreateNew && (
+                    <CommandItem
+                      value="__create-new__"
+                      onSelect={handleCreateNew}
+                    >
+                      <Plus className="mr-2 h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {t('invoices.create.contactSearch.createNew')}
+                      </span>
+                    </CommandItem>
+                  )}
                 </CommandGroup>
               </>
             ) : (

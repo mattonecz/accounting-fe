@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { Loader2 } from 'lucide-react';
 import {
   getGetContactQueryKey,
@@ -69,10 +70,11 @@ const UpdateContact = () => {
           ]);
           navigate('/contacts');
         },
-        onError: () => {
-          enqueueSnackbar(t('contacts.messages.updateFailed'), {
-            variant: 'error',
-          });
+        onError: (error) => {
+          enqueueSnackbar(
+            getApiErrorMessage(error, t, 'contacts.messages.updateFailed'),
+            { variant: 'error' },
+          );
         },
       },
     );
