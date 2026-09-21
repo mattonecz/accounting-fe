@@ -7,7 +7,7 @@
  */
 
 /**
- * CLAIMED is reserved for the future tax-filing workflow and cannot be set via API.
+ * Whether the input-VAT deduction should be claimed (PENDING) or not (SKIPPED).
  */
 export type UpdateInvoiceDtoVatClaimStatus =
   (typeof UpdateInvoiceDtoVatClaimStatus)[keyof typeof UpdateInvoiceDtoVatClaimStatus];

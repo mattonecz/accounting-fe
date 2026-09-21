@@ -28,7 +28,9 @@
           }
         },
         "summary": "Sign in",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/auth/refresh": {
@@ -48,7 +50,9 @@
           }
         },
         "summary": "Refresh tokens",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/auth/logout": {
@@ -61,7 +65,9 @@
           }
         },
         "summary": "Logout",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/auth/profile": {
@@ -74,7 +80,9 @@
           }
         },
         "summary": "Get Profile",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/auth/memberships": {
@@ -97,7 +105,9 @@
           }
         },
         "summary": "List company memberships for current user",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/users": {
@@ -127,7 +137,9 @@
           }
         },
         "summary": "Create user",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/users/emailAvailable": {
@@ -156,7 +168,9 @@
           }
         },
         "summary": "Check email available",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/user-companies/mine": {
@@ -179,7 +193,9 @@
           }
         },
         "summary": "List current user memberships",
-        "tags": ["UserCompany"]
+        "tags": [
+          "UserCompany"
+        ]
       }
     },
     "/user-companies": {
@@ -202,7 +218,9 @@
           }
         },
         "summary": "List members of the active company",
-        "tags": ["UserCompany"]
+        "tags": [
+          "UserCompany"
+        ]
       }
     },
     "/user-companies/invite": {
@@ -232,7 +250,9 @@
           }
         },
         "summary": "Invite existing user to active company",
-        "tags": ["UserCompany"]
+        "tags": [
+          "UserCompany"
+        ]
       }
     },
     "/user-companies/{id}/role": {
@@ -271,7 +291,9 @@
           }
         },
         "summary": "Change a member's role",
-        "tags": ["UserCompany"]
+        "tags": [
+          "UserCompany"
+        ]
       }
     },
     "/user-companies/{id}": {
@@ -293,7 +315,9 @@
           }
         },
         "summary": "Remove a member",
-        "tags": ["UserCompany"]
+        "tags": [
+          "UserCompany"
+        ]
       }
     },
     "/contacts": {
@@ -323,7 +347,9 @@
           }
         },
         "summary": "Create contact",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       },
       "put": {
         "operationId": "updateContact",
@@ -351,7 +377,9 @@
           }
         },
         "summary": "Update contact",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       },
       "get": {
         "operationId": "listContacts",
@@ -372,7 +400,9 @@
           }
         },
         "summary": "List contacts",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       }
     },
     "/contacts/search/by-name": {
@@ -404,7 +434,9 @@
           }
         },
         "summary": "Find contacts by name",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       }
     },
     "/contacts/{id}/stats": {
@@ -433,7 +465,9 @@
           }
         },
         "summary": "Get contact invoice statistics",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       }
     },
     "/contacts/{id}": {
@@ -462,7 +496,9 @@
           }
         },
         "summary": "Get contact",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       },
       "delete": {
         "operationId": "deleteContact",
@@ -482,7 +518,9 @@
           }
         },
         "summary": "Delete contact",
-        "tags": ["Contacts"]
+        "tags": [
+          "Contacts"
+        ]
       }
     },
     "/ares/search": {
@@ -512,7 +550,9 @@
           }
         },
         "summary": "Search ARES registry",
-        "tags": ["Ares"]
+        "tags": [
+          "Ares"
+        ]
       }
     },
     "/ares/registration-data": {
@@ -542,7 +582,9 @@
           }
         },
         "summary": "Get ARES registration data (+ optional VAT status)",
-        "tags": ["Ares"]
+        "tags": [
+          "Ares"
+        ]
       }
     },
     "/companies": {
@@ -572,7 +614,9 @@
           }
         },
         "summary": "Create company",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       },
       "patch": {
         "operationId": "companyUpdate",
@@ -600,7 +644,9 @@
           }
         },
         "summary": "Update company",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       }
     },
     "/companies/isds-credentials": {
@@ -630,7 +676,9 @@
           }
         },
         "summary": "Set company ISDS (datové schránky) credentials",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       },
       "get": {
         "operationId": "companyGetIsdsSettings",
@@ -648,7 +696,9 @@
           }
         },
         "summary": "Get the active company ISDS (datové schránky) settings",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       }
     },
     "/companies/list": {
@@ -671,7 +721,9 @@
           }
         },
         "summary": "List companies the user belongs to",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       }
     },
     "/companies/{id}": {
@@ -700,7 +752,9 @@
           }
         },
         "summary": "Get company by id",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       }
     },
     "/companies/findByName": {
@@ -732,7 +786,9 @@
           }
         },
         "summary": "Find user companies by name (partial, diacritic-insensitive)",
-        "tags": ["Companies"]
+        "tags": [
+          "Companies"
+        ]
       }
     },
     "/invoice-settings": {
@@ -752,7 +808,9 @@
           }
         },
         "summary": "Get invoice settings for company",
-        "tags": ["InvoiceSettings"]
+        "tags": [
+          "InvoiceSettings"
+        ]
       },
       "patch": {
         "operationId": "invoiceSettingsUpdate",
@@ -780,7 +838,9 @@
           }
         },
         "summary": "Update invoice settings for company",
-        "tags": ["InvoiceSettings"]
+        "tags": [
+          "InvoiceSettings"
+        ]
       }
     },
     "/invoices": {
@@ -811,7 +871,9 @@
           }
         },
         "summary": "Create invoice",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       },
       "patch": {
         "operationId": "invoiceUpdate",
@@ -839,7 +901,9 @@
           }
         },
         "summary": "Update invoice",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/list": {
@@ -853,7 +917,10 @@
             "description": "Filter by invoice kind",
             "schema": {
               "type": "string",
-              "enum": ["INVOICE", "SIMPLE"]
+              "enum": [
+                "INVOICE",
+                "SIMPLE"
+              ]
             }
           },
           {
@@ -871,7 +938,10 @@
             "in": "query",
             "description": "Filter by invoice type - RECEIVED or ISSUED",
             "schema": {
-              "enum": ["RECEIVED", "ISSUED"],
+              "enum": [
+                "RECEIVED",
+                "ISSUED"
+              ],
               "type": "string"
             }
           },
@@ -891,7 +961,13 @@
             "description": "Filter by invoice status. OVERDUE matches ISSUED invoices past their due date.",
             "schema": {
               "type": "string",
-              "enum": ["DRAFT", "ISSUED", "OVERDUE", "PAID", "CANCELLED"]
+              "enum": [
+                "DRAFT",
+                "ISSUED",
+                "OVERDUE",
+                "PAID",
+                "CANCELLED"
+              ]
             }
           },
           {
@@ -962,7 +1038,10 @@
             "schema": {
               "default": "DESC",
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           {
@@ -1004,7 +1083,9 @@
           }
         },
         "summary": "List invoices by company with filtering and pagination",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/count": {
@@ -1024,7 +1105,9 @@
           }
         },
         "summary": "Get count of invoices for the active company in current year",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/stats": {
@@ -1044,7 +1127,9 @@
           }
         },
         "summary": "Get dashboard stats",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/{id}": {
@@ -1073,7 +1158,9 @@
           }
         },
         "summary": "Get invoice by id",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       },
       "delete": {
         "operationId": "invoiceDelete",
@@ -1093,7 +1180,9 @@
           }
         },
         "summary": "Delete invoice by id",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/{id}/status": {
@@ -1132,7 +1221,9 @@
           }
         },
         "summary": "Update invoice status",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/invoices/byNumber/{number}": {
@@ -1161,7 +1252,9 @@
           }
         },
         "summary": "Get invoice by number",
-        "tags": ["Invoices"]
+        "tags": [
+          "Invoices"
+        ]
       }
     },
     "/banks": {
@@ -1191,7 +1284,9 @@
           }
         },
         "summary": "Create bank",
-        "tags": ["Bank"]
+        "tags": [
+          "Bank"
+        ]
       },
       "patch": {
         "operationId": "bankUpdate",
@@ -1219,7 +1314,9 @@
           }
         },
         "summary": "Update bank",
-        "tags": ["Bank"]
+        "tags": [
+          "Bank"
+        ]
       }
     },
     "/banks/list": {
@@ -1242,7 +1339,9 @@
           }
         },
         "summary": "List banks by company",
-        "tags": ["Bank"]
+        "tags": [
+          "Bank"
+        ]
       }
     },
     "/banks/setDefault": {
@@ -1272,7 +1371,9 @@
           }
         },
         "summary": "Set default bank for company",
-        "tags": ["Bank"]
+        "tags": [
+          "Bank"
+        ]
       }
     },
     "/payments": {
@@ -1303,7 +1404,9 @@
           }
         },
         "summary": "Create payment",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       },
       "patch": {
         "operationId": "paymentUpdate",
@@ -1331,7 +1434,9 @@
           }
         },
         "summary": "Update payment",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       }
     },
     "/payments/list": {
@@ -1354,7 +1459,9 @@
           }
         },
         "summary": "List payments by company",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       }
     },
     "/payments/invoice/{invoiceId}": {
@@ -1387,7 +1494,9 @@
           }
         },
         "summary": "List payments by invoice",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       }
     },
     "/payments/{id}": {
@@ -1417,7 +1526,9 @@
           }
         },
         "summary": "Get payment by id",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       },
       "delete": {
         "operationId": "paymentDelete",
@@ -1438,7 +1549,9 @@
           }
         },
         "summary": "Delete payment",
-        "tags": ["Payments"]
+        "tags": [
+          "Payments"
+        ]
       }
     },
     "/documents/receipt/parse": {
@@ -1451,7 +1564,9 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["file"],
+                "required": [
+                  "file"
+                ],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -1475,7 +1590,9 @@
           }
         },
         "summary": "Parse receipt image into structured data",
-        "tags": ["Documents"]
+        "tags": [
+          "Documents"
+        ]
       }
     },
     "/vat/export": {
@@ -1522,14 +1639,19 @@
                       "type": "string"
                     }
                   },
-                  "required": ["khXml", "vatXml"]
+                  "required": [
+                    "khXml",
+                    "vatXml"
+                  ]
                 }
               }
             }
           }
         },
         "summary": "Export VAT return and control statement XML",
-        "tags": ["vat"]
+        "tags": [
+          "vat"
+        ]
       }
     },
     "/vat/summary-by-month": {
@@ -1577,7 +1699,9 @@
           }
         },
         "summary": "List invoices contributing to the VAT return for a given month",
-        "tags": ["vat"]
+        "tags": [
+          "vat"
+        ]
       }
     },
     "/tax-filings": {
@@ -1607,7 +1731,9 @@
           }
         },
         "summary": "Create tax filing",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       },
       "get": {
         "operationId": "listTaxFilings",
@@ -1628,7 +1754,9 @@
           }
         },
         "summary": "List tax filings",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/tax-filings/{id}": {
@@ -1657,7 +1785,9 @@
           }
         },
         "summary": "Get tax filing",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/tax-filings/{id}/submit": {
@@ -1696,7 +1826,9 @@
           }
         },
         "summary": "Submit tax filing",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/tax-filings/{id}/cancel": {
@@ -1725,7 +1857,9 @@
           }
         },
         "summary": "Cancel tax filing",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/tax-filings/{id}/vat-xml": {
@@ -1747,7 +1881,9 @@
           }
         },
         "summary": "Download VAT return XML",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/tax-filings/{id}/kh-xml": {
@@ -1769,7 +1905,9 @@
           }
         },
         "summary": "Download VAT control statement XML",
-        "tags": ["tax-filings"]
+        "tags": [
+          "tax-filings"
+        ]
       }
     },
     "/data-messages/test-login": {
@@ -1799,7 +1937,9 @@
           }
         },
         "summary": "Test the ISDS (datové schránky) connection by logging in via SOAP. Pass username + password to verify credentials before saving them; send an empty body to test the company's saved credentials.",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     },
     "/data-messages/send": {
@@ -1829,7 +1969,9 @@
           }
         },
         "summary": "Send a data message with XML attachments via ISDS",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     },
     "/data-messages/messages": {
@@ -1852,7 +1994,9 @@
           }
         },
         "summary": "List data messages recorded for the current company",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     },
     "/data-messages/submit-tax/{taxFilingId}": {
@@ -1882,7 +2026,9 @@
           }
         },
         "summary": "Submit a tax filing (DPH + KH XML) to the financial office via ISDS",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     },
     "/data-messages/messages/{id}/status": {
@@ -1912,7 +2058,9 @@
           }
         },
         "summary": "Get the ISDS delivery status of a recorded data message",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     },
     "/data-messages/messages/{id}": {
@@ -1942,7 +2090,9 @@
           }
         },
         "summary": "Get a single recorded data message by id (no ISDS refresh)",
-        "tags": ["data-messages"]
+        "tags": [
+          "data-messages"
+        ]
       }
     }
   },
@@ -1971,7 +2121,10 @@
             "type": "string"
           }
         },
-        "required": ["username", "password"]
+        "required": [
+          "username",
+          "password"
+        ]
       },
       "LoginResponseDto": {
         "type": "object",
@@ -1984,7 +2137,10 @@
             "format": "date-time"
           }
         },
-        "required": ["accessToken", "expiresAt"]
+        "required": [
+          "accessToken",
+          "expiresAt"
+        ]
       },
       "UserCompanyUserSummaryDto": {
         "type": "object",
@@ -1996,7 +2152,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "email"]
+        "required": [
+          "id",
+          "email"
+        ]
       },
       "UserCompanyCompanySummaryDto": {
         "type": "object",
@@ -2008,7 +2167,9 @@
             "type": "string"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "UserCompanyResponseDto": {
         "type": "object",
@@ -2024,7 +2185,11 @@
           },
           "role": {
             "type": "string",
-            "enum": ["OWNER", "ACCOUNTANT", "MEMBER"]
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
           },
           "createdAt": {
             "format": "date-time",
@@ -2037,7 +2202,13 @@
             "$ref": "#/components/schemas/UserCompanyCompanySummaryDto"
           }
         },
-        "required": ["id", "userId", "companyId", "role", "createdAt"]
+        "required": [
+          "id",
+          "userId",
+          "companyId",
+          "role",
+          "createdAt"
+        ]
       },
       "CreateUserDto": {
         "type": "object",
@@ -2049,7 +2220,10 @@
             "type": "string"
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "UserResponseDto": {
         "type": "object",
@@ -2061,7 +2235,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "email"]
+        "required": [
+          "id",
+          "email"
+        ]
       },
       "CreateUserCompanyDto": {
         "type": "object",
@@ -2074,20 +2251,34 @@
           },
           "role": {
             "type": "string",
-            "enum": ["OWNER", "ACCOUNTANT", "MEMBER"]
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
           }
         },
-        "required": ["companyId", "userEmail", "role"]
+        "required": [
+          "companyId",
+          "userEmail",
+          "role"
+        ]
       },
       "UpdateUserCompanyRoleDto": {
         "type": "object",
         "properties": {
           "role": {
             "type": "string",
-            "enum": ["OWNER", "ACCOUNTANT", "MEMBER"]
+            "enum": [
+              "OWNER",
+              "ACCOUNTANT",
+              "MEMBER"
+            ]
           }
         },
-        "required": ["role"]
+        "required": [
+          "role"
+        ]
       },
       "CreateContactDto": {
         "type": "object",
@@ -2123,7 +2314,10 @@
             "type": "string"
           }
         },
-        "required": ["name", "country"]
+        "required": [
+          "name",
+          "country"
+        ]
       },
       "ContactResponseDto": {
         "type": "object",
@@ -2162,7 +2356,11 @@
             "type": "string"
           }
         },
-        "required": ["id", "name", "country"]
+        "required": [
+          "id",
+          "name",
+          "country"
+        ]
       },
       "UpdateContactDto": {
         "type": "object",
@@ -2201,7 +2399,9 @@
             "type": "string"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "ContactInvoiceStatsDto": {
         "type": "object",
@@ -2260,7 +2460,10 @@
             "$ref": "#/components/schemas/ContactInvoiceStatsDto"
           }
         },
-        "required": ["issued", "received"]
+        "required": [
+          "issued",
+          "received"
+        ]
       },
       "ContactSearchDto": {
         "type": "object",
@@ -2379,7 +2582,10 @@
             "type": "string"
           }
         },
-        "required": ["radekAdresy1", "radekAdresy2"]
+        "required": [
+          "radekAdresy1",
+          "radekAdresy2"
+        ]
       },
       "DphBankAccountDto": {
         "type": "object",
@@ -2531,7 +2737,10 @@
             }
           }
         },
-        "required": ["pocetCelkem", "ekonomickeSubjekty"]
+        "required": [
+          "pocetCelkem",
+          "ekonomickeSubjekty"
+        ]
       },
       "RegistrationDataRequestDto": {
         "type": "object",
@@ -2542,14 +2751,19 @@
             "example": "45274649"
           }
         },
-        "required": ["ico"]
+        "required": [
+          "ico"
+        ]
       },
       "CreateCompanyDto": {
         "type": "object",
         "properties": {
           "companyType": {
             "type": "string",
-            "enum": ["OSVC", "SRO"]
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
           },
           "name": {
             "type": "string"
@@ -2607,7 +2821,13 @@
             "type": "string"
           }
         },
-        "required": ["companyType", "country", "city", "psc", "ico"]
+        "required": [
+          "companyType",
+          "country",
+          "city",
+          "psc",
+          "ico"
+        ]
       },
       "CompanyResponseDto": {
         "type": "object",
@@ -2626,7 +2846,10 @@
           },
           "companyType": {
             "type": "string",
-            "enum": ["OSVC", "SRO"]
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
           },
           "country": {
             "type": "string"
@@ -2674,7 +2897,11 @@
             "type": "string"
           }
         },
-        "required": ["id", "country", "vatPayer"]
+        "required": [
+          "id",
+          "country",
+          "vatPayer"
+        ]
       },
       "UpdateCompanyDto": {
         "type": "object",
@@ -2684,7 +2911,10 @@
           },
           "companyType": {
             "type": "string",
-            "enum": ["OSVC", "SRO"]
+            "enum": [
+              "OSVC",
+              "SRO"
+            ]
           },
           "name": {
             "type": "string"
@@ -2741,7 +2971,13 @@
             "type": "string"
           }
         },
-        "required": ["id", "companyType", "city", "psc", "ico"]
+        "required": [
+          "id",
+          "companyType",
+          "city",
+          "psc",
+          "ico"
+        ]
       },
       "UpdateIsdsCredentialsDto": {
         "type": "object",
@@ -2755,7 +2991,10 @@
             "description": "ISDS (datové schránky) login password"
           }
         },
-        "required": ["username", "password"]
+        "required": [
+          "username",
+          "password"
+        ]
       },
       "IsdsSettingsDto": {
         "type": "object",
@@ -2770,7 +3009,10 @@
             "description": "Whether an ISDS password is stored"
           }
         },
-        "required": ["username", "hasPassword"]
+        "required": [
+          "username",
+          "hasPassword"
+        ]
       },
       "InvoiceSettingsResponseDto": {
         "type": "object",
@@ -2945,14 +3187,22 @@
             "description": "VAT rate %"
           }
         },
-        "required": ["name", "quantity", "unitPrice", "total"]
+        "required": [
+          "name",
+          "quantity",
+          "unitPrice",
+          "total"
+        ]
       },
       "CreateInvoiceDto": {
         "type": "object",
         "properties": {
           "kind": {
             "type": "string",
-            "enum": ["INVOICE", "SIMPLE"],
+            "enum": [
+              "INVOICE",
+              "SIMPLE"
+            ],
             "default": "INVOICE"
           },
           "bankId": {
@@ -2991,19 +3241,31 @@
           },
           "type": {
             "type": "string",
-            "enum": ["RECEIVED", "ISSUED"],
+            "enum": [
+              "RECEIVED",
+              "ISSUED"
+            ],
             "example": "RECEIVED",
             "description": "Required for kind=INVOICE. Defaults to RECEIVED for kind=SIMPLE."
           },
           "vatMode": {
             "type": "string",
-            "enum": ["STANDARD", "NON_VAT_PAYER", "REVERSE_CHARGE"],
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ],
             "example": "STANDARD",
             "description": "Required for kind=INVOICE."
           },
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "ISSUED", "PAID", "CANCELLED"],
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "PAID",
+              "CANCELLED"
+            ],
             "example": "ISSUED",
             "description": "Invoice status. Defaults to ISSUED when omitted."
           },
@@ -3069,7 +3331,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"],
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ],
             "description": "Payment method (forma úhrady). Defaults to BANK_TRANSFER."
           },
           "note": {
@@ -3089,7 +3356,10 @@
           },
           "vatClaimType": {
             "type": "string",
-            "enum": ["FULL", "PARTIAL"]
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ]
           },
           "vatClaimRatio": {
             "type": "number",
@@ -3106,7 +3376,10 @@
             "type": "string"
           }
         },
-        "required": ["createdDate", "duzpDate"]
+        "required": [
+          "createdDate",
+          "duzpDate"
+        ]
       },
       "InvoiceItemResponseDto": {
         "type": "object",
@@ -3160,7 +3433,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "amount": {
             "type": "number"
@@ -3210,14 +3488,22 @@
             "nullable": true
           }
         },
-        "required": ["item"]
+        "required": [
+          "item"
+        ]
       },
       "InvoiceStatusHistoryItemDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "ISSUED", "OVERDUE", "PAID", "CANCELLED"],
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "OVERDUE",
+              "PAID",
+              "CANCELLED"
+            ],
             "example": "ISSUED"
           },
           "datetime": {
@@ -3231,7 +3517,10 @@
             }
           }
         },
-        "required": ["status", "datetime"]
+        "required": [
+          "status",
+          "datetime"
+        ]
       },
       "InvoiceResponseDto": {
         "type": "object",
@@ -3272,15 +3561,27 @@
           },
           "vatMode": {
             "type": "string",
-            "enum": ["STANDARD", "NON_VAT_PAYER", "REVERSE_CHARGE"]
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "ISSUED", "PAID", "CANCELLED"]
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "PAID",
+              "CANCELLED"
+            ]
           },
           "kind": {
             "type": "string",
-            "enum": ["INVOICE", "SIMPLE"]
+            "enum": [
+              "INVOICE",
+              "SIMPLE"
+            ]
           },
           "description": {
             "type": "string"
@@ -3314,7 +3615,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "note": {
             "type": "string"
@@ -3345,7 +3651,10 @@
           },
           "vatClaimType": {
             "type": "string",
-            "enum": ["FULL", "PARTIAL"],
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ],
             "nullable": true
           },
           "vatClaimRatio": {
@@ -3359,17 +3668,19 @@
           },
           "vatClaimStatus": {
             "type": "string",
-            "enum": ["PENDING", "CLAIMED", "SKIPPED"],
-            "nullable": true
-          },
-          "vatClaimedAt": {
-            "format": "date-time",
-            "type": "string",
+            "enum": [
+              "PENDING",
+              "SKIPPED"
+            ],
             "nullable": true
           },
           "vatClaimNote": {
             "type": "object",
             "nullable": true
+          },
+          "isLocked": {
+            "type": "boolean",
+            "description": "True while the invoice belongs to an active tax filing (processing, ready or submitted). Locked invoices cannot be updated or deleted."
           }
         },
         "required": [
@@ -3384,7 +3695,8 @@
           "totalWithTax",
           "items",
           "companyId",
-          "paymentMethod"
+          "paymentMethod",
+          "isLocked"
         ]
       },
       "PaginatedInvoiceResponseDto": {
@@ -3409,7 +3721,13 @@
             "type": "number"
           }
         },
-        "required": ["data", "total", "page", "pageSize", "totalPages"]
+        "required": [
+          "data",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
       },
       "DashboardSummaryDto": {
         "type": "object",
@@ -3482,7 +3800,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["PAID", "PENDING"]
+            "enum": [
+              "PAID",
+              "PENDING"
+            ]
           }
         },
         "required": [
@@ -3562,17 +3883,29 @@
           },
           "type": {
             "type": "string",
-            "enum": ["RECEIVED", "ISSUED"],
+            "enum": [
+              "RECEIVED",
+              "ISSUED"
+            ],
             "example": "ISSUED"
           },
           "vatMode": {
             "type": "string",
-            "enum": ["STANDARD", "NON_VAT_PAYER", "REVERSE_CHARGE"],
+            "enum": [
+              "STANDARD",
+              "NON_VAT_PAYER",
+              "REVERSE_CHARGE"
+            ],
             "example": "STANDARD"
           },
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "ISSUED", "PAID", "CANCELLED"],
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "PAID",
+              "CANCELLED"
+            ],
             "example": "PAID"
           },
           "exchangeRate": {
@@ -3612,7 +3945,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "note": {
             "type": "string"
@@ -3643,7 +3981,10 @@
           },
           "vatClaimType": {
             "type": "string",
-            "enum": ["FULL", "PARTIAL"]
+            "enum": [
+              "FULL",
+              "PARTIAL"
+            ]
           },
           "vatClaimRatio": {
             "type": "number",
@@ -3658,25 +3999,37 @@
           },
           "vatClaimStatus": {
             "type": "string",
-            "enum": ["PENDING", "SKIPPED"],
-            "description": "CLAIMED is reserved for the future tax-filing workflow and cannot be set via API."
+            "enum": [
+              "PENDING",
+              "SKIPPED"
+            ],
+            "description": "Whether the input-VAT deduction should be claimed (PENDING) or not (SKIPPED)."
           },
           "vatClaimNote": {
             "type": "string"
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "UpdateInvoiceStatusDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "ISSUED", "PAID", "CANCELLED"],
+            "enum": [
+              "DRAFT",
+              "ISSUED",
+              "PAID",
+              "CANCELLED"
+            ],
             "example": "PAID"
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "CreateBankDto": {
         "type": "object",
@@ -3697,7 +4050,10 @@
             "type": "string"
           }
         },
-        "required": ["name", "currency"]
+        "required": [
+          "name",
+          "currency"
+        ]
       },
       "BankResponseDto": {
         "type": "object",
@@ -3724,7 +4080,12 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "name", "currency", "default"]
+        "required": [
+          "id",
+          "name",
+          "currency",
+          "default"
+        ]
       },
       "UpdateBankDto": {
         "type": "object",
@@ -3751,7 +4112,11 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "name", "currency"]
+        "required": [
+          "id",
+          "name",
+          "currency"
+        ]
       },
       "SetDefaultBankDto": {
         "type": "object",
@@ -3761,7 +4126,9 @@
             "description": "UUID of the bank to set as default"
           }
         },
-        "required": ["bankId"]
+        "required": [
+          "bankId"
+        ]
       },
       "CreatePaymentDto": {
         "type": "object",
@@ -3776,7 +4143,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "amount": {
             "type": "number",
@@ -3802,7 +4174,12 @@
             "example": 24.8654
           }
         },
-        "required": ["invoiceId", "paymentMethod", "amount", "paymentDate"]
+        "required": [
+          "invoiceId",
+          "paymentMethod",
+          "amount",
+          "paymentDate"
+        ]
       },
       "UpdatePaymentDto": {
         "type": "object",
@@ -3821,7 +4198,12 @@
           },
           "paymentMethod": {
             "type": "string",
-            "enum": ["BANK_TRANSFER", "CASH", "CARD", "OTHER"]
+            "enum": [
+              "BANK_TRANSFER",
+              "CASH",
+              "CARD",
+              "OTHER"
+            ]
           },
           "amount": {
             "type": "number",
@@ -3847,7 +4229,9 @@
             "example": 24.8654
           }
         },
-        "required": ["id"]
+        "required": [
+          "id"
+        ]
       },
       "VatBreakdownItemDto": {
         "type": "object",
@@ -3867,7 +4251,11 @@
             "description": "VAT amount at this rate"
           }
         },
-        "required": ["rate", "base", "amount"]
+        "required": [
+          "rate",
+          "base",
+          "amount"
+        ]
       },
       "ReceiptParseDataDto": {
         "type": "object",
@@ -3985,7 +4373,10 @@
             }
           }
         },
-        "required": ["data", "llmCalls"]
+        "required": [
+          "data",
+          "llmCalls"
+        ]
       },
       "CreateTaxFilingDto": {
         "type": "object",
@@ -4004,14 +4395,23 @@
           },
           "submissionType": {
             "type": "string",
-            "enum": ["REGULAR", "CORRECTIVE", "FOLLOWUP"]
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
           },
           "createDate": {
             "type": "string",
             "format": "date"
           }
         },
-        "required": ["month", "year", "submissionType", "createDate"]
+        "required": [
+          "month",
+          "year",
+          "submissionType",
+          "createDate"
+        ]
       },
       "TaxFilingSummaryDto": {
         "type": "object",
@@ -4048,10 +4448,17 @@
           },
           "role": {
             "type": "string",
-            "enum": ["ISSUED", "RECEIVED", "SIMPLE"]
+            "enum": [
+              "ISSUED",
+              "RECEIVED",
+              "SIMPLE"
+            ]
           }
         },
-        "required": ["invoiceId", "role"]
+        "required": [
+          "invoiceId",
+          "role"
+        ]
       },
       "TaxFilingResponseDto": {
         "type": "object",
@@ -4070,11 +4477,21 @@
           },
           "status": {
             "type": "string",
-            "enum": ["PROCESSING", "READY", "FAILED", "SUBMITTED", "CANCELLED"]
+            "enum": [
+              "PROCESSING",
+              "READY",
+              "FAILED",
+              "SUBMITTED",
+              "CANCELLED"
+            ]
           },
           "submissionType": {
             "type": "string",
-            "enum": ["REGULAR", "CORRECTIVE", "FOLLOWUP"]
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -4130,13 +4547,20 @@
         "properties": {
           "role": {
             "type": "string",
-            "enum": ["ISSUED", "RECEIVED", "SIMPLE"]
+            "enum": [
+              "ISSUED",
+              "RECEIVED",
+              "SIMPLE"
+            ]
           },
           "invoice": {
             "$ref": "#/components/schemas/InvoiceResponseDto"
           }
         },
-        "required": ["role", "invoice"]
+        "required": [
+          "role",
+          "invoice"
+        ]
       },
       "TaxFilingDetailResponseDto": {
         "type": "object",
@@ -4155,11 +4579,21 @@
           },
           "status": {
             "type": "string",
-            "enum": ["PROCESSING", "READY", "FAILED", "SUBMITTED", "CANCELLED"]
+            "enum": [
+              "PROCESSING",
+              "READY",
+              "FAILED",
+              "SUBMITTED",
+              "CANCELLED"
+            ]
           },
           "submissionType": {
             "type": "string",
-            "enum": ["REGULAR", "CORRECTIVE", "FOLLOWUP"]
+            "enum": [
+              "REGULAR",
+              "CORRECTIVE",
+              "FOLLOWUP"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -4255,7 +4689,11 @@
             "description": "Owner display name (company name or person full name)"
           }
         },
-        "required": ["dbID", "dbType", "name"]
+        "required": [
+          "dbID",
+          "dbType",
+          "name"
+        ]
       },
       "TestLoginResponseDto": {
         "type": "object",
@@ -4285,7 +4723,12 @@
             ]
           }
         },
-        "required": ["success", "statusCode", "statusMessage", "owner"]
+        "required": [
+          "success",
+          "statusCode",
+          "statusMessage",
+          "owner"
+        ]
       },
       "SendMessageAttachmentDto": {
         "type": "object",
@@ -4305,7 +4748,10 @@
             "description": "MIME type of the attachment (defaults to text/xml)"
           }
         },
-        "required": ["filename", "content"]
+        "required": [
+          "filename",
+          "content"
+        ]
       },
       "SendMessageDto": {
         "type": "object",
@@ -4328,7 +4774,11 @@
             }
           }
         },
-        "required": ["recipientId", "subject", "attachments"]
+        "required": [
+          "recipientId",
+          "subject",
+          "attachments"
+        ]
       },
       "SendMessageResponseDto": {
         "type": "object",
@@ -4355,7 +4805,12 @@
             "description": "Human-readable ISDS dmStatusMessage"
           }
         },
-        "required": ["success", "messageId", "statusCode", "statusMessage"]
+        "required": [
+          "success",
+          "messageId",
+          "statusCode",
+          "statusMessage"
+        ]
       },
       "MessageStatusEventDto": {
         "type": "object",
@@ -4371,7 +4826,10 @@
             "description": "ISDS event description (dmEventDescr)"
           }
         },
-        "required": ["time", "description"]
+        "required": [
+          "time",
+          "description"
+        ]
       },
       "DataMessageDto": {
         "type": "object",
@@ -4388,7 +4846,10 @@
           },
           "direction": {
             "type": "string",
-            "enum": ["SENT", "RECEIVED"]
+            "enum": [
+              "SENT",
+              "RECEIVED"
+            ]
           },
           "recipient": {
             "type": "string",
@@ -4406,7 +4867,13 @@
           },
           "state": {
             "type": "string",
-            "enum": ["SENT", "DELIVERED", "SERVED", "FAILED", "UNKNOWN"]
+            "enum": [
+              "SENT",
+              "DELIVERED",
+              "SERVED",
+              "FAILED",
+              "UNKNOWN"
+            ]
           },
           "statusCode": {
             "type": "string",
@@ -4522,7 +4989,13 @@
           },
           "state": {
             "type": "string",
-            "enum": ["SENT", "DELIVERED", "SERVED", "FAILED", "UNKNOWN"],
+            "enum": [
+              "SENT",
+              "DELIVERED",
+              "SERVED",
+              "FAILED",
+              "UNKNOWN"
+            ],
             "description": "Derived lifecycle state"
           },
           "statusCode": {

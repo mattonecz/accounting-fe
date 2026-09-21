@@ -16,6 +16,5 @@ export type InvoiceResponseDtoVatClaimStatus =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InvoiceResponseDtoVatClaimStatus = {
   PENDING: 'PENDING',
-  CLAIMED: 'CLAIMED',
   SKIPPED: 'SKIPPED',
 } as const;

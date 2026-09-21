@@ -15,7 +15,7 @@ import { isInvoiceLocked } from '@/lib/invoiceLock';
 
 export type DeletableInvoice = Pick<
   InvoiceResponseDto,
-  'id' | 'number' | 'kind' | 'vatClaimStatus'
+  'id' | 'number' | 'kind' | 'isLocked'
 >;
 
 interface DeleteInvoiceDialogProps {

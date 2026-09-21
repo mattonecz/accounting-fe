@@ -59,7 +59,7 @@ export interface UpdateInvoiceDto {
   vatClaimRatio?: number;
   /** First day of the month in which VAT is claimed (YYYY-MM-01). */
   vatClaimMonth?: string;
-  /** CLAIMED is reserved for the future tax-filing workflow and cannot be set via API. */
+  /** Whether the input-VAT deduction should be claimed (PENDING) or not (SKIPPED). */
   vatClaimStatus?: UpdateInvoiceDtoVatClaimStatus;
   vatClaimNote?: string;
 }

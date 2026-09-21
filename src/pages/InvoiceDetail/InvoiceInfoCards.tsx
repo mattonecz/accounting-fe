@@ -5,6 +5,7 @@ import {
   InvoiceResponseDtoVatClaimStatus,
 } from '@/api/model';
 import { Lock } from 'lucide-react';
+import { isInvoiceLocked } from '@/lib/invoiceLock';
 import { cn } from '@/lib/utils';
 import { DetailCard, MetaField, SectionLabel } from './primitives';
 import { formatDate, formatCompanyAddress } from './utils';
@@ -15,6 +16,13 @@ interface InvoiceInfoCardsProps {
 
 export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
   const { t } = useTranslation();
+  // "Claimed" is no longer stored: a document the user wants to deduct that
+  // already sits in an active VAT filing is shown as included in it.
+  const claimDisplay =
+    invoice.vatClaimStatus === InvoiceResponseDtoVatClaimStatus.PENDING &&
+    isInvoiceLocked(invoice)
+      ? 'IN_FILING'
+      : invoice.vatClaimStatus;
   const counterparty = invoice.contactSnapshot;
   const isReceived = invoice.type === 'RECEIVED';
   const addressLines = formatCompanyAddress(counterparty);
@@ -145,18 +153,15 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
                 <span
                   className={cn(
                     'rounded-full px-2.5 py-0.5 text-xs font-medium',
-                    invoice.vatClaimStatus ===
-                      InvoiceResponseDtoVatClaimStatus.CLAIMED &&
+                    claimDisplay === 'IN_FILING' &&
                       'bg-success/15 text-success',
-                    invoice.vatClaimStatus ===
-                      InvoiceResponseDtoVatClaimStatus.SKIPPED &&
+                    claimDisplay === InvoiceResponseDtoVatClaimStatus.SKIPPED &&
                       'bg-muted text-muted-foreground',
-                    invoice.vatClaimStatus ===
-                      InvoiceResponseDtoVatClaimStatus.PENDING &&
+                    claimDisplay === InvoiceResponseDtoVatClaimStatus.PENDING &&
                       'bg-warning/15 text-warning',
                   )}
                 >
-                  {t(`invoices.vatClaim.status.${invoice.vatClaimStatus}`)}
+                  {t(`invoices.vatClaim.status.${claimDisplay}`)}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
@@ -181,15 +186,6 @@ export const InvoiceInfoCards = ({ invoice }: InvoiceInfoCardsProps) => {
                     mono
                   />
                 )}
-                {invoice.vatClaimStatus ===
-                  InvoiceResponseDtoVatClaimStatus.CLAIMED &&
-                  invoice.vatClaimedAt && (
-                    <MetaField
-                      label={t('invoices.vatClaim.claimedAt')}
-                      value={formatDate(invoice.vatClaimedAt)}
-                      mono
-                    />
-                  )}
                 {invoice.vatClaimNote != null && (
                   <MetaField
                     label={t('invoices.vatClaim.note.label')}

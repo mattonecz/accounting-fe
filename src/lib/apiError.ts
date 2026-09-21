@@ -26,7 +26,7 @@ export const getApiErrorText = (error: unknown): string | undefined => {
  * Anything unrecognised falls back to the caller's generic message.
  */
 const KNOWN_MESSAGES: [RegExp, string][] = [
-  [/locked by a submitted tax filing/i, 'errors.invoiceLocked'],
+  [/locked by an? (active|submitted) tax filing/i, 'errors.invoiceLocked'],
   [/same number already exists/i, 'errors.invoiceNumberTaken'],
   [/number cannot be cleared/i, 'errors.invoiceNumberRequired'],
   [/Submitted filings cannot be cancelled/i, 'errors.filingSubmitted'],

@@ -60,7 +60,7 @@ export interface InvoiceResponseDto {
   /** @nullable */
   vatClaimStatus?: InvoiceResponseDtoVatClaimStatus;
   /** @nullable */
-  vatClaimedAt?: string | null;
-  /** @nullable */
   vatClaimNote?: InvoiceResponseDtoVatClaimNote;
+  /** True while the invoice belongs to an active tax filing (processing, ready or submitted). Locked invoices cannot be updated or deleted. */
+  isLocked: boolean;
 }

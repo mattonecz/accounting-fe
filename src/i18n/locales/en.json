@@ -441,17 +441,16 @@
         "ratioRange": "Ratio must be in the interval (0, 1)"
       },
       "statusLabel": "VAT claim status",
-      "claimedAt": "Claimed on",
       "status": {
         "PENDING": "Pending",
-        "CLAIMED": "Claimed",
-        "SKIPPED": "Skipped"
+        "SKIPPED": "Skipped",
+        "IN_FILING": "Included in a VAT filing"
       }
     },
     "locked": {
-      "badge": "Locked by a submitted filing",
+      "badge": "Locked by a VAT filing",
       "title": "Invoice is locked",
-      "description": "This invoice is part of a submitted VAT filing. It cannot be edited or deleted until the filing is cancelled."
+      "description": "This invoice is part of a VAT filing that is being processed, waiting to be submitted or already submitted. It cannot be edited or deleted. A filing that has not been submitted can be cancelled; a submitted one cannot."
     },
     "delete": {
       "title": "Delete invoice?",
@@ -652,9 +651,9 @@
       "contactLocked": "This document is linked to a contact — the supplier can only be changed by picking another contact."
     },
     "locked": {
-      "badge": "Locked by a submitted filing",
+      "badge": "Locked by a VAT filing",
       "title": "Document is locked",
-      "description": "This document is part of a submitted VAT filing. It cannot be edited or deleted until the filing is cancelled."
+      "description": "This document is part of a VAT filing that is being processed, waiting to be submitted or already submitted. It cannot be edited or deleted. A filing that has not been submitted can be cancelled; a submitted one cannot."
     },
     "delete": {
       "title": "Delete simplified document?",
@@ -969,11 +968,11 @@
       "cancelFiling": "Cancel filing",
       "cancelling": "Cancelling…",
       "cancelConfirmTitle": "Cancel filing?",
-      "cancelConfirmDescription": "The filing for {{period}} will be marked as cancelled. Its documents stay available for a new filing.",
+      "cancelConfirmDescription": "The filing for {{period}} will be cancelled. Its documents are unlocked, so they can be edited and included in a new filing.",
       "cancelSuccess": "Filing cancelled.",
       "cancelError": "Cancelling the filing failed.",
       "submitConfirmTitle": "Submit the VAT return via data box?",
-      "submitConfirmDescription": "The return for {{period}} will be sent to the tax office via data box. This cannot be undone and the documents in the filing become locked against edits and deletion.",
+      "submitConfirmDescription": "The return for {{period}} will be sent to the tax office via data box. This cannot be undone — the filing can no longer be cancelled and its documents stay locked for good.",
       "submitConfirm": "Submit return"
     }
   },
@@ -1443,7 +1442,7 @@
     "receiptFailedMessage": "Receipt parsing failed."
   },
   "errors": {
-    "invoiceLocked": "This document is locked by a submitted VAT filing. Cancel the filing first.",
+    "invoiceLocked": "This document is part of a VAT filing and cannot be edited or deleted.",
     "invoiceNumberTaken": "A document with this number already exists.",
     "invoiceNumberRequired": "The document number cannot be cleared.",
     "filingSubmitted": "Submitted filings cannot be cancelled.",

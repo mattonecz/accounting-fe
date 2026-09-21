@@ -442,17 +442,16 @@
         "ratioRange": "Poměr musí být v intervalu (0, 1)"
       },
       "statusLabel": "Stav odpočtu DPH",
-      "claimedAt": "Uplatněno dne",
       "status": {
         "PENDING": "Čeká na uplatnění",
-        "CLAIMED": "Uplatněno",
-        "SKIPPED": "Přeskočeno"
+        "SKIPPED": "Přeskočeno",
+        "IN_FILING": "Zahrnuto v přiznání"
       }
     },
     "locked": {
-      "badge": "Uzamčeno podaným přiznáním",
+      "badge": "Uzamčeno přiznáním k DPH",
       "title": "Faktura je uzamčená",
-      "description": "Faktura je zahrnutá v podaném přiznání k DPH. Úpravy ani smazání nejsou možné, dokud podání nestornujete."
+      "description": "Faktura je zahrnutá v přiznání k DPH, které se zpracovává, čeká na odeslání nebo už bylo odesláno. Upravit ani smazat ji nejde. Neodeslané podání můžete stornovat, odeslané už ne."
     },
     "delete": {
       "title": "Smazat fakturu?",
@@ -653,9 +652,9 @@
       "contactLocked": "Doklad je navázaný na kontakt – dodavatele lze změnit jen výběrem jiného kontaktu."
     },
     "locked": {
-      "badge": "Uzamčeno podaným přiznáním",
+      "badge": "Uzamčeno přiznáním k DPH",
       "title": "Doklad je uzamčený",
-      "description": "Doklad je zahrnutý v podaném přiznání k DPH. Úpravy ani smazání nejsou možné, dokud podání nestornujete."
+      "description": "Doklad je zahrnutý v přiznání k DPH, které se zpracovává, čeká na odeslání nebo už bylo odesláno. Upravit ani smazat ho nejde. Neodeslané podání můžete stornovat, odeslané už ne."
     },
     "delete": {
       "title": "Smazat zjednodušený doklad?",
@@ -972,11 +971,11 @@
       "cancelFiling": "Stornovat podání",
       "cancelling": "Stornuji…",
       "cancelConfirmTitle": "Stornovat podání?",
-      "cancelConfirmDescription": "Podání za období {{period}} bude označené jako stornované. Doklady v něm zůstanou dostupné pro nové podání.",
+      "cancelConfirmDescription": "Podání za období {{period}} bude stornované. Doklady v něm se odemknou, takže je půjde upravit a zahrnout do nového podání.",
       "cancelSuccess": "Podání bylo stornované.",
       "cancelError": "Storno podání se nepodařilo.",
       "submitConfirmTitle": "Odeslat přiznání datovou schránkou?",
-      "submitConfirmDescription": "Přiznání za období {{period}} se odešle datovou schránkou na finanční úřad. Odeslání nelze vzít zpět a doklady v podání se uzamknou proti úpravám i smazání.",
+      "submitConfirmDescription": "Přiznání za období {{period}} se odešle datovou schránkou na finanční úřad. Odeslání nelze vzít zpět — podání pak už nepůjde stornovat a doklady v něm zůstanou uzamčené natrvalo.",
       "submitConfirm": "Odeslat přiznání"
     }
   },
@@ -1452,7 +1451,7 @@
     "receiptFailedMessage": "Parsování účtenky selhalo."
   },
   "errors": {
-    "invoiceLocked": "Doklad je uzamčený podaným přiznáním k DPH. Nejdřív stornujte podání.",
+    "invoiceLocked": "Doklad je zahrnutý v přiznání k DPH, proto ho nelze upravit ani smazat.",
     "invoiceNumberTaken": "Doklad s tímto číslem už ve firmě existuje.",
     "invoiceNumberRequired": "Číslo dokladu nelze odebrat.",
     "filingSubmitted": "Odeslané podání nelze stornovat.",
