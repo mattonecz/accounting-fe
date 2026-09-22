@@ -1595,6 +1595,48 @@
         ]
       }
     },
+    "/documents/invoice/parse": {
+      "post": {
+        "description": "Images are normalised first; a PDF is sent to the model as is.",
+        "operationId": "documentParseInvoice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseInvoiceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Parse an invoice image or PDF into a prefilled issued or received invoice",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
     "/vat/export": {
       "get": {
         "operationId": "vatExport",
@@ -4344,6 +4386,10 @@
           "totalTokens": {
             "type": "number"
           },
+          "estimatedCostUsd": {
+            "type": "number",
+            "description": "Rough USD cost of the call"
+          },
           "validationErrors": {
             "type": "array",
             "items": {
@@ -4357,7 +4403,8 @@
           "model",
           "inputTokens",
           "outputTokens",
-          "totalTokens"
+          "totalTokens",
+          "estimatedCostUsd"
         ]
       },
       "ParseReceiptResponseDto": {
@@ -4365,6 +4412,244 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ReceiptParseDataDto"
+          },
+          "llmCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceiptLlmCallDto"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "llmCalls"
+        ]
+      },
+      "ParsedInvoiceType": {
+        "type": "string",
+        "enum": [
+          "ISSUED",
+          "RECEIVED"
+        ]
+      },
+      "ParsedInvoiceTypeSource": {
+        "type": "string",
+        "enum": [
+          "MATCH",
+          "MODEL",
+          "DEFAULT"
+        ],
+        "description": "How type was decided: the company's own IČO/DIČ on the document (MATCH), the model's guess (MODEL) or the RECEIVED default (DEFAULT)"
+      },
+      "ParsedPartyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ico": {
+            "type": "string",
+            "nullable": true,
+            "description": "IČO"
+          },
+          "dic": {
+            "type": "string",
+            "nullable": true,
+            "description": "DIČ"
+          },
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "psc": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 3166-1 alpha-2, e.g. CZ"
+          }
+        },
+        "required": [
+          "name",
+          "ico",
+          "dic",
+          "street",
+          "city",
+          "psc",
+          "country"
+        ]
+      },
+      "ParsedBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "nullable": true,
+            "description": "Czech format 123456789/0100"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "swift": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "number",
+          "iban",
+          "swift"
+        ]
+      },
+      "ParsedInvoiceItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Unit price without VAT"
+          },
+          "vatRate": {
+            "type": "number",
+            "nullable": true,
+            "description": "VAT rate %"
+          }
+        },
+        "required": [
+          "name",
+          "quantity",
+          "unit",
+          "unitPrice",
+          "vatRate"
+        ]
+      },
+      "InvoiceParseDataDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParsedInvoiceType"
+              }
+            ]
+          },
+          "typeSource": {
+            "description": "How type was decided: the company's own IČO/DIČ on the document (MATCH), the model's guess (MODEL) or the RECEIVED default (DEFAULT)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParsedInvoiceTypeSource"
+              }
+            ]
+          },
+          "counterparty": {
+            "description": "The other party: supplier of a received invoice, customer of an issued one",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParsedPartyDto"
+              }
+            ]
+          },
+          "documentNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "variableSymbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "issueDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "YYYY-MM-DD"
+          },
+          "taxDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "DUZP, YYYY-MM-DD"
+          },
+          "dueDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "YYYY-MM-DD"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "total": {
+            "type": "number",
+            "nullable": true
+          },
+          "vat": {
+            "type": "number",
+            "nullable": true
+          },
+          "vatBreakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VatBreakdownItemDto"
+            }
+          },
+          "bankAccount": {
+            "nullable": true,
+            "description": "The supplier's account; received invoices only",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParsedBankAccountDto"
+              }
+            ]
+          },
+          "reverseCharge": {
+            "type": "boolean"
+          },
+          "items": {
+            "description": "Line items; issued invoices only",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParsedInvoiceItemDto"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "typeSource",
+          "counterparty",
+          "documentNumber",
+          "variableSymbol",
+          "issueDate",
+          "taxDate",
+          "dueDate",
+          "currency",
+          "total",
+          "vat",
+          "vatBreakdown",
+          "bankAccount",
+          "reverseCharge",
+          "items"
+        ]
+      },
+      "ParseInvoiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InvoiceParseDataDto"
           },
           "llmCalls": {
             "type": "array",

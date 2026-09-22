@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
 import { TriangleAlert, UserPlus, X } from 'lucide-react';
@@ -35,6 +36,12 @@ interface InvoiceContactFieldProps<T extends ContactPickerValues> {
   label: string;
   placeholder: string;
   requiredMessage: string;
+  /**
+   * Prefilled from a parsed document: a pending contact whose IČO matches an
+   * existing contact is selected without asking, also once the contact list
+   * finishes loading after the form mounted.
+   */
+  autoSelectMatch?: boolean;
 }
 
 /**
@@ -49,6 +56,7 @@ export const InvoiceContactField = <T extends ContactPickerValues>({
   label,
   placeholder,
   requiredMessage,
+  autoSelectMatch = false,
 }: InvoiceContactFieldProps<T>) => {
   const { t } = useTranslation();
   // The field paths below exist on every form that satisfies
@@ -92,6 +100,12 @@ export const InvoiceContactField = <T extends ContactPickerValues>({
   };
 
   const duplicate = findContactByIco(contacts, pendingContact?.ico);
+
+  useEffect(() => {
+    if (!autoSelectMatch || !duplicate) return;
+    form.setValue('contactId', duplicate.id, { shouldValidate: true });
+    form.setValue('pendingContact', null);
+  }, [autoSelectMatch, duplicate, form]);
 
   const cancelPendingContact = () => {
     form.setValue('pendingContact', null, { shouldDirty: true });

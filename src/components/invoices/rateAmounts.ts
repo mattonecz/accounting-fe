@@ -1,4 +1,4 @@
-import type { InvoiceItemDto } from '@/api/model';
+import type { InvoiceItemDto, VatBreakdownItemDto } from '@/api/model';
 import { parseRateItemName, rateItemName } from '@/lib/simpleInvoiceItems';
 
 // Amounts-by-VAT-rate logic shared across the received-invoice and simplified-
@@ -144,4 +144,62 @@ export const invoiceItemsToRates = (
     };
   }
   return rows;
+};
+
+/** Amounts read from a document by the AI parse endpoints (receipt or invoice). */
+export interface ParsedAmounts {
+  vatBreakdown?: VatBreakdownItemDto[] | null;
+  total?: number | null;
+  vat?: number | null;
+}
+
+/**
+ * Rate rows prefilled from a parsed document: the per-rate breakdown when the
+ * document prints one, otherwise a single row derived from total and VAT.
+ * `unknownVatRate` files a total whose VAT is unknown under that rate as a
+ * gross amount; without it the total is treated as a base at 21 % (the
+ * receipt flow's historical behaviour).
+ */
+export const ratesFromParsedAmounts = (
+  parsed: ParsedAmounts,
+  options: { unknownVatRate?: number } = {},
+): RateRowValue[] => {
+  const totals = new Map<number, number>(DEFAULT_RATES.map((r) => [r, 0]));
+  const addTotal = (rate: number, total: number) =>
+    totals.set(rate, round2((totals.get(rate) ?? 0) + total));
+
+  const breakdown = parsed.vatBreakdown ?? [];
+  if (breakdown.length > 0) {
+    for (const row of breakdown) {
+      const rate = Number(row.rate) || 0;
+      const base =
+        row.base != null
+          ? Number(row.base)
+          : row.amount != null && rate > 0
+            ? round2((Number(row.amount) * 100) / rate)
+            : 0;
+      const vat = row.amount != null ? Number(row.amount) : (base * rate) / 100;
+      addTotal(rate, round2(base + vat));
+    }
+  } else {
+    const total = parsed.total ?? 0;
+    const vat = parsed.vat ?? 0;
+    if (total > 0 && vat > 0 && total > vat) {
+      const base = round2(total - vat);
+      const derivedRate = base > 0 ? Math.round((vat / base) * 100) : 0;
+      addTotal(derivedRate, round2(total));
+    } else if (total > 0 && options.unknownVatRate !== undefined) {
+      addTotal(options.unknownVatRate, round2(total));
+    } else if (total > 0) {
+      addTotal(21, round2(total * 1.21));
+    }
+  }
+
+  return [...totals.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([vatRate, total]) =>
+      total > 0
+        ? { vatRate, ...recomputeRow(vatRate, 'total', String(total)) }
+        : { vatRate, base: '', vat: '', total: '' },
+    );
 };

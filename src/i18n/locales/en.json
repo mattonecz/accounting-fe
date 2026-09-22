@@ -1461,5 +1461,26 @@
     "invoiceContactLinked": "This document is linked to a contact — change the supplier by picking another contact.",
     "supplierRequired": "A simplified document needs a supplier.",
     "contactIcoTaken": "A contact with this IČO already exists."
+  },
+  "invoiceUpload": {
+    "button": "Upload invoice",
+    "processing": "Processing invoice…",
+    "successIssued": "Recognised as an issued invoice. Check the prefilled details.",
+    "successReceived": "Recognised as a received invoice. Check the prefilled details.",
+    "error": "The invoice could not be processed.",
+    "fallbackItem": "Supply per invoice ({{rate}} %)"
+  },
+  "aiParse": {
+    "stats": {
+      "title": "Extracted with AI",
+      "model": "Model",
+      "attempts": "Attempts",
+      "duration": "Duration",
+      "inputTokens": "Input tokens",
+      "outputTokens": "Output tokens",
+      "totalTokens": "Total tokens",
+      "cost": "Estimated cost",
+      "validationErrors": "The totals check failed: {{errors}}. Review the details carefully."
+    }
   }
 }

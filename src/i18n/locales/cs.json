@@ -1470,5 +1470,26 @@
     "invoiceContactLinked": "Doklad je navázaný na kontakt – dodavatele lze změnit jen výběrem jiného kontaktu.",
     "supplierRequired": "U zjednodušeného dokladu je potřeba vyplnit dodavatele.",
     "contactIcoTaken": "Kontakt s tímto IČO už existuje."
+  },
+  "invoiceUpload": {
+    "button": "Nahrát fakturu",
+    "processing": "Zpracovávám fakturu…",
+    "successIssued": "Rozpoznána vydaná faktura. Zkontrolujte předvyplněné údaje.",
+    "successReceived": "Rozpoznána přijatá faktura. Zkontrolujte předvyplněné údaje.",
+    "error": "Zpracování faktury se nepodařilo.",
+    "fallbackItem": "Plnění dle faktury ({{rate}} %)"
+  },
+  "aiParse": {
+    "stats": {
+      "title": "Vytěženo pomocí AI",
+      "model": "Model",
+      "attempts": "Pokusy",
+      "duration": "Trvání",
+      "inputTokens": "Vstupní tokeny",
+      "outputTokens": "Výstupní tokeny",
+      "totalTokens": "Celkem tokenů",
+      "cost": "Odhad ceny",
+      "validationErrors": "Kontrola součtů neprošla: {{errors}}. Údaje pečlivě zkontrolujte."
+    }
   }
 }

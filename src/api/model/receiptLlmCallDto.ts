@@ -13,5 +13,7 @@ export interface ReceiptLlmCallDto {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
+  /** Rough USD cost of the call */
+  estimatedCostUsd: number;
   validationErrors?: string[];
 }

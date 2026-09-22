@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import i18n from '@/i18n';
-import { addDays } from '@/lib/formatters';
+import { addDays, daysBetween } from '@/lib/formatters';
+import {
+  parsedCurrency,
+  parsedDate,
+  partyToPendingContact,
+  readParsedInvoiceState,
+} from '@/lib/parsedDocument';
+import { round2 } from '@/components/invoices/rateAmounts';
 import {
   CreateContactDto,
   CreateInvoiceDto,
@@ -13,6 +20,8 @@ import {
   CreateInvoiceDtoVatClaimType,
   CreateInvoiceDtoVatMode,
   InvoiceBankAccountSnapshotDto,
+  InvoiceItemDto,
+  InvoiceParseDataDto,
 } from '@/api/model';
 
 export type InvoiceFormValues = CreateInvoiceDto & {
@@ -63,9 +72,63 @@ const buildBankSnapshot = (
   return hasAny ? cleaned : undefined;
 };
 
+/**
+ * Line items of an AI-parsed issued invoice. When the model returned none
+ * (e.g. it misjudged the direction), one line per VAT rate keeps the amounts.
+ */
+const itemsFromParsed = (parsed: InvoiceParseDataDto): InvoiceItemDto[] => {
+  if (parsed.items.length > 0) {
+    return parsed.items.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit ?? undefined,
+      unitPrice: item.unitPrice,
+      total: round2(item.quantity * item.unitPrice),
+      vatRate: item.vatRate ?? undefined,
+    }));
+  }
+  return parsed.vatBreakdown
+    .filter((row) => row.base != null && row.base > 0)
+    .map((row) => ({
+      name: i18n.t('invoiceUpload.fallbackItem', { rate: row.rate }),
+      quantity: 1,
+      unitPrice: row.base ?? 0,
+      total: row.base ?? 0,
+      vatRate: row.rate,
+    }));
+};
+
+/** Overrides of the blank form for an AI-parsed issued invoice. */
+const defaultsFromParsed = (
+  parsed: InvoiceParseDataDto,
+  today: string,
+): Partial<InvoiceFormValues> => {
+  const createdDate = parsedDate(parsed.issueDate) ?? today;
+  const dueDate = parsedDate(parsed.dueDate);
+  const items = itemsFromParsed(parsed);
+  return {
+    createdDate,
+    duzpDate: parsedDate(parsed.taxDate) ?? createdDate,
+    ...(dueDate
+      ? { dueDate, paymentDays: daysBetween(createdDate, dueDate) }
+      : {}),
+    ...(parsedCurrency(parsed.currency)
+      ? { currency: parsedCurrency(parsed.currency) }
+      : {}),
+    ...(parsed.reverseCharge
+      ? { vatMode: CreateInvoiceDtoVatMode.REVERSE_CHARGE }
+      : {}),
+    ...(items.length > 0 ? { items } : {}),
+    pendingContact: partyToPendingContact(parsed.counterparty),
+  };
+};
+
 export const useInvoiceForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  // Read once, like the form's default values it seeds.
+  const [parsedState] = useState(() => readParsedInvoiceState(location.state));
   const isReceived = searchParams.get('type') === 'received';
   const invoiceType = isReceived
     ? CreateInvoiceDtoType.RECEIVED
@@ -113,12 +176,18 @@ export const useInvoiceForm = () => {
       vatClaimMonth: new Date().toISOString().slice(0, 7),
       vatClaimNote: '',
       pendingContact: null,
+      ...(parsedState
+        ? defaultsFromParsed(parsedState.parsedInvoice, today)
+        : {}),
     },
   });
 
   // Sync per-item vatRate once the profile loads (the dropdown for vatMode is
   // hidden for non-VAT payers, and submitInvoice coerces vatMode itself).
   useEffect(() => {
+    // Wait for the profile: before it loads isVatPayer reads false, which
+    // would strip rates prefilled from a parsed invoice.
+    if (!companyResponse) return;
     const items = form.getValues('items') ?? [];
     items.forEach((item, index) => {
       if (isVatPayer && item.vatRate == null) {
@@ -128,7 +197,7 @@ export const useInvoiceForm = () => {
         form.setValue(`items.${index}.vatRate`, undefined);
       }
     });
-  }, [isVatPayer, form]);
+  }, [isVatPayer, companyResponse, form]);
 
   const selectedCurrency = form.watch('currency') || 'CZK';
   const currencyLabel = CURRENCY_SYMBOLS[selectedCurrency] || selectedCurrency;
@@ -345,6 +414,7 @@ export const useInvoiceForm = () => {
   };
 
   return {
+    parsedState,
     form,
     fieldArray,
     submitMode,

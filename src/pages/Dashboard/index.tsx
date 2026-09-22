@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { PageLayout } from '@/components/PageLayout';
+import { UploadInvoiceButton } from '@/components/UploadInvoiceButton';
 import { UploadReceiptButton } from '@/components/UploadReceiptButton';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -150,6 +151,8 @@ export default function Dashboard() {
               {action.label}
             </Button>
           ))}
+          {/* Opens the issued or received form, whichever the AI recognises. */}
+          <UploadInvoiceButton size="sm" className="gap-1.5" />
           <UploadReceiptButton size="sm" />
         </div>
       </div>

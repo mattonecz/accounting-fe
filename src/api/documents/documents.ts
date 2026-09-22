@@ -17,7 +17,9 @@ import * as axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import type {
+  DocumentParseInvoiceBody,
   DocumentParseReceiptBody,
+  ParseInvoiceResponseDto,
   ParseReceiptResponseDto,
 } from '.././model';
 
@@ -103,6 +105,92 @@ export const useDocumentParseReceipt = <
   TContext
 > => {
   const mutationOptions = getDocumentParseReceiptMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * Images are normalised first; a PDF is sent to the model as is.
+ * @summary Parse an invoice image or PDF into a prefilled issued or received invoice
+ */
+export const documentParseInvoice = (
+  documentParseInvoiceBody: DocumentParseInvoiceBody,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<ParseInvoiceResponseDto>> => {
+  const formData = new FormData();
+  formData.append(`file`, documentParseInvoiceBody.file);
+
+  return axios.default.post(`/documents/invoice/parse`, formData, options);
+};
+
+export const getDocumentParseInvoiceMutationOptions = <
+  TError = AxiosError<ParseInvoiceResponseDto>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof documentParseInvoice>>,
+    TError,
+    { data: DocumentParseInvoiceBody },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof documentParseInvoice>>,
+  TError,
+  { data: DocumentParseInvoiceBody },
+  TContext
+> => {
+  const mutationKey = ['documentParseInvoice'];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof documentParseInvoice>>,
+    { data: DocumentParseInvoiceBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return documentParseInvoice(data, axiosOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DocumentParseInvoiceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof documentParseInvoice>>
+>;
+export type DocumentParseInvoiceMutationBody = DocumentParseInvoiceBody;
+export type DocumentParseInvoiceMutationError =
+  AxiosError<ParseInvoiceResponseDto>;
+
+/**
+ * @summary Parse an invoice image or PDF into a prefilled issued or received invoice
+ */
+export const useDocumentParseInvoice = <
+  TError = AxiosError<ParseInvoiceResponseDto>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof documentParseInvoice>>,
+      TError,
+      { data: DocumentParseInvoiceBody },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof documentParseInvoice>>,
+  TError,
+  { data: DocumentParseInvoiceBody },
+  TContext
+> => {
+  const mutationOptions = getDocumentParseInvoiceMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

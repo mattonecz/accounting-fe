@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -41,6 +41,7 @@ import type {
   ContactResponseDto,
   ContactSnapshotDto,
   InvoiceItemDto,
+  ReceiptLlmCallDto,
   ReceiptParseDataDto,
 } from '@/api/model';
 import {
@@ -53,8 +54,8 @@ import { formatMoney } from '@/lib/formatters';
 import { rateItemName } from '@/lib/simpleInvoiceItems';
 import { cn } from '@/lib/utils';
 import {
-  DEFAULT_RATES,
   getDefaultRateRows,
+  ratesFromParsedAmounts,
   recomputeRow,
   round2,
   sumRates,
@@ -62,8 +63,8 @@ import {
   type RateRowValue,
 } from '@/components/invoices/rateAmounts';
 import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
+import { ParsedDocumentStats } from '@/components/ParsedDocumentStats';
 
-const DEFAULT_VAT_RATE = 21;
 // Legal limit for a simplified tax document (zjednodušený daňový doklad).
 const MAX_TOTAL_WITH_VAT = 10000;
 
@@ -105,47 +106,6 @@ const getDefaultFormValues = (): FormValues => ({
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-const buildRatesFromReceipt = (
-  receipt: ReceiptParseDataDto,
-): RateRowValue[] => {
-  const totals = new Map<number, number>(DEFAULT_RATES.map((r) => [r, 0]));
-  const addTotal = (rate: number, total: number) =>
-    totals.set(rate, round2((totals.get(rate) ?? 0) + total));
-
-  const breakdown = receipt.vatBreakdown ?? [];
-  if (breakdown.length > 0) {
-    for (const row of breakdown) {
-      const rate = Number(row.rate) || 0;
-      const base =
-        row.base != null
-          ? Number(row.base)
-          : row.amount != null && rate > 0
-            ? round2((Number(row.amount) * 100) / rate)
-            : 0;
-      const vat = row.amount != null ? Number(row.amount) : (base * rate) / 100;
-      addTotal(rate, round2(base + vat));
-    }
-  } else {
-    const total = receipt.total ?? 0;
-    const vat = receipt.vat ?? 0;
-    if (total > 0 && vat > 0 && total > vat) {
-      const base = round2(total - vat);
-      const derivedRate = base > 0 ? Math.round((vat / base) * 100) : 0;
-      addTotal(derivedRate, round2(total));
-    } else if (total > 0) {
-      addTotal(DEFAULT_VAT_RATE, round2(total * (1 + DEFAULT_VAT_RATE / 100)));
-    }
-  }
-
-  return [...totals.entries()]
-    .sort((a, b) => b[0] - a[0])
-    .map(([vatRate, total]) =>
-      total > 0
-        ? { vatRate, ...recomputeRow(vatRate, 'total', String(total)) }
-        : { vatRate, base: '', vat: '', total: '' },
-    );
-};
-
 const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
   const base = getDefaultFormValues();
   const date =
@@ -160,7 +120,7 @@ const buildDefaultsFromReceipt = (receipt: ReceiptParseDataDto): FormValues => {
     number: receipt.documentNumber?.trim() ?? '',
     createdDate: date,
     duzpDate: date,
-    rates: buildRatesFromReceipt(receipt),
+    rates: ratesFromParsedAmounts(receipt),
     description: receipt.description?.trim() ?? '',
     vatClaimMonth: date.slice(0, 7),
   };
@@ -176,6 +136,12 @@ const CreateSimpleInvoice = () => {
   const receiptFromState = (
     location.state as { receipt?: ReceiptParseDataDto } | null
   )?.receipt;
+  // Token usage of the AI extraction, shown while checking the prefill.
+  const [receiptLlmCalls] = useState(
+    () =>
+      (location.state as { llmCalls?: ReceiptLlmCallDto[] } | null)?.llmCalls ??
+      [],
+  );
 
   const form = useForm<FormValues>({
     defaultValues: receiptFromState
@@ -428,6 +394,8 @@ const CreateSimpleInvoice = () => {
               </div>
             </div>
           </div>
+
+          <ParsedDocumentStats llmCalls={receiptLlmCalls} />
 
           {/* Main card: description + dates + amounts */}
           <Card className="border-border/60 p-5 shadow-sm">

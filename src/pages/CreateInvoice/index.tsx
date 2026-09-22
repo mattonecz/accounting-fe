@@ -34,6 +34,7 @@ import { useInvoiceForm } from '@/components/invoices/useInvoiceForm';
 import CreateIncomingInvoice from '@/pages/CreateIncomingInvoice';
 import { InvoiceItemsEditor } from '@/components/invoices/InvoiceItemsEditor';
 import { InvoiceContactField } from '@/components/invoices/InvoiceContactField';
+import { ParsedDocumentStats } from '@/components/ParsedDocumentStats';
 import {
   CreateInvoiceDtoPaymentMethod,
   CreateInvoiceDtoVatClaimType,
@@ -46,6 +47,7 @@ const CreateIssuedInvoice = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const {
+    parsedState,
     form,
     fieldArray,
     isCreatingInvoice,
@@ -197,6 +199,10 @@ const CreateIssuedInvoice = () => {
             </div>
           </div>
 
+          {parsedState && (
+            <ParsedDocumentStats llmCalls={parsedState.llmCalls} />
+          )}
+
           {/* Customer / supplier */}
           <Card className="border-border/60 p-5 shadow-sm">
             <InvoiceContactField
@@ -211,6 +217,7 @@ const CreateIssuedInvoice = () => {
               requiredMessage={t('validation.required', {
                 field: contactLabel,
               })}
+              autoSelectMatch={!!parsedState}
             />
           </Card>
 

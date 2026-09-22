@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import {
@@ -38,7 +38,11 @@ import { useListContacts } from '@/api/contacts/contacts';
 import { useInvoiceCreate } from '@/api/invoices/invoices';
 import { useCompanyGet } from '@/api/companies/companies';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ContactResponseDto, CreateContactDto } from '@/api/model';
+import type {
+  ContactResponseDto,
+  CreateContactDto,
+  InvoiceParseDataDto,
+} from '@/api/model';
 import {
   CreateInvoiceDtoType,
   CreateInvoiceDtoVatClaimType,
@@ -48,6 +52,7 @@ import { addDays, formatMoney } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import {
   getDefaultRateRows,
+  ratesFromParsedAmounts,
   ratesToInvoiceItems,
   recomputeRow,
   sumRates,
@@ -57,6 +62,13 @@ import {
 import { RateAmountsTable } from '@/components/invoices/RateAmountsTable';
 import { InvoiceContactField } from '@/components/invoices/InvoiceContactField';
 import { useResolveContactId } from '@/components/invoices/useResolveContactId';
+import { ParsedDocumentStats } from '@/components/ParsedDocumentStats';
+import {
+  parsedCurrency,
+  parsedDate,
+  partyToPendingContact,
+  readParsedInvoiceState,
+} from '@/lib/parsedDocument';
 
 const DEFAULT_PAYMENT_DAYS = 14;
 
@@ -128,13 +140,58 @@ const trimOrUndefined = (value: string | undefined) => {
   return trimmed ? trimmed : undefined;
 };
 
+/** Form values prefilled from an AI-parsed received invoice. */
+const buildDefaultsFromParsed = (parsed: InvoiceParseDataDto): FormValues => {
+  const base = getDefaultValues();
+  const createdDate = parsedDate(parsed.issueDate) ?? base.createdDate;
+  const duzpDate = parsedDate(parsed.taxDate) ?? createdDate;
+  const dueDate =
+    parsedDate(parsed.dueDate) ?? addDays(createdDate, DEFAULT_PAYMENT_DAYS);
+  return {
+    ...base,
+    pendingContact: partyToPendingContact(parsed.counterparty),
+    originalNumber: parsed.documentNumber ?? '',
+    createdDate,
+    duzpDate,
+    dueDate,
+    paidDate: dueDate,
+    currency: parsedCurrency(parsed.currency) ?? base.currency,
+    vatMode: parsed.reverseCharge
+      ? CreateInvoiceDtoVatMode.REVERSE_CHARGE
+      : base.vatMode,
+    // A supplier's total with unknown VAT is most likely from a non-payer.
+    rates: ratesFromParsedAmounts(parsed, { unknownVatRate: 0 }),
+    variableSymbol: parsed.variableSymbol ?? '',
+    bankNumber: parsed.bankAccount?.number ?? '',
+    bankIban: parsed.bankAccount?.iban ?? '',
+    bankSwift: parsed.bankAccount?.swift ?? '',
+    vatClaimMonth: duzpDate.slice(0, 7),
+  };
+};
+
 const CreateIncomingInvoice = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const form = useForm<FormValues>({ defaultValues: getDefaultValues() });
-  const [symbolsOpen, setSymbolsOpen] = useState(false);
+  const location = useLocation();
+  // Read once: "create another" resets the form to blank, and the stats
+  // belong to the document that was uploaded, not to later invoices.
+  const [parsedState, setParsedState] = useState(() =>
+    readParsedInvoiceState(location.state),
+  );
+  const parsedInvoice = parsedState?.parsedInvoice;
+
+  const form = useForm<FormValues>({
+    defaultValues: parsedInvoice
+      ? buildDefaultsFromParsed(parsedInvoice)
+      : getDefaultValues(),
+  });
+  // Payment symbols and the supplier's bank sit in a collapsed section; open
+  // it when the document filled any of them, so they get checked too.
+  const [symbolsOpen, setSymbolsOpen] = useState(
+    () => !!(parsedInvoice?.variableSymbol || parsedInvoice?.bankAccount),
+  );
   const createAnotherRef = useRef(false);
 
   const { activeCompanyId } = useAuth();
@@ -244,6 +301,7 @@ const CreateIncomingInvoice = () => {
           createAnotherRef.current = false;
           form.reset(getDefaultValues());
           setSymbolsOpen(false);
+          setParsedState(undefined);
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
@@ -372,6 +430,10 @@ const CreateIncomingInvoice = () => {
             </div>
           </div>
 
+          {parsedState && (
+            <ParsedDocumentStats llmCalls={parsedState.llmCalls} />
+          )}
+
           {/* Supplier */}
           <Card className="border-border/60 p-5 shadow-sm">
             <InvoiceContactField
@@ -380,6 +442,7 @@ const CreateIncomingInvoice = () => {
               label={t('invoices.fields.supplier')}
               placeholder={t('invoices.placeholders.selectSupplier')}
               requiredMessage={t('invoices.validation.supplierRequired')}
+              autoSelectMatch={!!parsedInvoice}
             />
           </Card>
 

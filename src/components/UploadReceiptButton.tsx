@@ -31,7 +31,10 @@ export const UploadReceiptButton = ({
       onSuccess: (response) => {
         enqueueSnackbar(t('receiptUpload.success'), { variant: 'success' });
         navigate('/invoices/simple/create', {
-          state: { receipt: response.data.data },
+          state: {
+            receipt: response.data.data,
+            llmCalls: response.data.llmCalls,
+          },
         });
       },
       onError: () => {

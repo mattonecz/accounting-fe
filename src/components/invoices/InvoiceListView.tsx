@@ -59,6 +59,7 @@ import {
 import { getInvoiceDisplayStatus } from '@/lib/invoiceStatus';
 import { isInvoiceLocked } from '@/lib/invoiceLock';
 import { formatDate, formatMoney } from '@/lib/formatters';
+import { UploadInvoiceButton } from '@/components/UploadInvoiceButton';
 import { cn } from '@/lib/utils';
 
 type Variant = 'issued' | 'received';
@@ -425,13 +426,16 @@ export function InvoiceListView({ variant }: InvoiceListViewProps) {
               {t(config.descriptionKey)}
             </p>
           </div>
-          <Button
-            className="gap-2 sm:shrink-0"
-            onClick={() => navigate(config.createPath)}
-          >
-            <Plus className="h-4 w-4" />
-            {t('invoices.actions.create')}
-          </Button>
+          <div className="flex flex-wrap gap-2 sm:shrink-0">
+            <UploadInvoiceButton />
+            <Button
+              className="gap-2"
+              onClick={() => navigate(config.createPath)}
+            >
+              <Plus className="h-4 w-4" />
+              {t('invoices.actions.create')}
+            </Button>
+          </div>
         </div>
       </header>
 
